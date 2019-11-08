@@ -1,9 +1,21 @@
 package pm.eclipse.editbox.impl;
 
+/*
+ * TODO: Martin, you will have to adapt all usages of boxes to fit the new Format:
+ * old format: List<Box>
+ * new format List<List<Box>> 
+ * newer Format because we want to have different Boxes for different Requirements.
+ * 
+ * Next step afterwards will be the Change Management. Idea: react to Editor input.
+ * 
+ * And Afterwards you will have to worry about colours.
+ */
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
@@ -24,11 +36,19 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Pattern;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPathEditorInput;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
 import pm.eclipse.editbox.Box;
 import pm.eclipse.editbox.EditBox;
@@ -36,6 +56,7 @@ import pm.eclipse.editbox.IBoxBuilder;
 import pm.eclipse.editbox.IBoxDecorator;
 import pm.eclipse.editbox.IBoxProvider;
 import pm.eclipse.editbox.IBoxSettings;
+import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
 
 public class BoxDecoratorImpl implements IBoxDecorator {
 
@@ -56,7 +77,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 	protected RGB oldBackground;
 	protected int oldIndent;
 	protected boolean decorated;
-	protected List<Box> boxes;
+	protected List<List<Box>> boxes;
 	protected boolean setCaretOffset;
 	protected String builderName;
 	protected IBoxBuilder builder;
@@ -71,6 +92,8 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 	protected int stateMask;
 	public boolean keyPressed;
 	protected int charCount;
+	protected IPath path; //The absolute path of the file that is active in the Editor
+	
 	
 	public void enableUpdates(boolean flag) {
 		boolean update = flag && !this.visible;
@@ -99,21 +122,45 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		this.boxText = newSt;
 	}
 
+	/**
+	 * This is where the magic happens and the currentBoxes are being built
+	 */
 	protected void buildBoxes() {
 		IBoxBuilder boxBuilder = getBuilder();
 		if (boxBuilder == null)
 			return;
 		
+		// from here on: get the path of the file that is inspected TODO: remove MAGIC
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		IWorkbenchWindow window = 
+				workbench == null ? null : workbench.getActiveWorkbenchWindow();
+		IWorkbenchPage activePage = 
+				window == null ? null : window.getActivePage();		
+		IEditorPart editor = 
+				activePage == null ? null : activePage.getActiveEditor();
+		IEditorInput input = 
+				editor == null ? null : editor.getEditorInput();
+		IPath path = input instanceof IPathEditorInput 
+				? ((IPathEditorInput)input).getPath()
+						: null;
+				if (path != null)
+				{
+					new Throwable("MAGIC here is the path: " + path).printStackTrace();
+					builder.setFilePath(path);
+					this.path = path;
+				}
+
 		builder.setTabSize(boxText.getTabs());
 		builder.setCaretOffset(setCaretOffset?boxText.getCaretOffset():-1);
 		setCaretOffset = false;
 		
 		StringBuilder text = new StringBuilder(boxText.getText());
 		
-		if (text.length() >0 && text.charAt(text.length()-1)!='\n')
+		if (text.length() > 0 && text.charAt(text.length()-1)!='\n')
 			text.append(".");
 		
 		boxBuilder.setText(text);
+		
 		boxes = boxBuilder.build();
 		
 		charCount = boxText.getCharCount();
@@ -121,9 +168,12 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 
 	protected void updateOffsetColors() {
 		int maxLevel = 0;
-		for (Box b : boxes)
-			if (b.level > maxLevel)
-				maxLevel = b.level;
+		for (List<Box> list : boxes) {
+			for (Box b : list) {
+				if (b.level > maxLevel)
+					maxLevel = b.level;
+			}
+		}
 		settings.setColorsSize(maxLevel + 2);
 	}
 
@@ -178,17 +228,25 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		if (settings.getAlpha()>0)
 			gc.setAlpha(settings.getAlpha());
 
-		// fill boxes
+		// fill currentBoxes
 		Box fillBox = null;
 		boolean checkFillbox = !settings.getFillOnMove();
 		Collection<Box> visibleBoxes = visibleBoxes();
 
 		boolean ex = settings.getExpandBox();
 		
+		/**
+		 * This Loop below is filling the visible Boxes with the color
+		 */
 		for (Box b : visibleBoxes) {
 			if (checkFillbox && b.level == fillBoxLevel && b.start <= fillBoxStart && b.end >=fillBoxEnd)
 				fillBox = b;
-			fillRectangle(settings.getColor(b.level + 1), gc, b.rec.x - xOffset, b.rec.y - yOffset, ex?r0.width:b.rec.width, b.rec.height);
+			//Old version:
+			//fillRectangle(settings.getColor(b.level + 1), gc, b.rec.x - xOffset, b.rec.y - yOffset, ex?r0.width:b.rec.width, b.rec.height);
+			System.out.println("FARBEN: " + b.getColor().toString());
+			Color c = b.getColor();
+			Color transparent = new Color(null, c.getRed(), c.getGreen(), c.getBlue(), 100);
+			fillRectangle(transparent, gc, b.rec.x - xOffset, b.rec.y - yOffset, ex?r0.width:b.rec.width, b.rec.height);
 		}
 		
 		// fill selected
@@ -255,11 +313,30 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 			gc.drawRectangle(x, y, width, height);
 	}
 
+	/**
+	 * fills the rectangle with the given Color, overpainting everything that might have been there before.
+	 * @param c
+	 * @param gc
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 */
 	void fillRectangle(Color c, GC gc, int x, int y, int width, int height) {
 		if (c == null)
 			return;
 		
+		//TODO : Think about a smarter way of merging the colors:
+		//TODO IDEA: Create Extra "Requirements" that conist of merged ones e.g. R01+R02
+		// and then the Boxes where they shall be. Or Just use Patterns.
+		//Color a = gc.getBackground();
+		//System.out.println("Color before: " + a.toString() + "; Color afterwards: " + c.toString());
+		//Color merge = new Color(null, (a.getRed() + c.getRed()) / 2,(a.getGreen() + c.getGreen()) / 2, (a.getBlue() + c.getBlue()) / 2, 100);
+		//gc.setBackground(merge);
+		//Pattern z = gc.getBackgroundPattern();
+		
 		gc.setBackground(c);
+		
 		if (settings.getRoundBox()){
 			gc.fillRoundRectangle(x, y, width, height, ROUND_BOX_ARC, ROUND_BOX_ARC);
 		}
@@ -279,6 +356,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		if (boxText == null || settings == null)
 			return;
 
+		//TODO: Add Tooltip Info of Requirements
 		boxPaint = new BoxPaintListener();
 		boxMouseMove = new BoxMouseMoveListener();
 		boxMouseTrack = new BoxMouseTrackListener();
@@ -342,10 +420,11 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 			end = boxText.getOffsetAtLine(lineIndex);
 		
 		List<Box> result = new ArrayList<Box>();
-		for (Box b : boxes)
-			if (b.intersects(start, end))
-				result.add(b);
-
+		for (List<Box> list : boxes) {
+			for (Box b : list)
+				if (b.intersects(start, end))
+					result.add(b);
+		}
 		calcBounds(result);
 		return result;
 	}
@@ -486,7 +565,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 	private final class BoxModifyListener implements ModifyListener {
 
 		public void modifyText(ModifyEvent e) {
-			//it is more efficient to not draw boxes in PaintListner (especially on Linux)
+			//it is more efficient to not draw currentBoxes in PaintListner (especially on Linux)
 			//and in this event caret offset is correct
 			if (boxes == null) {
 				buildBoxes();
@@ -558,10 +637,12 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		public void mouseExit(MouseEvent e) {
 			boolean redraw = false;
 			if (boxes != null)
-				for (Box b : boxes) {
-					if (b.isOn){
-						redraw = true;
-						b.isOn = false;
+				for (List<Box> list : boxes) {
+					for (Box b : list) {
+						if (b.isOn){
+							redraw = true;
+							b.isOn = false;
+						}
 					}
 				}
 			if (redraw)
@@ -578,12 +659,46 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 			boxes = null;
 			setCaretOffset = true;
 		}
-
+		
+		/**
+		 * This method is actualising all existing Boxes and writing them back to the trc file.
+		 * @param event
+		 */
+		private void actualizeBoxes(TextChangingEvent event) {
+			int positionOfChange = event.start;
+			int amountOfChange = event.newCharCount - event.replaceCharCount;
+			
+			//TODO: remove DEBUG: 
+			//System.err.println("Änderung bei: " + positionOfChange + "; Änderungsmenge: " + amountOfChange);
+			
+			List<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile(path);
+			
+			for(TRCRequirement r : reqs) {
+				List<int[]> pairs = r.getPositions();
+				for(int[] pair : pairs) {
+					if(positionOfChange <= pair[0]) {
+						//whole box has to be moved because the change occurs before or at the start of the box.
+						pair[0] = (pair[0] + amountOfChange);
+						pair[1] = (pair[1] + amountOfChange);
+					}
+					else if(positionOfChange <= pair[1]) {
+						//only box end needs to be altered. Change occurs inside of the box.
+						pair[1] = (pair[1] + amountOfChange);
+					}
+				}
+			}
+			
+			TRCFileInteraction.WriteTRCsToFile(reqs, path);
+			
+		}
+		
+		//TODO: Change Text Changed Text Text has changed event listener
 		public void textChanged(TextChangedEvent event) {
 			change();
 		}
 
 		public void textChanging(TextChangingEvent event) {
+			actualizeBoxes(event);
 		}
 
 		public void textSet(TextChangedEvent event) {
@@ -672,11 +787,14 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 			if (p == null || p.x == p.y) 
 				b = currentBox;
 			else{
-				for(Box box : boxes)
-					if (p.x <= box.start && p.y >= box.end-1){
-						b = box.parent;
-						break;
-					}
+				
+				for (List<Box> list : boxes) {
+					for (Box box : list)
+						if (p.x <= box.start && p.y >= box.end - 1) {
+							b = box.parent;
+							break;
+						} 
+				}
 			}
 			if (b!=null) {
 				int end = Character.isWhitespace(boxText.getText(b.end-1, b.end-1).charAt(0))? b.end -1 : b.end;

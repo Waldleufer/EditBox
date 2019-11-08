@@ -2,6 +2,8 @@ package pm.eclipse.editbox;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
+
 
 public interface IBoxBuilder {
 	String getName();
@@ -14,5 +16,8 @@ public interface IBoxBuilder {
 	int getCaretOffset();
 	
 	void setText(StringBuilder sb);
-	List<Box> build();
+	
+	List<List<Box>> build();
+	
+	void setFilePath(IPath path);
 }

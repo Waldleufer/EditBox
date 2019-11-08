@@ -107,7 +107,7 @@ public class MarkupBuilder2 extends MarkupBoxBuilder {
 			if (b.parent != null && b.parent.data != null && !data(b.parent).isClosed && data(b.parent).type == LineType.OPEN_TAG){
 				b.parent.children().remove(b);
 				b.parent.hasChildren = !b.parent.children().isEmpty();
-				boxes.remove(b);
+				currentBoxes.remove(b);
 			}
 		}
 			

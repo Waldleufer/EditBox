@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 
-public class Box {
+public class Box_colorBackup {
 	/**
 	 *  start and end represent vertical positioning. Offset is the horizontal offset
 	 */
@@ -15,7 +14,7 @@ public class Box {
 
 	
 
-	public Box parent;
+	public Box_colorBackup parent;
 	public Rectangle rec;
 	public boolean isOn;
 	public int red;
@@ -29,7 +28,7 @@ public class Box {
 	public int level;
 	public int tabsStart = -1;
 	public boolean hasChildren;
-	private List<Box> children;
+	private List<Box_colorBackup> children;
 	public Object data;
 	
 	public List<String> requirements;
@@ -39,14 +38,15 @@ public class Box {
 		return "["+start+","+end+","+offset+","+maxEndOffset+"]";
 	}
 
-	public void setColor(Color color) {
-		this.red = color.getRed();
-		this.green = color.getGreen();
-		this.blue = color.getBlue();
+	public void setColor(int red, int green, int blue) {
+		this.red = red;
+		this.green = green;
+		this.blue = blue;
 	}
 	
-	public Color getColor() {
-		return new Color(null, red, green, blue);
+	public int[] getColor() {
+		int[] a = {red, green, blue};
+		return a;
 	}
 
 	/**
@@ -71,13 +71,13 @@ public class Box {
 		return s<=m && e>=m;
 	}
 
-	public List<Box> children() {
+	public List<Box_colorBackup> children() {
 		return children != null ? children : Collections.EMPTY_LIST;
 	}
 	
-	public void addChild(Box box){
+	public void addChild(Box_colorBackup box){
 		if (children == null) 
-			children = new ArrayList<Box>();
+			children = new ArrayList<Box_colorBackup>();
 		children.add(box);
 	}
 }

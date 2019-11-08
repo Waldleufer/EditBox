@@ -9,6 +9,10 @@ import pm.eclipse.editbox.Box;
 
 public class JavaBoxBuilder extends BoxBuilderImpl {
 
+	
+	/**
+	 * All the editing magic is happening here.
+	 */
 	protected void addLine(int start, int end, int offset, boolean empty) {
 		//if (!empty && !startLineComment(start,end,offset,empty)) {
 		if(!empty){
