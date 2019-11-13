@@ -78,17 +78,6 @@ public class TRCFileInteraction {
 			}
 			return out;
 		}
-
-//		public void setColor(int red, int green, int blue) {
-//			this.red = red;
-//			this.green = green;
-//			this.blue = blue;
-//		}
-//		
-//		public int[] getColor() {
-//			int[] a = {red, green, blue};
-//			return a;
-//		}
 		
 		public Color getColor() {
 			return new Color(null, red, green, blue);
@@ -104,34 +93,11 @@ public class TRCFileInteraction {
 	
 	public static final Path ANCHOR = Paths.get("/Users/Martin/Uni/Bachelorarbeit/runtime-EclipseApplication");
 	
-//	/**
-//	 * 
-//	 * @return true if the operation was successful.
-//	 */
-//	public static TRCRequirement[] getTRCSets(String path) {
-//		
-//		Scanner fileToRead = null;
-//		TRCRequirement[] requirementsAndTRCInfoOfThisFile;
-//        try {
-//            fileToRead = new Scanner(new File(ANCHOR.resolve(path.substring(1)).toString())); //point the scanner method to a file + Remove heading "/" from path and get full path.
-//            //check if there is a next line and it is not null and then read it in
-//            for (Object line; fileToRead.hasNextLine() && (line = fileToRead.nextLine()) != null; ) {
-//                System.out.println(req[0]);//TODO: remove Debug
-//                TRCRequirement lineReq = 
-//                //TRCRequirement lineReq = new TRCRequirement(req[0], req[1])  //TODO: remove \r\n
-//                	requirementsAndTRCInfoOfThisFile;
-//                }
-//            
-//            fileToRead.close();//this is used to release the scanner from file
-//            return null;
-//        } catch (FileNotFoundException ex) {//if the file cannot be found an exception will be thrown
-//        	System.err.println("The file " + path + " could not be found! " + ex.getMessage());
-//            return null;
-//        } finally {
-//        	fileToRead.close();
-//        }
-//	}
-	
+	/**
+	 * Creating a test Purpose .trc File
+	 * @param filePath - the IPath of the .trc file
+	 * 
+	 */
 	public static void debug(IPath filePath) {
 		
 //		String path = filePath.toOSString();
@@ -217,19 +183,6 @@ public class TRCFileInteraction {
 //            System.out.println("The OBJECT is: " + debugs[0].toString());
             System.out.println("The Object was succesfully read from the file: " + stringPath);
             return debugs;
-//        try {
-//        	String path = filePath.toString();
-//        	String name = exchangeEnding(path);    	
-//            FileInputStream fis = new FileInputStream(name);
-//            System.err.println("one");
-//            ObjectInputStream ois = new ObjectInputStream(fis);
-//            System.err.println("two");
-//            TRCRequirement[] trcsFromSavedFile = (TRCRequirement[])ois.readObject();
-//            System.err.println("three");
-//            ois.close();
-//            fis.close(); //TODO: Neccesarry?
-//            System.out.println("The Object was succesfully read from the file: " + name);
-//            return trcsFromSavedFile;
         } catch (Exception ex) {
         	new Throwable("File access Error").printStackTrace();
             ex.printStackTrace();
