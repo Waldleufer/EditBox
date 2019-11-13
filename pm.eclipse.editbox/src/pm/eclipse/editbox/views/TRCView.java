@@ -16,7 +16,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.part.ViewPart;
 
 public class TRCView extends ViewPart {
-	public static final String ID = "pm..eclipse.editbox.views.TRCView";
+	public static final String ID = "pm.eclipse.editbox.views.TRCView";
 
 	@Inject IWorkbench workbench;
 	
