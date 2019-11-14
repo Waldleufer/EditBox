@@ -13,6 +13,7 @@ import com.sun.org.apache.xml.internal.resolver.readers.TR9401CatalogReader;
 import pm.eclipse.editbox.Box;
 import pm.eclipse.editbox.impl.TRCFileInteraction;
 import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
+import pm.eclipse.editbox.views.TRCView;
 
 /**
  * Is able to create and manage boxes This is the entry point for creating the
@@ -111,8 +112,9 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 		currentBoxes.clear(); // skip root box
 
 		// TODO: delete line below:  Debug Starting Point
-		TRCFileInteraction.debug(filePath);
+		// TRCFileInteraction.debug(filePath);
 		requirements = TRCFileInteraction.ReadTRCsFromFile(filePath);
+		TRCView.updateViewer(); //update Viewers context
 
 		emptyPrevLine = false;
 		int start = 0;

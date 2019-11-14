@@ -35,6 +35,7 @@ public class TRCFileInteraction {
 		private int red;
 		private int green;
 		private int blue;
+		private boolean active;
 		
 
 		/**
@@ -50,6 +51,7 @@ public class TRCFileInteraction {
 			int g =  (int) (rand.nextFloat() * 256.0);
 			int b =  (int) (rand.nextFloat() * 256.0);
 			Color randomColor = new Color(null, r, g, b);
+			setActive(false);
 			// Debug: 
 			//Color randomColor = new Color(null, 100, 150, 0);
 			setColor(randomColor);
@@ -88,6 +90,14 @@ public class TRCFileInteraction {
 			this.green = color.getGreen();
 			this.blue = color.getBlue();
 		}
+
+		public boolean isActive() {
+			return active;
+		}
+
+		public void setActive(boolean active) {
+			this.active = active;
+		}
 		
 	}
 	
@@ -106,7 +116,8 @@ public class TRCFileInteraction {
     	List<TRCRequirement> requirements = new ArrayList<TRCRequirement>();
 		List<int[]> foo = new ArrayList<int[]>();
 		//int[] a1 = {0, 1543};
-		int[] a2 = {32, 208};
+		//int[] a2 = {13, 28};
+		int[] a2 = {34, 210};
 		int[] a3 = {809, 940};
 		int[] a4 = {211, 1484};
 		int[] a5 = {1487, 1539};
@@ -118,14 +129,14 @@ public class TRCFileInteraction {
 		foo.add(a5); 
 //		foo.add(b);
 	    TRCRequirement a = new TRCRequirement("R01", foo);
-	    a.setColor(new Color(null, 250, 1, 1, 100));
+	    //a.setColor(new Color(null, 250, 1, 1, 100));
 	    //TRCRequirement b = new TRCRequirement("R02", positions)
 	   
 	    List<int[]> bar = new ArrayList<int[]>();
 	    int[] b1 = {250, 1200}; //currently not used
 	    bar.add(b1);
 	    TRCRequirement b = new TRCRequirement("R02", bar);
-	    b.setColor(new Color(null, 1, 150, 1, 100));
+	   // b.setColor(new Color(null, 1, 150, 1, 100));
 	    requirements.add(b);
 	    requirements.add(a);
 		WriteTRCsToFile(requirements, filePath);
@@ -158,8 +169,9 @@ public class TRCFileInteraction {
     }
     
 	/**
+	 * Opens the corresponding .trc file to the file at filePath and reads its contents.
 	 * 
-	 * @param filePath the absolute system path
+	 * @param filePath the absolute system path to the currently opened file.
 	 * @return the TRCRequirement[] read.
 	 */
     public static List<TRCRequirement> ReadTRCsFromFile(IPath filePath) {
