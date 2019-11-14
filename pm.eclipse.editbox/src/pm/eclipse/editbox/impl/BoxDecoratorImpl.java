@@ -130,25 +130,15 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		if (boxBuilder == null)
 			return;
 		
-		// from here on: get the path of the file that is inspected TODO: remove MAGIC
-		IWorkbench workbench = PlatformUI.getWorkbench();
-		IWorkbenchWindow window = 
-				workbench == null ? null : workbench.getActiveWorkbenchWindow();
-		IWorkbenchPage activePage = 
-				window == null ? null : window.getActivePage();		
-		IEditorPart editor = 
-				activePage == null ? null : activePage.getActiveEditor();
-		IEditorInput input = 
-				editor == null ? null : editor.getEditorInput();
-		IPath path = input instanceof IPathEditorInput 
-				? ((IPathEditorInput)input).getPath()
-						: null;
-				if (path != null)
-				{
-					new Throwable("MAGIC here is the path: " + path).printStackTrace();
-					builder.setFilePath(path);
-					this.path = path;
-				}
+		IPath path = getCurrentActivePath();
+		
+		if (path != null)
+		{
+			new Throwable("MAGIC here is the path: " + path).printStackTrace();
+			builder.setFilePath(path);
+			this.path = path;
+		}
+		
 
 		builder.setTabSize(boxText.getTabs());
 		builder.setCaretOffset(setCaretOffset?boxText.getCaretOffset():-1);
@@ -164,6 +154,25 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		boxes = boxBuilder.build();
 		
 		charCount = boxText.getCharCount();
+	}
+	
+	/**
+	 * Calculates the path to the currently opened File.
+	 * @return the IPath of the currently opened File
+	 */
+	public static IPath getCurrentActivePath() {
+		// from here on: get the path of the file that is inspected TODO: remove MAGIC
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		IWorkbenchWindow window = 
+				workbench == null ? null : workbench.getActiveWorkbenchWindow();
+		IWorkbenchPage activePage = 
+				window == null ? null : window.getActivePage();		
+		IEditorPart editor = 
+				activePage == null ? null : activePage.getActiveEditor();
+		IEditorInput input = 
+				editor == null ? null : editor.getEditorInput();
+		IPath path = input instanceof IPathEditorInput ? ((IPathEditorInput)input).getPath() : null;
+		return path;
 	}
 
 	protected void updateOffsetColors() {
