@@ -342,36 +342,7 @@ public class TRCView extends ViewPart {
 				getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 		doubleClickAction = new Action() {
 			public void run() {
-				IPath path = BoxDecoratorImpl.getCurrentActivePath();
-				List<TRCRequirement> requirements = TRCFileInteraction.ReadTRCsFromFile(path);
-				IStructuredSelection selection = viewer.getStructuredSelection();
-				Object obj = selection.getFirstElement();
-				if(obj instanceof TRCRequirement) {
-					TRCRequirement req = (TRCRequirement) obj;
-					Shell shell = new Shell();
-					ColorDialog dlg = new ColorDialog(shell);
-					for (TRCRequirement trcRequirement : requirements) {
-						if (trcRequirement.getId().equals(req.getId())) {
-							dlg.setRGB(trcRequirement.getColor().getRGB());
-							RGB rgb = dlg.open();
-							trcRequirement.setColor(new Color(null, rgb.red, rgb.green, rgb.blue));
-						}
-					}
-					TRCFileInteraction.WriteTRCsToFile(requirements, path);
-					IWorkbenchWindow window = 
-							workbench == null ? null : workbench.getActiveWorkbenchWindow();
-					IWorkbenchPage activePage = 
-							window == null ? null : window.getActivePage();		
-					IEditorPart editor = 
-							activePage == null ? null : activePage.getActiveEditor();
-					if (editor != null) {
-						editor.setFocus();
-					}
-					BoxDecoratorImpl.change();
-				}
-				else {
-					showMessage("Double-click detected on "+obj.toString());	
-				}
+				showColorDialoge();
 			}
 		};
 		dragAction = new Action() {
@@ -395,6 +366,42 @@ public class TRCView extends ViewPart {
 			viewer.getControl().getShell(),
 			"TRC View",
 			message);
+	}
+	
+	/**
+	 * Opens a ColorDialoge Window where the user can change the color of the Requirement.
+	 */
+	private void showColorDialoge() {
+		IPath path = BoxDecoratorImpl.getCurrentActivePath();
+		List<TRCRequirement> requirements = TRCFileInteraction.ReadTRCsFromFile(path);
+		IStructuredSelection selection = viewer.getStructuredSelection();
+		Object obj = selection.getFirstElement();
+		if(obj instanceof TRCRequirement) {
+			TRCRequirement req = (TRCRequirement) obj;
+			Shell shell = new Shell();
+			ColorDialog dlg = new ColorDialog(shell);
+			for (TRCRequirement trcRequirement : requirements) {
+				if (trcRequirement.getId().equals(req.getId())) {
+					dlg.setRGB(trcRequirement.getColor().getRGB());
+					RGB rgb = dlg.open();
+					trcRequirement.setColor(new Color(null, rgb.red, rgb.green, rgb.blue));
+				}
+			}
+			TRCFileInteraction.WriteTRCsToFile(requirements, path);
+			IWorkbenchWindow window = 
+					workbench == null ? null : workbench.getActiveWorkbenchWindow();
+			IWorkbenchPage activePage = 
+					window == null ? null : window.getActivePage();		
+			IEditorPart editor = 
+					activePage == null ? null : activePage.getActiveEditor();
+			if (editor != null) {
+				editor.setFocus();
+			}
+			BoxDecoratorImpl.change();
+		}
+		else {
+			showMessage("Double-click detected on "+obj.toString());	
+		}
 	}
 
 	@Override
