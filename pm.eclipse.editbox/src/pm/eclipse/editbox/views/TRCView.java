@@ -339,7 +339,7 @@ public class TRCView extends ViewPart {
 				
 				IStructuredSelection selection = viewer.getStructuredSelection();
 				Object obj = selection.getFirstElement();
-				showMessage("Double-click detected on "+obj.toString());
+				//showMessage("Double-click detected on "+obj.toString());
 				Shell shell = new Shell();
 				ColorDialog dlg = new ColorDialog(shell);
 				for (TRCRequirement trcRequirement : requirements) {
