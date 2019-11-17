@@ -72,6 +72,7 @@ import pm.eclipse.editbox.impl.TRCFileInteraction;
 import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
 
 import org.eclipse.jface.viewers.*;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 
 import java.util.LinkedList;
@@ -81,7 +82,10 @@ import org.eclipse.jface.action.*;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.*;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DragDetectEvent;
+import org.eclipse.swt.events.DragDetectListener;
 
 
 /**
@@ -111,13 +115,15 @@ public class TRCView extends ViewPart {
 
 	private IWorkbench workbench = PlatformUI.getWorkbench();
 	
-	private static TableViewer viewer;
+	private static CheckboxTableViewer viewer;
+	private static Table table;
 	private Action action1;
 	private Action action2;
 	private Action doubleClickAction;
+	private Action dragAction;
 	 
 
-	class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
+	class ViewLabelProvider extends ColumnLabelProvider implements ITableLabelProvider {
 		@Override
 		public String getColumnText(Object obj, int index) {
 			return getText(obj);
@@ -130,7 +136,13 @@ public class TRCView extends ViewPart {
 		public Image getImage(Object obj) {
 			return workbench.getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
 		}
+		@Override
+		public Color getBackground(Object element) {
+			return new Color(null, 150, 150, 150);
+		}
 	}
+	
+	 
 	
 	public static void updateViewer() {
 		List<TRCRequirement> requirements = TRCFileInteraction.ReadTRCsFromFile(BoxDecoratorImpl.getCurrentActivePath());
@@ -147,7 +159,12 @@ public class TRCView extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		//viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		table = new Table(parent, SWT.MULTI );
+		
+		//DragDetectListener listener;
+		//table.addDragDetectListener(listener);
+		viewer = new CheckboxTableViewer(table);
 		
 		viewer.setContentProvider(ArrayContentProvider.getInstance());
 		updateViewer();
@@ -159,7 +176,20 @@ public class TRCView extends ViewPart {
 		makeActions();
 		hookContextMenu();
 		hookDoubleClickAction();
+		//hookDragAction();  // experimental TODO: remove?
 		contributeToActionBars();
+	}
+
+	private void hookDragAction() {
+		table.addDragDetectListener(new DragDetectListener() {
+			
+			@Override
+			public void dragDetected(DragDetectEvent e) {
+				e.
+				dragAction.run();	
+			}
+		});
+		
 	}
 
 	private void hookContextMenu() {
@@ -199,6 +229,9 @@ public class TRCView extends ViewPart {
 		manager.add(action2);
 	}
 
+	/**
+	 * Defines all the Actions that are meant to be executed when interacting with this viewer
+	 */
 	private void makeActions() {
 		action1 = new Action() {
 			public void run() {
@@ -224,6 +257,13 @@ public class TRCView extends ViewPart {
 				IStructuredSelection selection = viewer.getStructuredSelection();
 				Object obj = selection.getFirstElement();
 				showMessage("Double-click detected on "+obj.toString());
+			}
+		};
+		dragAction = new Action() {
+			public void run() {
+				IStructuredSelection selection = viewer.getStructuredSelection();
+				Object obj = selection.getFirstElement();
+				showMessage("Drag detected on "+obj.toString());
 			}
 		};
 	}
