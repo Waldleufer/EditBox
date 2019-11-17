@@ -77,8 +77,8 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 	protected RGB oldBackground;
 	protected int oldIndent;
 	protected boolean decorated;
-	protected List<List<Box>> boxes;
-	protected boolean setCaretOffset;
+	protected static List<List<Box>> boxes;
+	protected static boolean setCaretOffset;
 	protected String builderName;
 	protected IBoxBuilder builder;
 	protected Box currentBox;
@@ -662,12 +662,17 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		}
 	}
 
+	public static void change() {
+		boxes = null;
+		setCaretOffset = true;
+	}
+	
+	/**
+	 * Change Management
+	 * @author Martin
+	 *
+	 */
 	class BoxTextChangeListener implements TextChangeListener {
-
-		private void change() {
-			boxes = null;
-			setCaretOffset = true;
-		}
 		
 		/**
 		 * This method is actualising all existing Boxes and writing them back to the trc file.

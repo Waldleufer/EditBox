@@ -1,5 +1,7 @@
 package pm.eclipse.editbox.views;
 
+import org.eclipse.swt.widgets.ColorDialog;
+
 //import java.util.*;
 //
 //import javax.inject.Inject;
@@ -67,6 +69,7 @@ package pm.eclipse.editbox.views;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.*;
 
+import pm.eclipse.editbox.EditBox;
 import pm.eclipse.editbox.impl.BoxDecoratorImpl;
 import pm.eclipse.editbox.impl.TRCFileInteraction;
 import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
@@ -74,16 +77,24 @@ import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
 import org.eclipse.jface.viewers.*;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.layout.GridData;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.action.*;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.*;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.TextChangingEvent;
 import org.eclipse.swt.events.DragDetectEvent;
 import org.eclipse.swt.events.DragDetectListener;
 
@@ -121,7 +132,6 @@ public class TRCView extends ViewPart {
 	private Action action2;
 	private Action doubleClickAction;
 	private Action dragAction;
-	 
 
 	class ViewLabelProvider extends ColumnLabelProvider implements ITableLabelProvider {
 		@Override
@@ -139,6 +149,34 @@ public class TRCView extends ViewPart {
 		@Override
 		public Color getBackground(Object element) {
 			return new Color(null, 150, 150, 150);
+		}		
+	}
+	
+	private class TableCellModifier implements ICellModifier {
+		TableViewer fViewer;
+
+		public TableCellModifier(TableViewer viewer) {
+			fViewer = viewer;
+		}
+
+		public boolean canModify(Object element, String property) {
+			if (property.equals("Color") || property.equals("Name")) {
+				return true;
+			}
+			return false;
+		}
+
+		public void modify(Object element, String property, Object value) {
+		}
+
+		public Object getValue(Object element, String property) {
+			if (property.equals("Color")) {
+				return new Color(null, 255, 0, 0);
+			} else if (property.equals("Name")) {
+				return ((ITableLabelProvider)
+						fViewer.getLabelProvider()).getColumnText(element, 0);
+			}
+			return null;
 		}
 	}
 	
@@ -160,7 +198,11 @@ public class TRCView extends ViewPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		//viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-		table = new Table(parent, SWT.MULTI );
+		table = new Table(parent, SWT.BORDER
+				| SWT.SINGLE
+				| SWT.H_SCROLL
+				| SWT.V_SCROLL
+				| SWT.FULL_SELECTION );
 		
 		//DragDetectListener listener;
 		//table.addDragDetectListener(listener);
@@ -169,6 +211,7 @@ public class TRCView extends ViewPart {
 		viewer.setContentProvider(ArrayContentProvider.getInstance());
 		updateViewer();
 		viewer.setLabelProvider(new ViewLabelProvider());
+		viewer.setAllChecked(true);
 
 		// Create the help context id for the viewer's control
 		workbench.getHelpSystem().setHelp(viewer.getControl(), "pm.eclipse.editbox.viewer");
@@ -178,6 +221,44 @@ public class TRCView extends ViewPart {
 		hookDoubleClickAction();
 		//hookDragAction();  // experimental TODO: remove?
 		contributeToActionBars();
+		
+		// Newly found:
+//		
+//		table.setHeaderVisible(true);
+//		table.setLinesVisible(true);
+//		table.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL |
+//		GridData.FILL_BOTH));
+//
+//		TableColumn column = new TableColumn(table, SWT.NONE, 0);
+//		column.setText("Name");
+//		column.setAlignment(SWT.LEFT);
+//		column.setWidth(300);
+//
+//		column = new TableColumn(table, SWT.NONE, 1);
+//		column.setText("Color");
+//		column.setAlignment(SWT.LEFT);
+//		column.setWidth(100);
+//
+//		//TableViewer tableViewer = new TableViewer(table);
+//		viewer.setUseHashlookup(true);
+//		viewer.setColumnProperties(new String[] { "Name", "Color" });
+//
+//		CellEditor[] editors =
+//		new CellEditor[viewer.getColumnProperties().length];
+//		editors[0] = new TextCellEditor(table);
+//		editors[1] = new ColorCellEditor(table);
+//		viewer.setCellEditors(editors);
+//
+//		//viewer.setLabelProvider(new TableLabelProvider());
+//		//viewer.setContentProvider(new TableContentProvider());
+//		viewer.setCellModifier(new TableCellModifier(viewer));
+//
+//		List list = new ArrayList();
+//		list.add(new String[] { "Tree", "Green" });
+//		list.add(new String[] { "Sun", "Yellow" });
+//		list.add(new String[] { "IBM", "Blue" });
+//		viewer.setInput(list);
+		
 	}
 
 	private void hookDragAction() {
@@ -185,7 +266,6 @@ public class TRCView extends ViewPart {
 			
 			@Override
 			public void dragDetected(DragDetectEvent e) {
-				e.
 				dragAction.run();	
 			}
 		});
@@ -254,9 +334,32 @@ public class TRCView extends ViewPart {
 				getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 		doubleClickAction = new Action() {
 			public void run() {
+				IPath path = BoxDecoratorImpl.getCurrentActivePath();
+				List<TRCRequirement> requirements = TRCFileInteraction.ReadTRCsFromFile(path);
+				
 				IStructuredSelection selection = viewer.getStructuredSelection();
 				Object obj = selection.getFirstElement();
 				showMessage("Double-click detected on "+obj.toString());
+				Shell shell = new Shell();
+				ColorDialog dlg = new ColorDialog(shell);
+				for (TRCRequirement trcRequirement : requirements) {
+					if (trcRequirement.getId().equals(obj.toString())) {
+						dlg.setRGB(trcRequirement.getColor().getRGB());
+						RGB rgb = dlg.open();
+						trcRequirement.setColor(new Color(null, rgb.red, rgb.green, rgb.blue));
+					}
+				}
+				TRCFileInteraction.WriteTRCsToFile(requirements, path);
+				IWorkbenchWindow window = 
+						workbench == null ? null : workbench.getActiveWorkbenchWindow();
+				IWorkbenchPage activePage = 
+						window == null ? null : window.getActivePage();		
+				IEditorPart editor = 
+						activePage == null ? null : activePage.getActiveEditor();
+				if (editor != null) {
+					editor.setFocus();
+				}
+				BoxDecoratorImpl.change();
 			}
 		};
 		dragAction = new Action() {
