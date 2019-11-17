@@ -65,7 +65,7 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 		 * it also calculates the beginnings of the currentBoxes this way, as addLine
 		 * called with (empty = true) will set (emptyPrevLine = true);
 		 */
-		for (int i = 0; i <= len; i++) { // TODO: setze I zu beginn, da boxxen ja gespeichert. und begrenze end.
+		for (int i = 0; i <= len; i++) { // TODO: setze i zu Beginn, da boxxen ja gespeichert. und begrenze end.
 
 			char c = text.charAt(i);
 			boolean isWhitespace = Character.isWhitespace(c) && i != caretOffset;
