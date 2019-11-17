@@ -136,6 +136,9 @@ public class TRCView extends ViewPart {
 	class ViewLabelProvider extends ColumnLabelProvider implements ITableLabelProvider {
 		@Override
 		public String getColumnText(Object obj, int index) {
+			if (obj instanceof TRCRequirement) {
+		    	return ((TRCRequirement) obj).getId();
+			}
 			return getText(obj);
 		}
 		@Override
@@ -146,14 +149,17 @@ public class TRCView extends ViewPart {
 		public Image getImage(Object obj) {
 			return workbench.getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
 		}
-		@Override
-		public Color getBackground(Object element) {
-			return new Color(null, 150, 150, 150);
-		}		
+		@Override	
+		public Color getBackground(final Object element) {
+		    if (element instanceof TRCRequirement) {
+		    	return ((TRCRequirement) element).getColor();
+		    }
+		    return super.getBackground(element);
+		}
 	}
 	
 	private class TableCellModifier implements ICellModifier {
-		TableViewer fViewer;
+		private TableViewer fViewer;
 
 		public TableCellModifier(TableViewer viewer) {
 			fViewer = viewer;
@@ -171,7 +177,7 @@ public class TRCView extends ViewPart {
 
 		public Object getValue(Object element, String property) {
 			if (property.equals("Color")) {
-				return new Color(null, 255, 0, 0);
+				return new RGB(255, 0, 0);
 			} else if (property.equals("Name")) {
 				return ((ITableLabelProvider)
 						fViewer.getLabelProvider()).getColumnText(element, 0);
@@ -189,7 +195,8 @@ public class TRCView extends ViewPart {
 			requirementIDs.addFirst(trcRequirement.getId());
 		}
 		//viewer.setInput(new String[] { TRCFileInteraction.ReadTRCsFromFile(BoxDecoratorImpl.getCurrentActivePath()).toString() });
-		viewer.setInput(requirementIDs);
+//		viewer.setInput(requirementIDs);
+		viewer.setInput(requirements);
 
 		// Line below for testing: prints file Path of currently opened file
 		// viewer.setInput(new String[] { BoxDecoratorImpl.getCurrentActivePath().toString() });
@@ -212,6 +219,7 @@ public class TRCView extends ViewPart {
 		updateViewer();
 		viewer.setLabelProvider(new ViewLabelProvider());
 		viewer.setAllChecked(true);
+		viewer.setCellModifier(new TableCellModifier(viewer));
 
 		// Create the help context id for the viewer's control
 		workbench.getHelpSystem().setHelp(viewer.getControl(), "pm.eclipse.editbox.viewer");
@@ -336,30 +344,34 @@ public class TRCView extends ViewPart {
 			public void run() {
 				IPath path = BoxDecoratorImpl.getCurrentActivePath();
 				List<TRCRequirement> requirements = TRCFileInteraction.ReadTRCsFromFile(path);
-				
 				IStructuredSelection selection = viewer.getStructuredSelection();
 				Object obj = selection.getFirstElement();
-				//showMessage("Double-click detected on "+obj.toString());
-				Shell shell = new Shell();
-				ColorDialog dlg = new ColorDialog(shell);
-				for (TRCRequirement trcRequirement : requirements) {
-					if (trcRequirement.getId().equals(obj.toString())) {
-						dlg.setRGB(trcRequirement.getColor().getRGB());
-						RGB rgb = dlg.open();
-						trcRequirement.setColor(new Color(null, rgb.red, rgb.green, rgb.blue));
+				if(obj instanceof TRCRequirement) {
+					TRCRequirement req = (TRCRequirement) obj;
+					Shell shell = new Shell();
+					ColorDialog dlg = new ColorDialog(shell);
+					for (TRCRequirement trcRequirement : requirements) {
+						if (trcRequirement.getId().equals(req.getId())) {
+							dlg.setRGB(trcRequirement.getColor().getRGB());
+							RGB rgb = dlg.open();
+							trcRequirement.setColor(new Color(null, rgb.red, rgb.green, rgb.blue));
+						}
 					}
+					TRCFileInteraction.WriteTRCsToFile(requirements, path);
+					IWorkbenchWindow window = 
+							workbench == null ? null : workbench.getActiveWorkbenchWindow();
+					IWorkbenchPage activePage = 
+							window == null ? null : window.getActivePage();		
+					IEditorPart editor = 
+							activePage == null ? null : activePage.getActiveEditor();
+					if (editor != null) {
+						editor.setFocus();
+					}
+					BoxDecoratorImpl.change();
 				}
-				TRCFileInteraction.WriteTRCsToFile(requirements, path);
-				IWorkbenchWindow window = 
-						workbench == null ? null : workbench.getActiveWorkbenchWindow();
-				IWorkbenchPage activePage = 
-						window == null ? null : window.getActivePage();		
-				IEditorPart editor = 
-						activePage == null ? null : activePage.getActiveEditor();
-				if (editor != null) {
-					editor.setFocus();
+				else {
+					showMessage("Double-click detected on "+obj.toString());	
 				}
-				BoxDecoratorImpl.change();
 			}
 		};
 		dragAction = new Action() {
