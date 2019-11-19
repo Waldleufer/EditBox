@@ -67,21 +67,18 @@ import org.eclipse.swt.widgets.ColorDialog;
 
 
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.part.*;
 
-import pm.eclipse.editbox.EditBox;
 import pm.eclipse.editbox.impl.BoxDecoratorImpl;
 import pm.eclipse.editbox.impl.TRCFileInteraction;
 import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
-
 import org.eclipse.jface.viewers.*;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.layout.GridData;
-
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -92,9 +89,7 @@ import org.eclipse.ui.*;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.TextChangingEvent;
 import org.eclipse.swt.events.DragDetectEvent;
 import org.eclipse.swt.events.DragDetectListener;
 
@@ -127,7 +122,7 @@ public class TRCView extends ViewPart {
 	private IWorkbench workbench = PlatformUI.getWorkbench();
 	
 	private static CheckboxTableViewer viewer;
-	private static Table table;
+	private Table table;
 	private Action action1;
 	private Action action2;
 	private Action doubleClickAction;
@@ -156,6 +151,8 @@ public class TRCView extends ViewPart {
 		    }
 		    return super.getBackground(element);
 		}
+		
+		 
 	}
 	
 	private class TableCellModifier implements ICellModifier {
@@ -201,15 +198,39 @@ public class TRCView extends ViewPart {
 		// Line below for testing: prints file Path of currently opened file
 		// viewer.setInput(new String[] { BoxDecoratorImpl.getCurrentActivePath().toString() });
 	}
+	
 
 	@Override
 	public void createPartControl(Composite parent) {
 		//viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		table = new Table(parent, SWT.BORDER
-				| SWT.SINGLE
+				| SWT.MULTI
 				| SWT.H_SCROLL
 				| SWT.V_SCROLL
 				| SWT.FULL_SELECTION );
+		
+		table.addListener(SWT.EraseItem, new Listener() {
+			public void handleEvent(Event event) {
+				
+				event.detail &= ~SWT.HOT;
+				if ((event.detail & SWT.SELECTED) == 0) return; /* item not selected */
+				int clientWidth = table.getClientArea().width;
+				GC gc = event.gc;
+				Color oldForeground = gc.getForeground();
+				Color oldBackground = gc.getBackground();
+				gc.setBackground(event.display.getSystemColor(SWT.COLOR_YELLOW));
+			    gc.setForeground(event.display.getSystemColor(SWT.COLOR_BLUE));
+				//gc.fillGradientRectangle(event.x, event.y, event.width, event.height, false);
+			    gc.fillGradientRectangle(0, event.y, clientWidth, event.height, true);
+				//gc.drawRectangle(event.x, event.y, event.width, event.height);
+				System.out.println("MAGIC: " + event.x +  " " + event.y + " " + clientWidth + " " + event.height);
+				//gc.fillGradientRectangle(0, event.y, clientWidth, event.height, false);
+				
+				gc.setForeground(oldForeground);
+				gc.setBackground(oldBackground);
+				event.detail &= ~SWT.SELECTED;
+			}
+		});
 		
 		//DragDetectListener listener;
 		//table.addDragDetectListener(listener);
@@ -219,7 +240,7 @@ public class TRCView extends ViewPart {
 		updateViewer();
 		viewer.setLabelProvider(new ViewLabelProvider());
 		viewer.setAllChecked(true);
-		viewer.setCellModifier(new TableCellModifier(viewer));
+//		viewer.setCellModifier(new TableCellModifier(viewer));
 
 		// Create the help context id for the viewer's control
 		workbench.getHelpSystem().setHelp(viewer.getControl(), "pm.eclipse.editbox.viewer");
@@ -227,6 +248,7 @@ public class TRCView extends ViewPart {
 		makeActions();
 		hookContextMenu();
 		hookDoubleClickAction();
+//		hookListeners();	// TODO: eventually redesign all listeners?
 		//hookDragAction();  // experimental TODO: remove?
 		contributeToActionBars();
 		
@@ -370,6 +392,10 @@ public class TRCView extends ViewPart {
 	
 	/**
 	 * Opens a ColorDialoge Window where the user can change the color of the Requirement.
+	 * 
+	 * After the change: 
+	 *   - enforces Redraw of boxes
+	 *   - enforces Redraw of the View's table
 	 */
 	private void showColorDialoge() {
 		IPath path = BoxDecoratorImpl.getCurrentActivePath();
@@ -388,6 +414,8 @@ public class TRCView extends ViewPart {
 				}
 			}
 			TRCFileInteraction.WriteTRCsToFile(requirements, path);
+			BoxDecoratorImpl.change();
+			
 			IWorkbenchWindow window = 
 					workbench == null ? null : workbench.getActiveWorkbenchWindow();
 			IWorkbenchPage activePage = 
@@ -397,10 +425,21 @@ public class TRCView extends ViewPart {
 			if (editor != null) {
 				editor.setFocus();
 			}
-			BoxDecoratorImpl.change();
+			IViewReference[] references = activePage.getViewReferences();
+			for ( IViewReference v : references) {
+				if(v.getPartName().equals("TRC View")) {
+					IViewPart p = v.getView(true);
+					if (p instanceof TRCView) {
+						TRCView trcView = (TRCView) p;
+						trcView.table.deselectAll();
+						trcView.table.removeAll(); //This enforces redrawing with the updated values
+					}
+					p.setFocus();
+				}
+			}
 		}
 		else {
-			showMessage("Double-click detected on "+obj.toString());	
+			showMessage("Object is no instance of TRCRequirment: Double-click detected on "+obj.toString());	
 		}
 	}
 
