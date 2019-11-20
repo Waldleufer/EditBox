@@ -431,7 +431,7 @@ public class TRCView extends ViewPart {
 					IViewPart p = v.getView(true);
 					if (p instanceof TRCView) {
 						TRCView trcView = (TRCView) p;
-						trcView.table.deselectAll();
+						trcView.table.deselectAll();  //TODO: do you want to deselect all? or should the eddited one remain highlighted?
 						trcView.table.removeAll(); //This enforces redrawing with the updated values
 					}
 					p.setFocus();
