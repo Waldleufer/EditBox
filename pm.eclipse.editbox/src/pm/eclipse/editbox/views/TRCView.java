@@ -79,6 +79,8 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
+
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -129,7 +131,9 @@ public class TRCView extends ViewPart {
 	private Action dragAction;
 
 	class ViewLabelProvider extends ColumnLabelProvider implements ITableLabelProvider {
+		
 		@Override
+		//Displaying only the useful things
 		public String getColumnText(Object obj, int index) {
 			if (obj instanceof TRCRequirement) {
 		    	return ((TRCRequirement) obj).getId();
@@ -142,7 +146,8 @@ public class TRCView extends ViewPart {
 		}
 		@Override
 		public Image getImage(Object obj) {
-			return workbench.getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
+//			return workbench.getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
+			return super.getImage(obj);
 		}
 		@Override	
 		public Color getBackground(final Object element) {
@@ -183,7 +188,6 @@ public class TRCView extends ViewPart {
 		}
 	}
 	
-	 
 	
 	public static void updateViewer() {
 		List<TRCRequirement> requirements = TRCFileInteraction.ReadTRCsFromFile(BoxDecoratorImpl.getCurrentActivePath());
@@ -193,6 +197,7 @@ public class TRCView extends ViewPart {
 		}
 		//viewer.setInput(new String[] { TRCFileInteraction.ReadTRCsFromFile(BoxDecoratorImpl.getCurrentActivePath()).toString() });
 //		viewer.setInput(requirementIDs);
+		
 		viewer.setInput(requirements);
 
 		// Line below for testing: prints file Path of currently opened file
@@ -205,54 +210,33 @@ public class TRCView extends ViewPart {
 		//viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		table = new Table(parent, SWT.BORDER
 				| SWT.MULTI
+				| SWT.CHECK
 				| SWT.H_SCROLL
 				| SWT.V_SCROLL
 				| SWT.FULL_SELECTION );
 		
-		table.addListener(SWT.EraseItem, new Listener() {
-			public void handleEvent(Event event) {
-				
-				event.detail &= ~SWT.HOT;
-				if ((event.detail & SWT.SELECTED) == 0) return; /* item not selected */
-				int clientWidth = table.getClientArea().width;
-				GC gc = event.gc;
-				Color oldForeground = gc.getForeground();
-				Color oldBackground = gc.getBackground();
-				gc.setBackground(event.display.getSystemColor(SWT.COLOR_YELLOW));
-			    gc.setForeground(event.display.getSystemColor(SWT.COLOR_BLUE));
-				//gc.fillGradientRectangle(event.x, event.y, event.width, event.height, false);
-			    gc.fillGradientRectangle(0, event.y, clientWidth, event.height, true);
-				//gc.drawRectangle(event.x, event.y, event.width, event.height);
-				System.out.println("MAGIC: " + event.x +  " " + event.y + " " + clientWidth + " " + event.height);
-				//gc.fillGradientRectangle(0, event.y, clientWidth, event.height, false);
-				
-				gc.setForeground(oldForeground);
-				gc.setBackground(oldBackground);
-				event.detail &= ~SWT.SELECTED;
-			}
-		});
-		
-		//DragDetectListener listener;
-		//table.addDragDetectListener(listener);
 		viewer = new CheckboxTableViewer(table);
 		
-		viewer.setContentProvider(ArrayContentProvider.getInstance());
+		viewer.setContentProvider(TRCViewArrayContentProvider.getInstance());
 		updateViewer();
+		//Reverting Display Order
+//		TRCViewArrayContentProvider t = (TRCViewArrayContentProvider) viewer.getContentProvider();
+//		t.setReversedOrder(true);
 		viewer.setLabelProvider(new ViewLabelProvider());
 		viewer.setAllChecked(true);
-//		viewer.setCellModifier(new TableCellModifier(viewer));
+		//viewer.setCellModifier(new TableCellModifier(viewer));
 
 		// Create the help context id for the viewer's control
 		workbench.getHelpSystem().setHelp(viewer.getControl(), "pm.eclipse.editbox.viewer");
 		getSite().setSelectionProvider(viewer);
+		hookListeners();	// TODO: eventually redesign all listeners?
 		makeActions();
 		hookContextMenu();
 		hookDoubleClickAction();
-//		hookListeners();	// TODO: eventually redesign all listeners?
 		//hookDragAction();  // experimental TODO: remove?
 		contributeToActionBars();
 		
-		// Newly found:
+		// Newly found: // Advanced Styling of table
 //		
 //		table.setHeaderVisible(true);
 //		table.setLinesVisible(true);
@@ -290,6 +274,48 @@ public class TRCView extends ViewPart {
 //		viewer.setInput(list);
 		
 	}
+
+
+	private void hookListeners() {
+		table.addListener(SWT.EraseItem, new Listener() {
+			public void handleEvent(Event event) {
+				
+				event.detail &= ~SWT.HOT;
+				if ((event.detail & SWT.SELECTED) == 0) return; /* item not selected */
+				int clientWidth = table.getClientArea().width;
+				GC gc = event.gc;
+				Color oldForeground = gc.getForeground();
+				Color oldBackground = gc.getBackground();
+				gc.setBackground(event.display.getSystemColor(SWT.COLOR_YELLOW));
+			    gc.setForeground(event.display.getSystemColor(SWT.COLOR_BLUE));
+				//gc.fillGradientRectangle(event.x, event.y, event.width, event.height, false);
+			    gc.fillGradientRectangle(0, event.y, clientWidth, event.height, true);
+				//gc.drawRectangle(event.x, event.y, event.width, event.height);
+				System.out.println("MAGIC: " + event.x +  " " + event.y + " " + clientWidth + " " + event.height);
+				//gc.fillGradientRectangle(0, event.y, clientWidth, event.height, false);
+				
+				gc.setForeground(oldForeground);
+				gc.setBackground(oldBackground);
+				event.detail &= ~SWT.SELECTED;
+			}
+		});
+		
+		//DragDetectListener listener;
+				//table.addDragDetectListener(listener);
+		
+		viewer.addCheckStateListener(new ICheckStateListener() {
+
+			@Override
+			public void checkStateChanged(CheckStateChangedEvent event) {
+				//TODO Work On 20.11.2019:
+				
+			}
+			
+		});
+		
+		
+	}
+
 
 	private void hookDragAction() {
 		table.addDragDetectListener(new DragDetectListener() {
