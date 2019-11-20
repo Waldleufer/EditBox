@@ -80,10 +80,8 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.action.*;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -144,6 +142,7 @@ public class TRCView extends ViewPart {
 		public Image getColumnImage(Object obj, int index) {
 			return getImage(obj);
 		}
+		
 		@Override
 		public Image getImage(Object obj) {
 //			return workbench.getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
@@ -199,6 +198,9 @@ public class TRCView extends ViewPart {
 //		viewer.setInput(requirementIDs);
 		
 		viewer.setInput(requirements);
+		for (TRCRequirement trcRequirement : requirements) {
+			viewer.setChecked(trcRequirement, trcRequirement.isActive());
+		}
 
 		// Line below for testing: prints file Path of currently opened file
 		// viewer.setInput(new String[] { BoxDecoratorImpl.getCurrentActivePath().toString() });
@@ -223,7 +225,6 @@ public class TRCView extends ViewPart {
 //		TRCViewArrayContentProvider t = (TRCViewArrayContentProvider) viewer.getContentProvider();
 //		t.setReversedOrder(true);
 		viewer.setLabelProvider(new ViewLabelProvider());
-		viewer.setAllChecked(true);
 		//viewer.setCellModifier(new TableCellModifier(viewer));
 
 		// Create the help context id for the viewer's control
@@ -307,7 +308,20 @@ public class TRCView extends ViewPart {
 
 			@Override
 			public void checkStateChanged(CheckStateChangedEvent event) {
-				//TODO Work On 20.11.2019:
+				Object checkChanged = event.getElement();
+				if (checkChanged instanceof TRCRequirement) {
+					TRCRequirement req = (TRCRequirement) checkChanged;
+					req.setActive(event.getChecked());
+				}
+				CheckboxTableViewer viewerz = 
+						event == null ? null : (CheckboxTableViewer) event.getSource();
+				List<TRCRequirement> reqs = 
+						viewerz == null ? null : (List<TRCRequirement>) viewerz.getInput();
+				if (reqs != null && reqs instanceof List) {
+					// Reverse back to save order.
+					TRCFileInteraction.WriteReversedTRCsToFile(reqs, BoxDecoratorImpl.getCurrentActivePath());	
+				}
+				
 				
 			}
 			

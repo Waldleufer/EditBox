@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.io.FileOutputStream;
@@ -142,6 +143,34 @@ public class TRCFileInteraction {
 		WriteTRCsToFile(requirements, filePath);
 		new Throwable("DEBUG: TRCRequirement: " + a.toString() +"\n + TRCRequirement: " + b.toString()).printStackTrace();
 	}
+	
+	/**
+	 * The TRCView handles the Requirements in the reversed order. In order to save these, the list has to be reversed.
+	 * 
+	 * @param trcReqs the TRCRequirement Array that needs to be saved in reversed order
+	 * @param path - the Absolute system Path of the corresponding Code file
+	 */
+	public static void WriteReversedTRCsToFile(List<TRCRequirement> trcReqs, IPath path) {
+		
+		List<TRCRequirement> reversed = Arrays.asList(new TRCRequirement[trcReqs.size()]);
+		Collections.copy(reversed, trcReqs);
+		Collections.reverse(reversed); 	
+		
+        try {
+        	String stringPath = exchangeEnding(path.toOSString());
+        	
+            FileOutputStream fileOut = new FileOutputStream(stringPath);
+            ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+            objectOut.writeObject(reversed);
+            objectOut.close();
+            fileOut.close();
+            System.out.println("The Object  was succesfully reversed-written to the file: " + stringPath);
+ 
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+	
 	
 	/**
 	 * 
