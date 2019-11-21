@@ -111,8 +111,13 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 		rootbox = currentbox;
 		currentBoxes.clear(); // skip root box
 
+		// ----------------------------------------------- //
+		// ----------------------------------------------- //
 		// TODO: delete line below:  Debug Starting Point
-		// TRCFileInteraction.debug(filePath);
+//		TRCFileInteraction.debug(filePath);
+		// ----------------------------------------------- //
+		// ----------------------------------------------- //
+		
 		requirements = TRCFileInteraction.ReadTRCsFromFile(filePath);
 		TRCView.updateViewer(); //update Viewers context
 
@@ -130,9 +135,9 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 			currentBoxes = new LinkedList<Box>();
 			//int[] rgb = req.getColor();
 			currentColor = req.getColor();
-			System.out.println("Requirement Color: " + currentColor.toString());
-			new Throwable("TRC Requirement: " + req.toString()).printStackTrace();
-			// TODO: handle colour
+			//TODO: remove debug outputs below 2 lines
+//			System.out.println("Requirement Color: " + currentColor.toString());
+//			new Throwable("TRC Requirement: " + req.toString()).printStackTrace()
 			List<int[]> pairs = req.getPositions();
 
 			for (int[] pair : pairs) {
@@ -264,7 +269,8 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 	}
 
 	protected void addbox0(int start, int end, int offset) {
-		System.err.println("BOX: " + currentbox.toString());
+		// TODO: remove this and the line below. Box Boundery Debug entrance
+//		System.err.println("BOX: " + currentbox.toString());
 
 		if (offset == currentbox.offset) { // Same indentation level
 			if ((emptyPrevLine && currentbox.parent != null)) { // handles empty lines on same indentation level
@@ -345,7 +351,6 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 		Box box = new Box();
 		box.end = end;
 		box.start = start;
-		System.out.println("CURRENT COLOR IS: " + currentColor.toString());
 		box.setColor(currentColor);
 		box.offset = offset;
 		box.parent = parent;
