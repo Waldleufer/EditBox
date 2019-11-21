@@ -189,7 +189,7 @@ public class TRCView extends ViewPart {
 	
 	
 	public static void updateViewer() {
-		List<TRCRequirement> requirements = TRCFileInteraction.ReadTRCsFromFile(BoxDecoratorImpl.getCurrentActivePath());
+		LinkedList<TRCRequirement> requirements = TRCFileInteraction.ReadTRCsFromFile(BoxDecoratorImpl.getCurrentActivePath());
 		LinkedList<String> requirementIDs = new LinkedList<String>();
 		for (TRCRequirement trcRequirement : requirements) {
 			requirementIDs.addFirst(trcRequirement.getId());
@@ -315,8 +315,8 @@ public class TRCView extends ViewPart {
 				}
 				CheckboxTableViewer viewerz = 
 						event == null ? null : (CheckboxTableViewer) event.getSource();
-				List<TRCRequirement> reqs = 
-						viewerz == null ? null : (List<TRCRequirement>) viewerz.getInput();
+				LinkedList<TRCRequirement> reqs = 
+						viewerz == null ? null : (LinkedList<TRCRequirement>) viewerz.getInput();
 				if (reqs != null && reqs instanceof List) {
 					// Reverse back to save order.
 					TRCFileInteraction.WriteReversedTRCsToFile(reqs, BoxDecoratorImpl.getCurrentActivePath());	
@@ -439,7 +439,7 @@ public class TRCView extends ViewPart {
 	 */
 	private void showColorDialoge() {
 		IPath path = BoxDecoratorImpl.getCurrentActivePath();
-		List<TRCRequirement> requirements = TRCFileInteraction.ReadTRCsFromFile(path);
+		LinkedList<TRCRequirement> requirements = TRCFileInteraction.ReadTRCsFromFile(path);
 		IStructuredSelection selection = viewer.getStructuredSelection();
 		Object obj = selection.getFirstElement();
 		if(obj instanceof TRCRequirement) {
