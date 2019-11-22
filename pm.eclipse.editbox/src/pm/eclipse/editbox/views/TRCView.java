@@ -80,9 +80,11 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.text.*;
 import org.eclipse.jface.action.*;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.*;
@@ -123,7 +125,7 @@ public class TRCView extends ViewPart {
 	
 	private static CheckboxTableViewer viewer;
 	private Table table;
-	private Action action1;
+	private Action actionSetRequirementBoxes;
 	private Action action2;
 	private Action doubleClickAction;
 	private Action dragAction;
@@ -362,20 +364,20 @@ public class TRCView extends ViewPart {
 	}
 
 	private void fillLocalPullDown(IMenuManager manager) {
-		manager.add(action1);
+		manager.add(actionSetRequirementBoxes);
 		manager.add(new Separator());
 		manager.add(action2);
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
-		manager.add(action1);
+		manager.add(actionSetRequirementBoxes);
 		manager.add(action2);
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 	
 	private void fillLocalToolBar(IToolBarManager manager) {
-		manager.add(action1);
+		manager.add(actionSetRequirementBoxes);
 		manager.add(action2);
 	}
 
@@ -383,15 +385,36 @@ public class TRCView extends ViewPart {
 	 * Defines all the Actions that are meant to be executed when interacting with this viewer
 	 */
 	private void makeActions() {
-		action1 = new Action() {
+		actionSetRequirementBoxes = new Action() {
 			public void run() {
-				showMessage("Action 1 executed");
+//				showMessage("Set Requirement(s) now executing");
+				setRequirementBoxes();
+//				showMessage("Set Requirement(s) executed");
+			}
+
+			private void setRequirementBoxes() {
+				IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+				ISelection selected = editor.getSite().getSelectionProvider().getSelection();
+				if (selected != null) {
+					if (selected instanceof TextSelection) {
+						TextSelection sel = (TextSelection) selected;
+						int start = sel.getOffset();
+						int length = sel.getLength();
+						int end = start + length;
+						int[] out = {start, end};
+						if(end > start) {
+							System.out.println(Arrays.toString(out));
+							BoxDecoratorImpl.changeBoxes(start, length);
+							editor.setFocus();
+						}
+					}
+				}
 			}
 		};
-		action1.setText("Action 1");
-		action1.setToolTipText("Action 1 tooltip");
-		action1.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
-			getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
+		actionSetRequirementBoxes.setText("Set Requirement(s)");
+		actionSetRequirementBoxes.setToolTipText("Sets the currently checked Requirements in the Selection in the Editor");
+		actionSetRequirementBoxes.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
+			getImageDescriptor(ISharedImages.IMG_OBJ_FILE));
 		
 		action2 = new Action() {
 			public void run() {

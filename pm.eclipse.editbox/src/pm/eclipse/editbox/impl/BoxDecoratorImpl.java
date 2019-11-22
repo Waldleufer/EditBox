@@ -84,8 +84,8 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 	public boolean keyPressed;
 	protected int charCount;
 	protected IPath path; //The absolute path of the file that is active in the Editor
-	
-	
+
+
 	public void enableUpdates(boolean flag) {
 		boolean update = flag && !this.visible;
 		this.visible = flag;
@@ -120,33 +120,33 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		IBoxBuilder boxBuilder = getBuilder();
 		if (boxBuilder == null)
 			return;
-		
+
 		IPath path = getCurrentActivePath();
-		
+
 		if (path != null)
 		{
 			new Throwable("MAGIC here is the path: " + path).printStackTrace();
 			builder.setFilePath(path);
 			this.path = path;
 		}
-		
+
 
 		builder.setTabSize(boxText.getTabs());
 		builder.setCaretOffset(setCaretOffset?boxText.getCaretOffset():-1);
 		setCaretOffset = false;
-		
+
 		StringBuilder text = new StringBuilder(boxText.getText());
-		
+
 		if (text.length() > 0 && text.charAt(text.length()-1)!='\n')
 			text.append(".");
-		
+
 		boxBuilder.setText(text);
-		
+
 		boxes = boxBuilder.build();
-		
+
 		charCount = boxText.getCharCount();
 	}
-	
+
 	/**
 	 * Calculates the path to the currently opened File.
 	 * @return the IPath of the currently opened File
@@ -194,7 +194,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 
 			if (boxes == null)
 				buildBoxes();
-			
+
 			offsetMoved();
 			updateCaret();
 			drawBackgroundBoxes();
@@ -224,7 +224,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 			Rectangle rec = newImage.getBounds();		
 			fillRectangle(bc, gc, rec.x, rec.y, rec.width, rec.height);
 		}
-		
+
 		if (settings.getAlpha()>0)
 			gc.setAlpha(settings.getAlpha());
 
@@ -234,22 +234,22 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		Collection<Box> visibleBoxes = visibleBoxes();
 
 		boolean ex = settings.getExpandBox();
-		
+
 		/**
 		 * This Loop below is filling the visible Boxes with the color
 		 */
 		for (Box b : visibleBoxes) {
 			if (checkFillbox && b.level == fillBoxLevel && b.start <= fillBoxStart && b.end >=fillBoxEnd)
 				fillBox = b;
-//			TODO: Remove Sysout
+			//			TODO: Remove Sysout
 			//Old version:
 			//fillRectangle(settings.getColor(b.level + 1), gc, b.rec.x - xOffset, b.rec.y - yOffset, ex?r0.width:b.rec.width, b.rec.height);
-//			System.out.println("FARBEN: " + b.getColor().toString());
+			//			System.out.println("FARBEN: " + b.getColor().toString());
 			Color c = b.getColor();
 			Color transparent = new Color(null, c.getRed(), c.getGreen(), c.getBlue(), 100);
 			fillRectangle(transparent, gc, b.rec.x - xOffset, b.rec.y - yOffset, ex?r0.width:b.rec.width, b.rec.height);
 		}
-		
+
 		// fill selected
 		if (settings.getFillSelected() ) {
 			if (settings.getFillOnMove() && currentBox != null && stateMask == settings.getFillKeyModifierSWTInt())
@@ -257,21 +257,21 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 			else if (fillBox != null)
 				fillRectangle(settings.getFillSelectedColor(), gc, fillBox.rec.x - xOffset, fillBox.rec.y - yOffset, ex?r0.width:(fillBox.rec.width + 1), (fillBox.rec.height + 1));
 		}
-		
+
 		for (Box b : visibleBoxes)
 			if (!b.isOn)
 				drawBox(gc, yOffset, xOffset, b, r0.width);
-		
+
 		for (Box b : visibleBoxes)
 			if (b.isOn)
 				drawBox(gc, yOffset, xOffset, b, r0.width);
-		
+
 		Image oldImage = boxText.getBackgroundImage();
 		boxText.setBackgroundImage(newImage);
 		if (oldImage != null)
 			oldImage.dispose();
 		gc.dispose();
-		
+
 		oldClientArea = r0;
 		oldXOffset = xOffset;
 		oldYOffset = yOffset;
@@ -326,7 +326,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 	void fillRectangle(Color c, GC gc, int x, int y, int width, int height) {
 		if (c == null)
 			return;
-		
+
 		//TODO : Think about a smarter way of merging the colors:
 		//TODO IDEA: Create Extra "Requirements" that conist of merged ones e.g. R01+R02
 		// and then the Boxes where they shall be. Or Just use Patterns.
@@ -335,9 +335,9 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		//Color merge = new Color(null, (a.getRed() + c.getRed()) / 2,(a.getGreen() + c.getGreen()) / 2, (a.getBlue() + c.getBlue()) / 2, 100);
 		//gc.setBackground(merge);
 		//Pattern z = gc.getBackgroundPattern();
-		
+
 		gc.setBackground(c);
-		
+
 		if (settings.getRoundBox()){
 			gc.fillRoundRectangle(x, y, width, height, ROUND_BOX_ARC, ROUND_BOX_ARC);
 		}
@@ -365,7 +365,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		fillMouseClick = new FillBoxMouseClick();
 		boxKey = new BoxKeyListener();
 		boxModify = new BoxModifyListener();
-		
+
 		if (mouseDbClickColorChange)
 			boxMouseClick = new BoxMouseClickListener();
 
@@ -382,7 +382,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		boxText.addMouseListener(fillMouseClick);
 		boxText.addModifyListener(boxModify);
 		boxText.addKeyListener(boxKey);
-				
+
 		if (mouseDbClickColorChange)
 			boxText.addMouseListener(boxMouseClick);
 
@@ -419,7 +419,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		int lineIndex = boxText.getLineIndex(r0.height);
 		if (lineIndex < boxText.getLineCount()-1)
 			end = boxText.getOffsetAtLine(lineIndex);
-		
+
 		List<Box> result = new ArrayList<Box>();
 		for (List<Box> list : boxes) {
 			for (Box b : list)
@@ -429,7 +429,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		calcBounds(result);
 		return result;
 	}
-	
+
 	protected void calcBounds(Collection<Box> boxes0) {
 		int yOffset = boxText.getTopPixel();
 		int xOffset = boxText.getHorizontalPixel();
@@ -462,7 +462,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 			p = p.parent;
 		}
 	}
-	
+
 	void updateWidth3(Box b) {
 		Box p = b.parent;
 		while (p != null && p.rec != null && p.rec.x >= b.rec.x) {
@@ -472,7 +472,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 			p = p.parent;
 		}
 	}
-	
+
 	protected boolean turnOnBox(int x0, int y0) {
 		if (boxes == null || !visible)
 			return false;
@@ -511,7 +511,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		Box newCurrent = null;
 		for (Box b : visibleBoxes()) {
 			if (contains(b.rec,x,y))
-					newCurrent = b;
+				newCurrent = b;
 			b.isOn = false;
 		}
 		if (newCurrent != null)
@@ -595,7 +595,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 
 	class BoxPaintListener implements PaintListener {
 		volatile boolean paintMode;
-		
+
 		public void paintControl(PaintEvent e) {
 			if (paintMode)
 				return;
@@ -658,29 +658,38 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		boxes = null;
 		setCaretOffset = true;
 	}
-	
+
 	/**
 	 * Change Management
 	 * @author Martin Wagner
 	 *
 	 */
 	class BoxTextChangeListener implements TextChangeListener {
-		
+
 		/**
 		 * This method is actualising all existing Boxes and writing them back to the .trc file.
 		 * @param event
 		 */
 		private void actualizeBoxes(TextChangingEvent event) {
 			int positionOfChange = event.start;
-			int amountOfChange = event.newCharCount - event.replaceCharCount;
-			
+			int amountOfChange = event.newCharCount - event.replaceCharCount;	
+			actualizeBoxes(positionOfChange, amountOfChange);	
+		}
+
+		/**
+		 * actualises the Boxes after a change at position positionOfChange with the length amountOfChange
+		 * @param positionOfChange 		0-indicated position of the change in the source code file
+		 * @param amountOfChange		the length of the change in chars.
+		 */
+		public void actualizeBoxes(int positionOfChange, int amountOfChange) {
+
 			//TODO: remove DEBUG: 
 			//System.err.println("Änderung bei: " + positionOfChange + "; Änderungsmenge: " + amountOfChange);
-			
+
 			LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile(path);
-//			LinkedList<TRCRequirement> activeRequirements = TRCFileInteraction.getActiveTRCRequirements(reqs);
-			
-			
+			//			LinkedList<TRCRequirement> activeRequirements = TRCFileInteraction.getActiveTRCRequirements(reqs);
+
+
 			for(TRCRequirement r : reqs) {
 				boolean active = r.isActive();
 				boolean changeHandled = false;
@@ -689,7 +698,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 				int splitIndex = -1;
 				int[] splitleft = null;
 				int[] splitright = null;
-				
+
 				// No occurrence of this requirement yet -> Create new pair if active
 				if(pairs.size() <= 0) {
 					System.out.println("pairs.size() == 0");
@@ -698,9 +707,9 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 						pairs.add(changed);
 						r.setPositions(pairs);						
 					}
-					
+
 				} else { // Requirement does already have at least one occurrence
-					
+
 					for(int[] pair : pairs) {
 						if(positionOfChange < pair[0]) {
 							/*
@@ -772,10 +781,10 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 						pairs.add(splitIndex, splitleft);
 						System.out.println(pairs.toString());
 					}
-					
+
 					r.setPositions(pairs);	
-					
-					
+
+
 					LinkedList<int[]> newpairs = new LinkedList<int[]>();
 					// Cleanup Pairs
 					int[] pair = null;
@@ -785,13 +794,13 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 						System.out.println("One Element found");
 						nextPair = (int[]) iterator.next();
 					}
-					
+
 					// Start at comparing the first and the second pair
 					while (iterator.hasNext()) {
 						System.out.println("Next Element found");
 						pair = nextPair;
 						nextPair = (int[]) iterator.next();
-					
+
 						if (pair[1] <= pair[0]) {
 							// Do not add the pair: pair is after change no longer valid
 						} else if (pair[1] >= nextPair[0]) {
@@ -821,7 +830,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 						System.out.println("Last | Single Element found");
 						newpairs.add(nextPair);
 					}
-					
+
 					System.out.print("    Pairs:");
 					for(int[] p : pairs) {
 						System.out.print(" " + Arrays.toString(p));
@@ -835,11 +844,11 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 					r.setPositions(newpairs);
 				}		
 			}
-			
+
 			TRCFileInteraction.WriteTRCsToFile(reqs, path);
-			
+
 		}
-		
+
 		//TODO: Change Text Changed Text Text has changed event listener
 		public void textChanged(TextChangedEvent event) {
 			change();
@@ -853,7 +862,138 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 			change();
 		}
 	}
-	
+
+	public static void changeBoxes(int positionOfChange, int amountOfChange) {
+		IPath path = getCurrentActivePath();
+		LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile(path);
+		int endOfChange = positionOfChange + amountOfChange;
+
+		for(TRCRequirement r : reqs) {
+			boolean active = r.isActive();
+			boolean changeHandled = false;
+			LinkedList<int[]> pairs = r.getPositions();
+			LinkedList<int[]> newPairs = new LinkedList<int[]>();
+
+			// No occurrence of this requirement yet -> Create new pair if active
+			if(pairs.size() <= 0) {
+				System.out.println("pairs.size() == 0");
+				if (active) {
+					int[] changed = {positionOfChange, positionOfChange+amountOfChange};
+					newPairs.add(changed);
+					r.setPositions(newPairs);	
+					changeHandled = true;
+				}
+
+			} else { // Requirement does already have at least one occurrence
+
+				for(int[] pair : pairs) {
+					if (changeHandled) {
+						int[] lastPair = newPairs.getLast();
+						if (lastPair[1] >= pair[0]) {
+							System.out.println("Fusion!");
+							if (pair[1] > lastPair[1]) {
+								lastPair[1] = pair[1];								
+							}
+						} else {
+							newPairs.add(pair);							
+						}
+					} else {
+						if(positionOfChange < pair[0]) {
+							if (endOfChange > pair[0]) {
+								// the selections right side overlaps with this box' left side
+								if (endOfChange >= pair[1]) {
+									//The selection overlaps the box completely
+									if (active) {
+										pair[0] = positionOfChange;
+										pair[1] = endOfChange;
+										newPairs.add(pair);
+										changeHandled = true;
+									} else {
+										// do NOT add the box to the new list
+									}
+								}
+								else if(active) {
+									//Add start to box
+									pair[0] = positionOfChange;	
+									newPairs.add(pair);	
+									changeHandled = true;
+								} else {
+									//Remove everything from start to end from selection 
+									//TODO: Check if the end has to be in or excluded
+									pair[0] = endOfChange;
+									newPairs.add(pair);	
+									changeHandled = true;
+								}
+							} else {
+								// No overlapp
+								if(active && !changeHandled) {
+									// New Box has to be created
+									int[] insert = {positionOfChange, endOfChange};
+									newPairs.add(insert); //add the new box
+									changeHandled = true;
+								}
+								newPairs.add(pair); // append this box
+							}
+						} else if(positionOfChange <= pair[1]) {
+							//Change occurs inside of the current box.
+							if (active && !changeHandled) {
+								System.out.println("Active + Inside Box Change!");
+								//box end needs to be altered. 
+								if(endOfChange >= pair[1]) {
+									pair[1] = endOfChange;
+								}
+								// else no change needed
+								newPairs.add(pair);	
+								changeHandled = true;
+							} else {
+								// Not active: Deletion of trc info of selection requested
+								System.out.println("Delete!");
+								if(positionOfChange > pair[0]) {
+									//handle remainder on left side
+									int[] insert = {pair[0], positionOfChange};
+									newPairs.add(insert);
+									changeHandled = true;
+								}
+								if (endOfChange < pair[1]) {
+									//handle remainder on right side
+									int[] insert = {endOfChange, pair[1]};
+									newPairs.add(insert);
+									changeHandled = true;
+								}
+							}
+						} else {
+							// the change is happening after the current box -> no action required, successor will handle.
+							newPairs.add(pair);
+						}
+					}
+
+
+				}
+				if (active && !changeHandled) {
+					// handle insertion after last boxes
+					int[] insert = {positionOfChange, positionOfChange+amountOfChange};
+					newPairs.add(insert);
+					changeHandled = true;
+				} 
+
+				System.out.print("    Pairs:");
+				for(int[] p : pairs) {
+					System.out.print(" " + Arrays.toString(p));
+				}
+				System.out.println();
+				System.out.print("New Pairs:");
+				for(int[] p : newPairs) {
+					System.out.print(" " + Arrays.toString(p));
+				}
+				System.out.println();
+				r.setPositions(newPairs);
+			}
+		}
+		
+		TRCFileInteraction.WriteTRCsToFile(reqs, path);
+		change();
+	}
+
 	class BoxMouseClickListener extends MouseAdapter {
 
 		public void mouseDoubleClick(MouseEvent e) {
@@ -880,7 +1020,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 	class FillBoxMouseClick extends MouseAdapter {
 
 		public void mouseDown(MouseEvent e) {
-			
+
 			if (e.button != 1 || settings.getFillOnMove() || e.stateMask != settings.getFillKeyModifierSWTInt()){
 				if (keyPressed) {
 					keyPressed = false;
@@ -888,15 +1028,15 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 				}
 				return;
 			}
-			
+
 			int x = e.x + boxText.getHorizontalPixel();
 			int y = e.y + boxText.getTopPixel();
-			
+
 			Box fillBox = null;
 			for (Box b : visibleBoxes())
 				if (contains(b.rec, x, y))
 					fillBox = b;
-			
+
 			if (fillBox != null && (fillBox.end != fillBoxEnd ||fillBox.start != fillBoxStart || fillBox.level != fillBoxLevel)){ 
 				fillBoxEnd = fillBox.end;
 				fillBoxLevel = fillBox.level;
@@ -906,7 +1046,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 				fillBoxStart = -1;
 				fillBoxLevel = -1;
 			}
-			
+
 			if (keyPressed) {
 				keyPressed = false;
 				Point newLoc = boxText.getLocationAtOffset(boxText.getCaretOffset());
@@ -915,11 +1055,11 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 					oldCaretLoc = newLoc;
 				}
 			}
-			
+
 			drawBackgroundBoxes();
 		}
 	}
-	
+
 	class BoxSettingsPropertyListner implements IPropertyChangeListener {
 
 		public void propertyChange(PropertyChangeEvent event) {
@@ -927,7 +1067,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		}
 	}
 
-	
+
 	public void selectCurrentBox() {
 		if (decorated && visible && boxes != null){
 			Box b = null;
@@ -935,7 +1075,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 			if (p == null || p.x == p.y) 
 				b = currentBox;
 			else{
-				
+
 				for (List<Box> list : boxes) {
 					for (Box box : list)
 						if (p.x <= box.start && p.y >= box.end - 1) {
