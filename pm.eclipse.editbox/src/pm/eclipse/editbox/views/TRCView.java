@@ -122,7 +122,7 @@ public class TRCView extends ViewPart {
 	public static final String ID = "pm.eclipse.editbox.views.TRCView";
 
 	private IWorkbench workbench = PlatformUI.getWorkbench();
-	
+
 	private static CheckboxTableViewer viewer;
 	private Table table;
 	private Action actionSetRequirementBoxes;
@@ -131,12 +131,12 @@ public class TRCView extends ViewPart {
 	private Action dragAction;
 
 	class ViewLabelProvider extends ColumnLabelProvider implements ITableLabelProvider {
-		
+
 		@Override
 		//Displaying only the useful things
 		public String getColumnText(Object obj, int index) {
 			if (obj instanceof TRCRequirement) {
-		    	return ((TRCRequirement) obj).getId();
+				return ((TRCRequirement) obj).getId();
 			}
 			return getText(obj);
 		}
@@ -144,23 +144,23 @@ public class TRCView extends ViewPart {
 		public Image getColumnImage(Object obj, int index) {
 			return getImage(obj);
 		}
-		
+
 		@Override
 		public Image getImage(Object obj) {
-//			return workbench.getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
+			//			return workbench.getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
 			return super.getImage(obj);
 		}
 		@Override	
 		public Color getBackground(final Object element) {
-		    if (element instanceof TRCRequirement) {
-		    	return ((TRCRequirement) element).getColor();
-		    }
-		    return super.getBackground(element);
+			if (element instanceof TRCRequirement) {
+				return ((TRCRequirement) element).getColor();
+			}
+			return super.getBackground(element);
 		}
-		
-		 
+
+
 	}
-	
+
 	private class TableCellModifier implements ICellModifier {
 		private TableViewer fViewer;
 
@@ -188,8 +188,8 @@ public class TRCView extends ViewPart {
 			return null;
 		}
 	}
-	
-	
+
+
 	public static void updateViewer() {
 		LinkedList<TRCRequirement> requirements = TRCFileInteraction.ReadTRCsFromFile(BoxDecoratorImpl.getCurrentActivePath());
 		LinkedList<String> requirementIDs = new LinkedList<String>();
@@ -197,8 +197,8 @@ public class TRCView extends ViewPart {
 			requirementIDs.addFirst(trcRequirement.getId());
 		}
 		//viewer.setInput(new String[] { TRCFileInteraction.ReadTRCsFromFile(BoxDecoratorImpl.getCurrentActivePath()).toString() });
-//		viewer.setInput(requirementIDs);
-		
+		//		viewer.setInput(requirementIDs);
+
 		viewer.setInput(requirements);
 		for (TRCRequirement trcRequirement : requirements) {
 			viewer.setChecked(trcRequirement, trcRequirement.isActive());
@@ -207,7 +207,7 @@ public class TRCView extends ViewPart {
 		// Line below for testing: prints file Path of currently opened file
 		// viewer.setInput(new String[] { BoxDecoratorImpl.getCurrentActivePath().toString() });
 	}
-	
+
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -218,14 +218,14 @@ public class TRCView extends ViewPart {
 				| SWT.H_SCROLL
 				| SWT.V_SCROLL
 				| SWT.FULL_SELECTION );
-		
+
 		viewer = new CheckboxTableViewer(table);
-		
+
 		viewer.setContentProvider(TRCViewArrayContentProvider.getInstance());
 		updateViewer();
 		//Reverting Display Order
-//		TRCViewArrayContentProvider t = (TRCViewArrayContentProvider) viewer.getContentProvider();
-//		t.setReversedOrder(true);
+		//		TRCViewArrayContentProvider t = (TRCViewArrayContentProvider) viewer.getContentProvider();
+		//		t.setReversedOrder(true);
 		viewer.setLabelProvider(new ViewLabelProvider());
 		//viewer.setCellModifier(new TableCellModifier(viewer));
 
@@ -238,51 +238,51 @@ public class TRCView extends ViewPart {
 		hookDoubleClickAction();
 		//hookDragAction();  // experimental TODO: remove?
 		contributeToActionBars();
-		
+
 		// Newly found: // Advanced Styling of table
-//		
-//		table.setHeaderVisible(true);
-//		table.setLinesVisible(true);
-//		table.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL |
-//		GridData.FILL_BOTH));
-//
-//		TableColumn column = new TableColumn(table, SWT.NONE, 0);
-//		column.setText("Name");
-//		column.setAlignment(SWT.LEFT);
-//		column.setWidth(300);
-//
-//		column = new TableColumn(table, SWT.NONE, 1);
-//		column.setText("Color");
-//		column.setAlignment(SWT.LEFT);
-//		column.setWidth(100);
-//
-//		//TableViewer tableViewer = new TableViewer(table);
-//		viewer.setUseHashlookup(true);
-//		viewer.setColumnProperties(new String[] { "Name", "Color" });
-//
-//		CellEditor[] editors =
-//		new CellEditor[viewer.getColumnProperties().length];
-//		editors[0] = new TextCellEditor(table);
-//		editors[1] = new ColorCellEditor(table);
-//		viewer.setCellEditors(editors);
-//
-//		//viewer.setLabelProvider(new TableLabelProvider());
-//		//viewer.setContentProvider(new TableContentProvider());
-//		viewer.setCellModifier(new TableCellModifier(viewer));
-//
-//		List list = new ArrayList();
-//		list.add(new String[] { "Tree", "Green" });
-//		list.add(new String[] { "Sun", "Yellow" });
-//		list.add(new String[] { "IBM", "Blue" });
-//		viewer.setInput(list);
-		
+		//		
+		//		table.setHeaderVisible(true);
+		//		table.setLinesVisible(true);
+		//		table.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL |
+		//		GridData.FILL_BOTH));
+		//
+		//		TableColumn column = new TableColumn(table, SWT.NONE, 0);
+		//		column.setText("Name");
+		//		column.setAlignment(SWT.LEFT);
+		//		column.setWidth(300);
+		//
+		//		column = new TableColumn(table, SWT.NONE, 1);
+		//		column.setText("Color");
+		//		column.setAlignment(SWT.LEFT);
+		//		column.setWidth(100);
+		//
+		//		//TableViewer tableViewer = new TableViewer(table);
+		//		viewer.setUseHashlookup(true);
+		//		viewer.setColumnProperties(new String[] { "Name", "Color" });
+		//
+		//		CellEditor[] editors =
+		//		new CellEditor[viewer.getColumnProperties().length];
+		//		editors[0] = new TextCellEditor(table);
+		//		editors[1] = new ColorCellEditor(table);
+		//		viewer.setCellEditors(editors);
+		//
+		//		//viewer.setLabelProvider(new TableLabelProvider());
+		//		//viewer.setContentProvider(new TableContentProvider());
+		//		viewer.setCellModifier(new TableCellModifier(viewer));
+		//
+		//		List list = new ArrayList();
+		//		list.add(new String[] { "Tree", "Green" });
+		//		list.add(new String[] { "Sun", "Yellow" });
+		//		list.add(new String[] { "IBM", "Blue" });
+		//		viewer.setInput(list);
+
 	}
 
 
 	private void hookListeners() {
 		table.addListener(SWT.EraseItem, new Listener() {
 			public void handleEvent(Event event) {
-				
+
 				event.detail &= ~SWT.HOT;
 				if ((event.detail & SWT.SELECTED) == 0) return; /* item not selected */
 				int clientWidth = table.getClientArea().width;
@@ -290,22 +290,22 @@ public class TRCView extends ViewPart {
 				Color oldForeground = gc.getForeground();
 				Color oldBackground = gc.getBackground();
 				gc.setBackground(event.display.getSystemColor(SWT.COLOR_YELLOW));
-			    gc.setForeground(event.display.getSystemColor(SWT.COLOR_BLUE));
+				gc.setForeground(event.display.getSystemColor(SWT.COLOR_BLUE));
 				//gc.fillGradientRectangle(event.x, event.y, event.width, event.height, false);
-			    gc.fillGradientRectangle(0, event.y, clientWidth, event.height, true);
+				gc.fillGradientRectangle(0, event.y, clientWidth, event.height, true);
 				//gc.drawRectangle(event.x, event.y, event.width, event.height);
 				System.out.println("MAGIC: " + event.x +  " " + event.y + " " + clientWidth + " " + event.height);
 				//gc.fillGradientRectangle(0, event.y, clientWidth, event.height, false);
-				
+
 				gc.setForeground(oldForeground);
 				gc.setBackground(oldBackground);
 				event.detail &= ~SWT.SELECTED;
 			}
 		});
-		
+
 		//DragDetectListener listener;
-				//table.addDragDetectListener(listener);
-		
+		//table.addDragDetectListener(listener);
+
 		viewer.addCheckStateListener(new ICheckStateListener() {
 
 			@Override
@@ -323,25 +323,25 @@ public class TRCView extends ViewPart {
 					// Reverse back to save order.
 					TRCFileInteraction.WriteReversedTRCsToFile(reqs, BoxDecoratorImpl.getCurrentActivePath());	
 				}
-				
-				
+
+
 			}
-			
+
 		});
-		
-		
+
+
 	}
 
 
 	private void hookDragAction() {
 		table.addDragDetectListener(new DragDetectListener() {
-			
+
 			@Override
 			public void dragDetected(DragDetectEvent e) {
 				dragAction.run();	
 			}
 		});
-		
+
 	}
 
 	private void hookContextMenu() {
@@ -375,7 +375,7 @@ public class TRCView extends ViewPart {
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
-	
+
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(actionSetRequirementBoxes);
 		manager.add(action2);
@@ -387,9 +387,9 @@ public class TRCView extends ViewPart {
 	private void makeActions() {
 		actionSetRequirementBoxes = new Action() {
 			public void run() {
-//				showMessage("Set Requirement(s) now executing");
+				//				showMessage("Set Requirement(s) now executing");
 				setRequirementBoxes();
-//				showMessage("Set Requirement(s) executed");
+				//				showMessage("Set Requirement(s) executed");
 			}
 
 			private void setRequirementBoxes() {
@@ -414,8 +414,8 @@ public class TRCView extends ViewPart {
 		actionSetRequirementBoxes.setText("Set Requirement(s)");
 		actionSetRequirementBoxes.setToolTipText("Sets the currently checked Requirements in the Selection in the Editor");
 		actionSetRequirementBoxes.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
-			getImageDescriptor(ISharedImages.IMG_OBJ_FILE));
-		
+				getImageDescriptor(ISharedImages.IMG_OBJ_FILE));
+
 		action2 = new Action() {
 			public void run() {
 				showMessage("Action 2 executed");
@@ -448,11 +448,11 @@ public class TRCView extends ViewPart {
 	}
 	private void showMessage(String message) {
 		MessageDialog.openInformation(
-			viewer.getControl().getShell(),
-			"TRC View",
-			message);
+				viewer.getControl().getShell(),
+				"TRC View",
+				message);
 	}
-	
+
 	/**
 	 * Opens a ColorDialoge Window where the user can change the color of the Requirement.
 	 * 
@@ -478,7 +478,7 @@ public class TRCView extends ViewPart {
 			}
 			TRCFileInteraction.WriteTRCsToFile(requirements, path);
 			BoxDecoratorImpl.change();
-			
+
 			IWorkbenchWindow window = 
 					workbench == null ? null : workbench.getActiveWorkbenchWindow();
 			IWorkbenchPage activePage = 
