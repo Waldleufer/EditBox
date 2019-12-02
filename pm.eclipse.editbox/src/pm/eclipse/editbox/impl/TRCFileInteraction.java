@@ -36,6 +36,7 @@ public class TRCFileInteraction {
 		private int green;
 		private int blue;
 		private boolean active;
+		private String info;
 		
 
 		/**
@@ -46,6 +47,7 @@ public class TRCFileInteraction {
 		public TRCRequirement(String id, LinkedList<int[]> positions) {
 			this.id = id;
 			this.positions = positions;
+			this.info = null;
 			Random rand = new Random();
 			int r =  (int) (rand.nextFloat() * 256.0);
 			int g =  (int) (rand.nextFloat() * 256.0);
@@ -104,6 +106,14 @@ public class TRCFileInteraction {
 
 		public void setActive(boolean active) {
 			this.active = active;
+		}
+
+		public String getInfo() {
+			return info;
+		}
+
+		public void setInfo(String info) {
+			this.info = info;
 		}
 		
 	}
@@ -237,6 +247,17 @@ public class TRCFileInteraction {
             fis.close(); //TODO: Neccesarry?
 //            System.out.println("The OBJECT is: " + debugs[0].toString());
             System.out.println("The Object was succesfully read from the file: " + stringPath);
+            
+            //TODO: Eventually launch a thread who does the following
+            
+            for (TRCRequirement trcRequirement : list) {
+				if (trcRequirement.getInfo() == null) {
+					String info = ReqIFFileInteraction.getInfo(trcRequirement.getId());
+				}
+			}
+
+            
+            
             return list;
         } catch (Exception ex) {
         	new Throwable("File access Error").printStackTrace();

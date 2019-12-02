@@ -125,10 +125,15 @@ public class TRCView extends ViewPart {
 
 	private static CheckboxTableViewer viewer;
 	private Table table;
+
 	private Action actionSetRequirementBoxes;
 	private Action action2;
 	private Action doubleClickAction;
 	private Action dragAction;
+	
+	public Table getTable() {
+		return table;
+	}
 
 	class ViewLabelProvider extends ColumnLabelProvider implements ITableLabelProvider {
 
@@ -156,6 +161,22 @@ public class TRCView extends ViewPart {
 				return ((TRCRequirement) element).getColor();
 			}
 			return super.getBackground(element);
+		}
+		
+		@Override
+		public String getToolTipText(Object element) {
+			if (element instanceof TRCRequirement) {
+				return ((TRCRequirement) element).getId();
+			}
+			return super.getToolTipText(element);
+		}
+		
+		@Override
+		public boolean useNativeToolTip(Object object) {
+			if (object instanceof TRCRequirement) {
+				return true;
+			}
+			return super.useNativeToolTip(object);
 		}
 
 
