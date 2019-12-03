@@ -41,8 +41,8 @@ public final class ReqIF10Parser {
 		String wkFile = this.getReqIFFilename();
 		// ***** Debug start ****** //
 		
-		String debug2 = "~/Uni/Bachelorarbeit/runtime-EclipseApplication/TestTest1/reqif/ReqIf\\ Train/chapter3";
 		wkFile = "/Users/Martin/Uni/Bachelorarbeit/runtime-EclipseApplication/TestTest1/reqif/chapter3.reqif";
+//		wkFile = "/Users/Martin/Uni/Bachelorarbeit/runtime-EclipseApplication/TestTest1/reqif/TestTest1.reqif";
 		this.setReqIFFilename(wkFile);
 		// ***** Debug  end  ****** //
 		 

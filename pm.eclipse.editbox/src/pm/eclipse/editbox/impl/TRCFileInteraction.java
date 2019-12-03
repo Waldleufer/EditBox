@@ -249,12 +249,7 @@ public class TRCFileInteraction {
             System.out.println("The Object was succesfully read from the file: " + stringPath);
             
             //TODO: Eventually launch a thread who does the following
-            
-            for (TRCRequirement trcRequirement : list) {
-				if (trcRequirement.getInfo() == null) {
-					String info = ReqIFFileInteraction.getInfo(trcRequirement.getId());
-				}
-			}
+            ReqIFFileInteraction.setInfos(list);
 
             
             
