@@ -79,6 +79,8 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -91,6 +93,7 @@ import org.eclipse.ui.*;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DragDetectEvent;
 import org.eclipse.swt.events.DragDetectListener;
@@ -141,7 +144,12 @@ public class TRCView extends ViewPart {
 		//Displaying only the useful things
 		public String getColumnText(Object obj, int index) {
 			if (obj instanceof TRCRequirement) {
-				return ((TRCRequirement) obj).getId();
+				if (index == 0) {
+					return ((TRCRequirement) obj).getId();
+				} else if (index == 1) {
+					return ((TRCRequirement) obj).getInfo();
+				}
+				
 			}
 			return getText(obj);
 		}
@@ -221,6 +229,7 @@ public class TRCView extends ViewPart {
 		//		viewer.setInput(requirementIDs);
 
 		viewer.setInput(requirements);
+		
 		for (TRCRequirement trcRequirement : requirements) {
 			viewer.setChecked(trcRequirement, trcRequirement.isActive());
 		}
@@ -236,10 +245,30 @@ public class TRCView extends ViewPart {
 		table = new Table(parent, SWT.BORDER
 				| SWT.MULTI
 				| SWT.CHECK
-				| SWT.H_SCROLL
 				| SWT.V_SCROLL
 				| SWT.FULL_SELECTION );
-
+		
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+		
+		TableColumn column = new TableColumn(table, SWT.BORDER, 0);
+		column.setText("Requirement ID");
+		column.setAlignment(SWT.LEFT);
+		
+		
+		TableColumn column2 = new TableColumn(table, SWT.BORDER, 1);
+		column2.setText("Info");
+		column2.setAlignment(SWT.LEFT);
+		
+		//TODO: Layout can be improved: Size of Columns should automatically adapt to Size of first column
+		//TODO: Cells content in Info column should be wrapped.
+		
+		TableLayout tableLayout = new TableLayout(true);
+		tableLayout.addColumnData(new ColumnWeightData(20));
+		tableLayout.addColumnData(new ColumnWeightData(80));
+		table.setLayout(tableLayout);
+		
+		
 		viewer = new CheckboxTableViewer(table);
 
 		viewer.setContentProvider(TRCViewArrayContentProvider.getInstance());
@@ -262,20 +291,20 @@ public class TRCView extends ViewPart {
 
 		// Newly found: // Advanced Styling of table
 		//		
-		//		table.setHeaderVisible(true);
-		//		table.setLinesVisible(true);
-		//		table.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL |
-		//		GridData.FILL_BOTH));
-		//
-		//		TableColumn column = new TableColumn(table, SWT.NONE, 0);
-		//		column.setText("Name");
-		//		column.setAlignment(SWT.LEFT);
-		//		column.setWidth(300);
-		//
-		//		column = new TableColumn(table, SWT.NONE, 1);
-		//		column.setText("Color");
-		//		column.setAlignment(SWT.LEFT);
-		//		column.setWidth(100);
+//				table.setHeaderVisible(true);
+//				table.setLinesVisible(true);
+//				table.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL |
+//				GridData.FILL_BOTH));
+//		
+//				TableColumn column = new TableColumn(table, SWT.NONE, 0);
+//				column.setText("Name");
+//				column.setAlignment(SWT.LEFT);
+//				column.setWidth(300);
+//		
+//				column = new TableColumn(table, SWT.NONE, 1);
+//				column.setText("Color");
+//				column.setAlignment(SWT.LEFT);
+//				column.setWidth(100);
 		//
 		//		//TableViewer tableViewer = new TableViewer(table);
 		//		viewer.setUseHashlookup(true);
