@@ -32,11 +32,22 @@ public class Box {
 	private List<Box> children;
 	public Object data;
 	
-	public List<String> requirements;
+	private ArrayList<String> requirements = new ArrayList<String>();  // List of all RequirementIDs highlighted in this box
 	
 	@Override
 	public String toString() {
 		return "["+start+","+end+","+offset+","+maxEndOffset+"]";
+	}
+	
+	/**
+	 * Adds the given Requirement ID to the List
+	 */
+	public void addRequirement(String reqId) {
+		requirements.add(reqId);
+	}
+	
+	public ArrayList<String> getRequirements() {
+		return requirements;
 	}
 
 	public void setColor(Color color) {

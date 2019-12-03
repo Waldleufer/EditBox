@@ -7,9 +7,9 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.Random;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
@@ -31,10 +31,12 @@ public class TRCFileInteraction {
 		 */
 		private static final long serialVersionUID = 3704543854027523254L;
 		private String id;
-		private List<int[]> positions;
+		private LinkedList<int[]> positions;
 		private int red;
 		private int green;
 		private int blue;
+		private boolean active;
+		private String info;
 		
 
 		/**
@@ -42,14 +44,16 @@ public class TRCFileInteraction {
 		 * @param id - the unique ID of the requirement
 		 * @param positions - a list of (start, end) tuples.
 		 */
-		public TRCRequirement(String id, List<int[]> positions) {
+		public TRCRequirement(String id, LinkedList<int[]> positions) {
 			this.id = id;
 			this.positions = positions;
+			this.info = null;
 			Random rand = new Random();
 			int r =  (int) (rand.nextFloat() * 256.0);
 			int g =  (int) (rand.nextFloat() * 256.0);
 			int b =  (int) (rand.nextFloat() * 256.0);
 			Color randomColor = new Color(null, r, g, b);
+			setActive(false);
 			// Debug: 
 			//Color randomColor = new Color(null, 100, 150, 0);
 			setColor(randomColor);
@@ -66,8 +70,15 @@ public class TRCFileInteraction {
 		/**
 		 * @return the position Pairs: [Start, End] contained in a list.
 		 */
-		public List<int[]> getPositions() {
+		public LinkedList<int[]> getPositions() {
 			return positions;
+		}
+		
+		/**
+		 * sets the new position pairs: [Start, End] contained in a list.
+		 */
+		public void setPositions(LinkedList<int[]> positions) {
+			this.positions = positions;
 		}
 
 		@Override
@@ -78,17 +89,6 @@ public class TRCFileInteraction {
 			}
 			return out;
 		}
-
-//		public void setColor(int red, int green, int blue) {
-//			this.red = red;
-//			this.green = green;
-//			this.blue = blue;
-//		}
-//		
-//		public int[] getColor() {
-//			int[] a = {red, green, blue};
-//			return a;
-//		}
 		
 		public Color getColor() {
 			return new Color(null, red, green, blue);
@@ -99,48 +99,44 @@ public class TRCFileInteraction {
 			this.green = color.getGreen();
 			this.blue = color.getBlue();
 		}
+
+		public boolean isActive() {
+			return active;
+		}
+
+		public void setActive(boolean active) {
+			this.active = active;
+		}
+
+		public String getInfo() {
+			return info;
+		}
+
+		public void setInfo(String info) {
+			this.info = info;
+		}
 		
 	}
 	
 	public static final Path ANCHOR = Paths.get("/Users/Martin/Uni/Bachelorarbeit/runtime-EclipseApplication");
 	
-//	/**
-//	 * 
-//	 * @return true if the operation was successful.
-//	 */
-//	public static TRCRequirement[] getTRCSets(String path) {
-//		
-//		Scanner fileToRead = null;
-//		TRCRequirement[] requirementsAndTRCInfoOfThisFile;
-//        try {
-//            fileToRead = new Scanner(new File(ANCHOR.resolve(path.substring(1)).toString())); //point the scanner method to a file + Remove heading "/" from path and get full path.
-//            //check if there is a next line and it is not null and then read it in
-//            for (Object line; fileToRead.hasNextLine() && (line = fileToRead.nextLine()) != null; ) {
-//                System.out.println(req[0]);//TODO: remove Debug
-//                TRCRequirement lineReq = 
-//                //TRCRequirement lineReq = new TRCRequirement(req[0], req[1])  //TODO: remove \r\n
-//                	requirementsAndTRCInfoOfThisFile;
-//                }
-//            
-//            fileToRead.close();//this is used to release the scanner from file
-//            return null;
-//        } catch (FileNotFoundException ex) {//if the file cannot be found an exception will be thrown
-//        	System.err.println("The file " + path + " could not be found! " + ex.getMessage());
-//            return null;
-//        } finally {
-//        	fileToRead.close();
-//        }
-//	}
-	
+	/**
+	 * Creating a test Purpose .trc File
+	 * @param filePath - the IPath of the .trc file
+	 * 
+	 */
 	public static void debug(IPath filePath) {
+		
+		System.err.println("DEBUGGING");
 		
 //		String path = filePath.toOSString();
 //    	String name = exchangeEnding(path);
 		
-    	List<TRCRequirement> requirements = new ArrayList<TRCRequirement>();
-		List<int[]> foo = new ArrayList<int[]>();
+    	LinkedList<TRCRequirement> requirements = new LinkedList<TRCRequirement>();
+		LinkedList<int[]> foo = new LinkedList<int[]>();
 		//int[] a1 = {0, 1543};
-		int[] a2 = {32, 208};
+		//int[] a2 = {13, 28};
+		int[] a2 = {34, 210};
 		int[] a3 = {809, 940};
 		int[] a4 = {211, 1484};
 		int[] a5 = {1487, 1539};
@@ -152,14 +148,14 @@ public class TRCFileInteraction {
 		foo.add(a5); 
 //		foo.add(b);
 	    TRCRequirement a = new TRCRequirement("R01", foo);
-	    a.setColor(new Color(null, 250, 1, 1, 100));
+	    //a.setColor(new Color(null, 250, 1, 1, 100));
 	    //TRCRequirement b = new TRCRequirement("R02", positions)
 	   
-	    List<int[]> bar = new ArrayList<int[]>();
+	    LinkedList<int[]> bar = new LinkedList<int[]>();
 	    int[] b1 = {250, 1200}; //currently not used
 	    bar.add(b1);
 	    TRCRequirement b = new TRCRequirement("R02", bar);
-	    b.setColor(new Color(null, 1, 150, 1, 100));
+	   // b.setColor(new Color(null, 1, 150, 1, 100));
 	    requirements.add(b);
 	    requirements.add(a);
 		WriteTRCsToFile(requirements, filePath);
@@ -167,12 +163,42 @@ public class TRCFileInteraction {
 	}
 	
 	/**
+	 * The TRCView handles the Requirements in the reversed order. In order to save these, the list has to be reversed.
+	 * 
+	 * @param trcReqs the TRCRequirement Array that needs to be saved in reversed order
+	 * @param path - the Absolute system Path of the corresponding Code file
+	 */
+	public static void WriteReversedTRCsToFile(LinkedList<TRCRequirement> trcReqs, IPath path) {
+		
+		LinkedList<TRCRequirement> reversed = new LinkedList<TRCRequirement>(Arrays.asList(new TRCRequirement[trcReqs.size()]));
+		Collections.copy(reversed, trcReqs);
+		Collections.reverse(reversed); 	
+		
+        try {
+        	String stringPath = exchangeEnding(path.toOSString());
+        	
+            FileOutputStream fileOut = new FileOutputStream(stringPath);
+            ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+            objectOut.writeObject(reversed);
+            objectOut.close();
+            fileOut.close();
+            System.out.println("The Object  was succesfully reversed-written to the file: " + stringPath);
+ 
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+	
+	
+	/**
 	 * 
 	 * @param trcReqs the TRCRequirement Array that needs to be saved
 	 * @param path - the Absolute system Path of the corresponding Code file
 	 */
-	public static void WriteTRCsToFile(List<TRCRequirement> trcReqs, IPath path) {
-		 	
+	public static void WriteTRCsToFile(LinkedList<TRCRequirement> trcReqs, IPath path) {
+		 	for (TRCRequirement trcRequirement : trcReqs) {
+				System.out.println(trcRequirement.toString());
+			}
         try {
         	String stringPath = exchangeEnding(path.toOSString());
         	
@@ -192,12 +218,13 @@ public class TRCFileInteraction {
     }
     
 	/**
+	 * Opens the corresponding .trc file to the file at filePath and reads its contents.
 	 * 
-	 * @param filePath the absolute system path
+	 * @param filePath the absolute system path to the currently opened file.
 	 * @return the TRCRequirement[] read.
 	 */
-    public static List<TRCRequirement> ReadTRCsFromFile(IPath filePath) {
-    	List<TRCRequirement> debugs = new ArrayList<TRCRequirement>();
+    public static LinkedList<TRCRequirement> ReadTRCsFromFile(IPath filePath) {
+    	LinkedList<TRCRequirement> debugs = new LinkedList<TRCRequirement>();
         try {
         	String stringPath = exchangeEnding(filePath.toOSString());    	
         	
@@ -205,31 +232,28 @@ public class TRCFileInteraction {
             System.err.println("one");
             ObjectInputStream ois = new ObjectInputStream(fis);
             System.err.println("two");
-            List<TRCRequirement> list = (List<TRCRequirement>) ois.readObject();
-            if (list == null) {
-				new Throwable("list = null").printStackTrace();
+            Object read = ois.readObject();	
+            LinkedList<TRCRequirement> list = null;
+            if (read == null) {
+				new Throwable("read = null").printStackTrace();
+			} else {
+				if (read instanceof LinkedList) {
+					list = (LinkedList<TRCRequirement>) read;
+				}			
 			}
-            debugs = list;
             System.err.println("three");
             //TRCRequirement[] trcsFromSavedFile = (TRCRequirement[]) ois.readObject();
             ois.close();
             fis.close(); //TODO: Neccesarry?
 //            System.out.println("The OBJECT is: " + debugs[0].toString());
             System.out.println("The Object was succesfully read from the file: " + stringPath);
-            return debugs;
-//        try {
-//        	String path = filePath.toString();
-//        	String name = exchangeEnding(path);    	
-//            FileInputStream fis = new FileInputStream(name);
-//            System.err.println("one");
-//            ObjectInputStream ois = new ObjectInputStream(fis);
-//            System.err.println("two");
-//            TRCRequirement[] trcsFromSavedFile = (TRCRequirement[])ois.readObject();
-//            System.err.println("three");
-//            ois.close();
-//            fis.close(); //TODO: Neccesarry?
-//            System.out.println("The Object was succesfully read from the file: " + name);
-//            return trcsFromSavedFile;
+            
+            //TODO: Eventually launch a thread who does the following
+            ReqIFFileInteraction.setInfos(list);
+
+            
+            
+            return list;
         } catch (Exception ex) {
         	new Throwable("File access Error").printStackTrace();
             ex.printStackTrace();
@@ -254,6 +278,21 @@ public class TRCFileInteraction {
 	private static String exchangeEnding(String filenameOrPath) {
 		String trcString = filenameOrPath.split("\\.")[0] + ".trc";
 		return trcString;
+	}
+
+	/**
+	 * 
+	 * @param reqs the current list of requirements
+	 * @return
+	 */
+	public static LinkedList<TRCRequirement> getActiveTRCRequirements(LinkedList<TRCRequirement> reqs) {
+		LinkedList<TRCRequirement> active = new LinkedList<TRCRequirement>();
+		for (TRCRequirement trcRequirement : reqs) {
+			if (trcRequirement.isActive()) {
+				active.add(trcRequirement);
+			}
+		}
+		return active;
 	}
 	
 }

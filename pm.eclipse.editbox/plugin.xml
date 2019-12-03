@@ -48,5 +48,55 @@
 		   </action>
 	   </actionSet>
 	</extension>
+ <extension
+       point="org.eclipse.ui.views">
+    <view
+          class="pm.eclipse.editbox.views.TRCView"
+          icon="icons/sample.png"
+          id="pm.eclipse.editbox.views.TRCview2"
+          name="TRC View">
+    </view>
+ </extension>
+ <extension
+       point="org.eclipse.ui.navigator.viewer">
+    <viewerActionBinding
+          viewerId="pm.eclipse.editbox.views.TRCview2">
+       <includes>
+          <actionExtension
+                pattern="org.eclipse.ui.navigator.resources.*">
+          </actionExtension>
+       </includes>
+    </viewerActionBinding>
+    <viewerContentBinding
+          viewerId="pm.eclipse.editbox.views.TRCview2">
+       <includes>
+          <contentExtension
+                pattern="org.eclipse.ui.navigator.resourceContent">
+          </contentExtension>
+          <contentExtension
+                pattern="org.eclipse.ui.navigator.resources.filters.*">
+          </contentExtension>
+          <contentExtension
+                pattern="org.eclipse.ui.navigator.resources.linkHelper">
+          </contentExtension>
+          <contentExtension
+                pattern="org.eclipse.ui.navigator.resources.workingSets">
+          </contentExtension>
+       </includes>
+    </viewerContentBinding>
+ </extension>
+ <extension
+       point="org.eclipse.ui.perspectiveExtensions">
+    <perspectiveExtension
+          targetID="org.eclipse.ui.resourcePerspective">
+       <view
+             id="pm.eclipse.editbox.views.TRCview2"
+             ratio="0.5"
+             relationship="stack"
+             relative="org.eclipse.ui.views.ContentOutline"
+             visible="true">
+       </view>
+    </perspectiveExtension>
+ </extension>
 
 </plugin>
