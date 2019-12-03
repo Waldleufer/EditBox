@@ -98,5 +98,19 @@
        </view>
     </perspectiveExtension>
  </extension>
+ <extension
+       point="org.eclipse.ui.newWizards">
+    <category
+          id="pm.eclipse.editbox"
+          name="TRC Wizards">
+    </category>
+    <wizard
+          category="pm.eclipse.editbox"
+          class="pm.eclipse.editbox.wizards.TRCNewWizard"
+          icon="icons/sample.png"
+          id="pm.eclipse.editbox.wizards.TRCNewWizard"
+          name="Traceability Data file">
+    </wizard>
+ </extension>
 
 </plugin>

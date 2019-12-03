@@ -261,7 +261,7 @@ public class TRCFileInteraction {
         }
     }
     
-    /** 
+    /** @deprecated
      * 
      * @param path The relative path in the project Directory
      * @return the absolute system path
@@ -275,7 +275,7 @@ public class TRCFileInteraction {
      * @param filenameOrPath ending with .*
      * @return filePath of the corresponding .trc file
      */
-	private static String exchangeEnding(String filenameOrPath) {
+	public static String exchangeEnding(String filenameOrPath) {
 		String trcString = filenameOrPath.split("\\.")[0] + ".trc";
 		return trcString;
 	}
