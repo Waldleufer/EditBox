@@ -31,7 +31,7 @@ public class ReqIFFileInteraction {
 
 		for(TRCRequirement req : trcList) {
 			String info = req.getInfo();
-			if (info != null && !info.isEmpty()) {
+			if (info == null || info.isEmpty()) {
 
 				String id = req.getId();
 
@@ -62,11 +62,16 @@ public class ReqIFFileInteraction {
 			int similarity = isSimilar(id, spec);
 			switch (similarity) {
 			case NOT_SIMILAR:
-				break;
+				continue;
 			case EQUAL: 
 				return spec;
 			case SIMILAR:
-				return descend(id, spec.getChildren());
+				SpecHierarchy lookFurther = descend(id, spec.getChildren());
+				if(lookFurther == null) {
+					continue;
+				} else {
+					return lookFurther;
+				}
 			}
 		}
 		//if not found at all:

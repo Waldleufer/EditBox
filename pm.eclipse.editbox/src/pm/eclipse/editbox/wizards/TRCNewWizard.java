@@ -139,6 +139,7 @@ public class TRCNewWizard extends Wizard implements INewWizard {
 		LinkedList<TRCRequirement> trcReqs = new LinkedList<TRCRequirement>();
 		for(String id : ids) {
 			TRCRequirement trcReq = new TRCRequirement(id, new LinkedList<int[]>());
+			System.out.println("Creating: " + trcReq.toString());
 			trcReqs.add(trcReq);
 		}
 		return trcReqs;

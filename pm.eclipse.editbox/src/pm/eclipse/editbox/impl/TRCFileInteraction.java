@@ -62,9 +62,9 @@ public class TRCFileInteraction {
 			this.positions = positions;
 			this.info = null;
 			Random rand = new Random();
-			int r =  (int) (rand.nextFloat() * 256.0);
-			int g =  (int) (rand.nextFloat() * 256.0);
-			int b =  (int) (rand.nextFloat() * 256.0);
+			int r =  (int) (180.0 + rand.nextFloat() * 76.0);
+			int g =  (int) (180.0 + rand.nextFloat() * 76.0);
+			int b =  (int) (180.0 + rand.nextFloat() * 76.0);
 			Color randomColor = new Color(null, r, g, b);
 			setActive(false);
 			// Debug: 
@@ -209,9 +209,10 @@ public class TRCFileInteraction {
 	 * @param path - the Absolute system Path of the corresponding Code file
 	 */
 	public static void WriteTRCsToFile(LinkedList<TRCRequirement> trcReqs, IPath path) {
-		 	for (TRCRequirement trcRequirement : trcReqs) {
-				System.out.println("WriteTRCsToFile: " + trcRequirement.toString());
-			}
+			// TODO: Debug print below 
+//		 	for (TRCRequirement trcRequirement : trcReqs) {
+//				System.out.println("WriteTRCsToFile: " + trcRequirement.toString());
+//			}
         try {
         	String stringPath = exchangeEnding(path.toOSString());
         	
@@ -269,17 +270,7 @@ public class TRCFileInteraction {
     	//Localise:
     	String local = stringPath.split(ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString())[1];
     	System.out.println("LOCAL: "+ local);
-    	
-    	try {
-    		IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(local, false);
-    		if (res == null || !res.exists()) {
-    			throw new Exception("file does not exist: " + res);
-    		}
-    	} catch (Exception ex) {
-//            ex.printStackTrace();
-    		// We are all good. there is just no .trc file
-            return null;
-    	}
+    	IPath localpath = new org.eclipse.core.runtime.Path(local);
     	
         try {
         	
@@ -316,6 +307,7 @@ public class TRCFileInteraction {
 
             return reqs;
         } catch (Exception ex) {
+        	// No file found or file access error
         	new Throwable("File access Error").printStackTrace();
             ex.printStackTrace();
             return null;
