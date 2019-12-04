@@ -113,13 +113,16 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 
 		// ----------------------------------------------- //
 		// ----------------------------------------------- //
-		// TODO: delete line below:  Debug Starting Point
+		// TODO: delete line below:  Debug Starting Point / Debug Entry Point 
 //		TRCFileInteraction.debug(filePath);
 		// ----------------------------------------------- //
 		// ----------------------------------------------- //
 		
-		requirements = TRCFileInteraction.ReadTRCsFromFile(filePath);
-		TRCView.updateViewer(); //update Viewers context
+		requirements = TRCFileInteraction.ReadTRCsFromFileAndUpdate(filePath);
+		if(requirements == null) {
+			//return the empty Linked List
+			return boxes;
+		}
 
 		emptyPrevLine = false;
 		int start = 0;
@@ -161,7 +164,10 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 				 * called with (empty = true) will set (emptyPrevLine = true);
 				 */
 				for (int i = start; i <= end; i++) { // setze i zu beginn, da boxen ja gespeichert. und begrenze end.
-
+					if (i >= text.length()) {
+						// Do not attempt to draw after EOF.
+						break;
+					}
 					char c = text.charAt(i);
 					boolean isWhitespace = Character.isWhitespace(c) && i != caretOffset;
 
@@ -278,7 +284,8 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 
 		if (offset == currentbox.offset) { // Same indentation level
 			if ((emptyPrevLine && currentbox.parent != null)) { // handles empty lines on same indentation level
-				if (offset <= 4) {
+				if (offset < 4) {
+					// offset <= 4 would create multiple inner boxes for any box. we only want 1 Box Layer per Requirement.
 					currentbox = newbox(start, end, offset, currentbox.parent);
 					updateParentEnds(currentbox);
 				} else {

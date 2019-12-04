@@ -48,6 +48,8 @@ import pm.eclipse.editbox.IBoxDecorator;
 import pm.eclipse.editbox.IBoxProvider;
 import pm.eclipse.editbox.IBoxSettings;
 import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
+import pm.eclipse.editbox.views.TRCView;
+import pm.eclipse.editbox.views.TRCViewArrayContentProvider;
 
 public class BoxDecoratorImpl implements IBoxDecorator {
 
@@ -125,7 +127,8 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 
 		if (path != null)
 		{
-			new Throwable("MAGIC here is the path: " + path).printStackTrace();
+			//TODO: MAGIC PATH LOCATION remove
+//			new Throwable("MAGIC here is the path: " + path).printStackTrace();
 			builder.setFilePath(path);
 			this.path = path;
 		}
@@ -685,12 +688,17 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 
 			//TODO: remove DEBUG: 
 			//System.err.println("Änderung bei: " + positionOfChange + "; Änderungsmenge: " + amountOfChange);
-
+			
 			LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile(path);
-			//			LinkedList<TRCRequirement> activeRequirements = TRCFileInteraction.getActiveTRCRequirements(reqs);
+			
+			if (reqs == null) {
+				return;
+			}
 
 
-			for(TRCRequirement r : reqs) {
+			for (TRCRequirement r : reqs) {
+				System.out.println("Requirement from Table: " + r.toString());					
+				
 				boolean active = r.isActive();
 				boolean changeHandled = false;
 				LinkedList<int[]> pairs = r.getPositions();
@@ -863,12 +871,23 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		}
 	}
 
+	
+	/**
+	 * sets the Requirement Boxes as selected in the Editor
+	 * @param positionOfChange
+	 * @param amountOfChange
+	 */
 	public static void changeBoxes(int positionOfChange, int amountOfChange) {
 		IPath path = getCurrentActivePath();
 		LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile(path);
+		if (reqs == null) {
+			return;
+		}
 		int endOfChange = positionOfChange + amountOfChange;
 
-		for(TRCRequirement r : reqs) {
+		for (Iterator<TRCRequirement> iterator = reqs.iterator(); iterator.hasNext();) {
+			TRCRequirement r = (TRCRequirement) iterator.next();
+			
 			boolean active = r.isActive();
 			boolean changeHandled = false;
 			LinkedList<int[]> pairs = r.getPositions();

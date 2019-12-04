@@ -9,20 +9,33 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+
+import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
+import pm.eclipse.editbox.views.TRCView;
 /**
  * @author Martin
  *
  */
 public class TRCFileInteraction {
+	
+	private static String page;
 	
 	public static final class TRCRequirement implements Serializable
 	{
@@ -197,7 +210,7 @@ public class TRCFileInteraction {
 	 */
 	public static void WriteTRCsToFile(LinkedList<TRCRequirement> trcReqs, IPath path) {
 		 	for (TRCRequirement trcRequirement : trcReqs) {
-				System.out.println(trcRequirement.toString());
+				System.out.println("WriteTRCsToFile: " + trcRequirement.toString());
 			}
         try {
         	String stringPath = exchangeEnding(path.toOSString());
@@ -224,9 +237,52 @@ public class TRCFileInteraction {
 	 * @return the TRCRequirement[] read.
 	 */
     public static LinkedList<TRCRequirement> ReadTRCsFromFile(IPath filePath) {
-    	LinkedList<TRCRequirement> debugs = new LinkedList<TRCRequirement>();
+    	checkWindowChanged();
+    	
+    	System.out.println("Initialised?: " + TRCView.isInitialized());
+//    	new Throwable("I Hate to do this printStackTrace thing").printStackTrace();
+    	
+    	
+    	if (TRCView.isInitialized()) {
+    		//Shortcut
+    		LinkedList<TRCRequirement> reverseReqs;
+    		LinkedList<TRCRequirement> reqs;
+    		
+    		try {
+				//displayed Order is reversed so we use a descending Iterator.
+    			reqs = (LinkedList<TRCRequirement>) TRCView.getViewer().getInput();	
+//    			reqs = new LinkedList<TRCRequirement>();
+//    			
+//    			for (Iterator<TRCRequirement> descIterator = reverseReqs.descendingIterator(); descIterator.hasNext();) {
+//    				TRCRequirement r = (TRCRequirement) descIterator.next();
+//    				reqs.add(r);
+//    			}
+    			return reqs;
+			} catch (Exception e) {
+				System.err.println("Not Initialised, due to: " + e.getMessage());
+			}
+    	}
+    	
+    	String stringPath = exchangeEnding(filePath.toOSString());
+    	IPath path = new org.eclipse.core.runtime.Path(stringPath);
+    	
+    	//Localise:
+    	String local = stringPath.split(ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString())[1];
+    	System.out.println("LOCAL: "+ local);
+    	
+    	try {
+    		IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(local, false);
+    		if (res == null || !res.exists()) {
+    			throw new Exception("file does not exist: " + res);
+    		}
+    	} catch (Exception ex) {
+//            ex.printStackTrace();
+    		// We are all good. there is just no .trc file
+            return null;
+    	}
+    	
         try {
-        	String stringPath = exchangeEnding(filePath.toOSString());    	
+        	
         	
             FileInputStream fis = new FileInputStream(stringPath);
             System.err.println("one");
@@ -248,12 +304,17 @@ public class TRCFileInteraction {
 //            System.out.println("The OBJECT is: " + debugs[0].toString());
             System.out.println("The Object was succesfully read from the file: " + stringPath);
             
+            LinkedList<TRCRequirement> reqs = new LinkedList<TRCRequirement>();
+			
+			for (Iterator<TRCRequirement> descIterator = list.descendingIterator(); descIterator.hasNext();) {
+				TRCRequirement r = (TRCRequirement) descIterator.next();
+				reqs.add(r);
+			}
+            
             //TODO: Eventually launch a thread who does the following
-            ReqIFFileInteraction.setInfos(list);
+            ReqIFFileInteraction.setInfos(reqs);
 
-            
-            
-            return list;
+            return reqs;
         } catch (Exception ex) {
         	new Throwable("File access Error").printStackTrace();
             ex.printStackTrace();
@@ -261,7 +322,29 @@ public class TRCFileInteraction {
         }
     }
     
-    /** @deprecated
+    /**
+     * Checks whether the user eventually switched page
+     */
+    private static void checkWindowChanged() {
+		String currPage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getTitle();
+		if (page == null || !page.equals(currPage)) {
+			TRCView.setInitialized(false);
+			page = currPage;
+		}
+		
+	}
+
+	public static List<TRCRequirement> ReadTRCsFromFileAndUpdate(IPath filePath) {
+    	
+		LinkedList<TRCRequirement> reqs = TRCView.updateViewer();
+		if(reqs == null) {
+			return null;
+		}
+//		TRCView.updateViewer(reqs); //update Viewers context // is done in updateViewer();
+		return reqs;
+	}
+
+	/** @deprecated
      * 
      * @param path The relative path in the project Directory
      * @return the absolute system path

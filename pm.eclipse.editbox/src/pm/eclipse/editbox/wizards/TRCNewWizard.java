@@ -7,6 +7,9 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.core.runtime.*;
 import org.eclipse.jface.operation.*;
 import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedList;
+import java.util.stream.Stream;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.core.resources.*;
@@ -14,6 +17,8 @@ import org.eclipse.core.runtime.CoreException;
 import java.io.*;
 import org.eclipse.ui.*;
 import org.eclipse.ui.ide.IDE;
+
+import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
 
 /**
  * This is a sample new wizard. Its role is to create a new file 
@@ -25,7 +30,8 @@ import org.eclipse.ui.ide.IDE;
  */
 
 public class TRCNewWizard extends Wizard implements INewWizard {
-	private TRCNewWizardPage page;
+	private TRCNewWizardPage newWisardPage;
+	private TRCWizardSelectRequirementsPage selectRequirementsPage;
 	private ISelection selection;
 
 	/**
@@ -37,12 +43,14 @@ public class TRCNewWizard extends Wizard implements INewWizard {
 	}
 	
 	/**
-	 * Adding the page to the wizard.
+	 * Adding the newWisardPage to the wizard.
 	 */
 	@Override
 	public void addPages() {
-		page = new TRCNewWizardPage(selection);
-		addPage(page);
+		newWisardPage = new TRCNewWizardPage(selection);
+		addPage(newWisardPage);
+		selectRequirementsPage = new TRCWizardSelectRequirementsPage();
+		addPage(selectRequirementsPage);
 	}
 
 	/**
@@ -52,11 +60,12 @@ public class TRCNewWizard extends Wizard implements INewWizard {
 	 */
 	@Override
 	public boolean performFinish() {
-		final String containerName = page.getSourceFileName();
-		final String fileName = page.getNewFileName();
+		final String sourceFileName = newWisardPage.getSourceFileName();
+		final String fileName = newWisardPage.getNewFileName();
+		final String[] requirementIDs = selectRequirementsPage.getSpecifiedIDs();
 		IRunnableWithProgress op = monitor -> {
 			try {
-				doFinish(containerName, fileName, monitor);
+				doFinish(sourceFileName, fileName, requirementIDs, monitor);
 			} catch (CoreException e) {
 				throw new InvocationTargetException(e);
 			} finally {
@@ -82,50 +91,57 @@ public class TRCNewWizard extends Wizard implements INewWizard {
 	 */
 
 	private void doFinish(
-		String containerName,
-		String fileName,
+		final String sourceFileName,
+		final String fileName,
+		final String[] requirementIDs,
 		IProgressMonitor monitor)
 		throws CoreException {
 		// create a sample file
 		monitor.beginTask("Creating " + fileName, 2);
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		IResource resource = root.findMember(new Path(containerName));
-		if (!resource.exists() || !(resource instanceof IContainer)) {
-			throwCoreException("Container \"" + containerName + "\" does not exist.");
+		IFile resource = root.getFile((new Path(sourceFileName)));
+		if (!resource.exists()) {
+			throwCoreException("File \"" + sourceFileName + "\" does not exist.");
 		}
-		IContainer container = (IContainer) resource;
-		final IFile file = container.getFile(new Path(fileName));
+		final IFile file = root.getFile(new Path(fileName));
+		System.out.println(file.toString());
+		final String absolut = file.getLocation().toOSString();
+		System.out.println("ABSOLUT: " + absolut);
 		try {
-			InputStream stream = openContentStream();
-			if (file.exists()) {
-				file.setContents(stream, true, true, monitor);
-			} else {
-				file.create(stream, true, monitor);
-			}
-			stream.close();
+			LinkedList<TRCRequirement> trcReqs = getTRCReqs(requirementIDs);
+			FileOutputStream fileOut = new FileOutputStream(absolut);
+            ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
+            objectOut.writeObject(trcReqs);
+            objectOut.close();
+            fileOut.close(); //TODO: Neccesarry?
 		} catch (IOException e) {
+			throwCoreException(e.getMessage());
 		}
-		monitor.worked(1);
-		monitor.setTaskName("Opening file for editing...");
-		getShell().getDisplay().asyncExec(() -> {
-			IWorkbenchPage page =
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-			try {
-				IDE.openEditor(page, file, true);
-			} catch (PartInitException e) {
-			}
-		});
+//		monitor.worked(1);
+//		monitor.setTaskName("Opening file for editing...");
+//		getShell().getDisplay().asyncExec(() -> {
+//			IWorkbenchPage page =
+//				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+//			try {
+//				IDE.openEditor(page, file, true);
+//			} catch (PartInitException e) {
+//			}
+//		});
 		monitor.worked(1);
 	}
 	
 	/**
-	 * We will initialize file contents with a sample text.
+	 * We will initialise file contents with the specified requirement IDs.
+	 * @param ids - the String Array containing the IDs
 	 */
 
-	private InputStream openContentStream() {
-		String contents =
-			"This is the initial file contents for *.trc file that should be word-sorted in the Preview page of the multi-page editor";
-		return new ByteArrayInputStream(contents.getBytes());
+	private LinkedList<TRCRequirement> getTRCReqs(String[] ids) {
+		LinkedList<TRCRequirement> trcReqs = new LinkedList<TRCRequirement>();
+		for(String id : ids) {
+			TRCRequirement trcReq = new TRCRequirement(id, new LinkedList<int[]>());
+			trcReqs.add(trcReq);
+		}
+		return trcReqs;
 	}
 
 	private void throwCoreException(String message) throws CoreException {
@@ -135,8 +151,8 @@ public class TRCNewWizard extends Wizard implements INewWizard {
 	}
 
 	/**
-	 * We will accept the selection in the workbench to see if
-	 * we can initialize from it.
+	 * We will take the selection in the workbench in order to see if
+	 * we can initialise from it.
 	 * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
 	 */
 	@Override

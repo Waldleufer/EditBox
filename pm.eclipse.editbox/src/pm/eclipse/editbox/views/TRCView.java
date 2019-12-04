@@ -124,10 +124,11 @@ public class TRCView extends ViewPart {
 	 */
 	public static final String ID = "pm.eclipse.editbox.views.TRCView";
 
-	private IWorkbench workbench = PlatformUI.getWorkbench();
+	private static IWorkbench workbench = PlatformUI.getWorkbench();
 
 	private static CheckboxTableViewer viewer;
 	private Table table;
+	private static boolean initialized = false;
 
 	private Action actionSetRequirementBoxes;
 	private Action action2;
@@ -136,6 +137,18 @@ public class TRCView extends ViewPart {
 	
 	public Table getTable() {
 		return table;
+	}
+
+	public static CheckboxTableViewer getViewer() {
+		return viewer;
+	}
+
+	public static boolean isInitialized() {
+		return initialized;
+	}
+	
+	public static void setInitialized(boolean state) {
+		initialized = state;
 	}
 
 	class ViewLabelProvider extends ColumnLabelProvider implements ITableLabelProvider {
@@ -217,25 +230,44 @@ public class TRCView extends ViewPart {
 			return null;
 		}
 	}
+	
+	/**
+	 * Updates TRC View without reading
+	 * @param requirements
+	 */
+	public static void updateViewer(LinkedList<TRCRequirement> requirements) {
 
-
-	public static void updateViewer() {
-		LinkedList<TRCRequirement> requirements = TRCFileInteraction.ReadTRCsFromFile(BoxDecoratorImpl.getCurrentActivePath());
-		LinkedList<String> requirementIDs = new LinkedList<String>();
-		for (TRCRequirement trcRequirement : requirements) {
-			requirementIDs.addFirst(trcRequirement.getId());
-		}
-		//viewer.setInput(new String[] { TRCFileInteraction.ReadTRCsFromFile(BoxDecoratorImpl.getCurrentActivePath()).toString() });
-		//		viewer.setInput(requirementIDs);
-
+		viewer.setAllGrayed(false);
 		viewer.setInput(requirements);
-		
+
 		for (TRCRequirement trcRequirement : requirements) {
 			viewer.setChecked(trcRequirement, trcRequirement.isActive());
 		}
+		
+		refreshed();
+
+		TRCView.setInitialized(true);
 
 		// Line below for testing: prints file Path of currently opened file
-		// viewer.setInput(new String[] { BoxDecoratorImpl.getCurrentActivePath().toString() });
+		// viewer.setInput(new String[] { BoxDecoratorImpl.getCurrentActivePath().toString() });			
+
+	}
+
+
+	/**
+	 * reads the TRCRequirements and updates the TRC View
+	 */
+	public static LinkedList<TRCRequirement> updateViewer() {
+		LinkedList<TRCRequirement> requirements = TRCFileInteraction.ReadTRCsFromFile(BoxDecoratorImpl.getCurrentActivePath());
+		if(requirements == null) {
+			System.out.println("Requirements == null");
+			viewer.setInput(new LinkedList<TRCRequirement>());
+			viewer.setAllGrayed(true);
+			refreshed();
+			return null;
+		}
+		updateViewer(requirements);
+		return requirements;
 	}
 
 
@@ -272,7 +304,7 @@ public class TRCView extends ViewPart {
 		viewer = new CheckboxTableViewer(table);
 
 		viewer.setContentProvider(TRCViewArrayContentProvider.getInstance());
-		updateViewer();
+//		updateViewer();  Do not update here as Build Boxes will set the content in a second
 		//Reverting Display Order
 		//		TRCViewArrayContentProvider t = (TRCViewArrayContentProvider) viewer.getContentProvider();
 		//		t.setReversedOrder(true);
@@ -370,8 +402,7 @@ public class TRCView extends ViewPart {
 				LinkedList<TRCRequirement> reqs = 
 						viewerz == null ? null : (LinkedList<TRCRequirement>) viewerz.getInput();
 				if (reqs != null && reqs instanceof List) {
-					// Reverse back to save order.
-					TRCFileInteraction.WriteReversedTRCsToFile(reqs, BoxDecoratorImpl.getCurrentActivePath());	
+					TRCFileInteraction.WriteTRCsToFile(reqs, BoxDecoratorImpl.getCurrentActivePath());	
 				}
 
 
@@ -453,7 +484,7 @@ public class TRCView extends ViewPart {
 						int end = start + length;
 						int[] out = {start, end};
 						if(end > start) {
-							System.out.println(Arrays.toString(out));
+							System.out.println("setRequirementBoxes: " + Arrays.toString(out));
 							BoxDecoratorImpl.changeBoxes(start, length);
 							editor.setFocus();
 						}
@@ -513,6 +544,9 @@ public class TRCView extends ViewPart {
 	private void showColorDialoge() {
 		IPath path = BoxDecoratorImpl.getCurrentActivePath();
 		LinkedList<TRCRequirement> requirements = TRCFileInteraction.ReadTRCsFromFile(path);
+		if(requirements == null) {
+			return;
+		}
 		IStructuredSelection selection = viewer.getStructuredSelection();
 		Object obj = selection.getFirstElement();
 		if(obj instanceof TRCRequirement) {
@@ -528,28 +562,30 @@ public class TRCView extends ViewPart {
 			}
 			TRCFileInteraction.WriteTRCsToFile(requirements, path);
 			BoxDecoratorImpl.change();
+			
+			refreshed();  // This should do the same as the commented section below. // TODO: Remove section below and this comment
 
-			IWorkbenchWindow window = 
-					workbench == null ? null : workbench.getActiveWorkbenchWindow();
-			IWorkbenchPage activePage = 
-					window == null ? null : window.getActivePage();		
-			IEditorPart editor = 
-					activePage == null ? null : activePage.getActiveEditor();
-			if (editor != null) {
-				editor.setFocus();
-			}
-			IViewReference[] references = activePage.getViewReferences();
-			for ( IViewReference v : references) {
-				if(v.getPartName().equals("TRC View")) {
-					IViewPart p = v.getView(true);
-					if (p instanceof TRCView) {
-						TRCView trcView = (TRCView) p;
-						trcView.table.deselectAll();  //TODO: do you want to deselect all? or should the eddited one remain highlighted?
-						trcView.table.removeAll(); //This enforces redrawing with the updated values
-					}
-					p.setFocus();
-				}
-			}
+//			IWorkbenchWindow window = 
+//					workbench == null ? null : workbench.getActiveWorkbenchWindow();
+//			IWorkbenchPage activePage = 
+//					window == null ? null : window.getActivePage();		
+//			IEditorPart editor = 
+//					activePage == null ? null : activePage.getActiveEditor();
+//			if (editor != null) {
+//				editor.setFocus();
+//			}
+//			IViewReference[] references = activePage.getViewReferences();
+//			for ( IViewReference v : references) {
+//				if(v.getPartName().equals("TRC View")) {
+//					IViewPart p = v.getView(true);
+//					if (p instanceof TRCView) {
+//						TRCView trcView = (TRCView) p;
+//						trcView.table.deselectAll();  //TODO: do you want to deselect all? or should the eddited one remain highlighted?
+//						trcView.table.removeAll(); //This enforces redrawing with the updated values
+//					}
+//					p.setFocus();
+//				}
+//			}
 		}
 		else {
 			showMessage("Object is no instance of TRCRequirment: Double-click detected on "+obj.toString());	
@@ -558,6 +594,35 @@ public class TRCView extends ViewPart {
 
 	@Override
 	public void setFocus() {
+		//TODO: This does not work properly.
 		viewer.getControl().setFocus();
+	}
+	
+	public static void refreshed() {
+		System.out.println("Refreshed");
+		viewer.getTable().getParent().pack();
+		viewer.getTable().getParent().layout(true);
+		viewer.getTable().setFocus();
+		IWorkbenchWindow window = 
+				workbench == null ? null : workbench.getActiveWorkbenchWindow();
+		IWorkbenchPage activePage = 
+				window == null ? null : window.getActivePage();		
+		IEditorPart editor = 
+				activePage == null ? null : activePage.getActiveEditor();
+		if (editor != null) {
+			editor.setFocus();
+		}
+		IViewReference[] references = activePage.getViewReferences();
+		for ( IViewReference v : references) {
+			if(v.getPartName().equals("TRC View")) {
+				IViewPart p = v.getView(true);
+				if (p instanceof TRCView) {
+				}
+				p.setFocus();		
+			}
+		}
+		if (editor != null) {
+			editor.setFocus();
+		}
 	}
 }

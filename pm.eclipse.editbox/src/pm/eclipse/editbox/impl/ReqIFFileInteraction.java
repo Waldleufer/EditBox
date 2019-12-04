@@ -20,21 +20,19 @@ public class ReqIFFileInteraction {
 	public static final int SIMILAR = 0;
 	public static final int EQUAL = 1;
 
-	public static boolean infoIsLoaded = false;
-
 	public static void setInfos(LinkedList<TRCRequirement> trcList) {
 
+		ReqIF10Parser parser = new ReqIF10Parser();
+		parser.setRemoveTemporaries(true);
+		parser.setRemoveToolExtensions(true);
+		parser.setReqIFFilename("chapter3");	
+		ReqIF r = parser.parseReqIFContent();
+		EList<Specification> list = r.getCoreContent().getSpecifications();
 
-		if(!infoIsLoaded) {
+		for(TRCRequirement req : trcList) {
+			String info = req.getInfo();
+			if (info != null && !info.isEmpty()) {
 
-			ReqIF10Parser parser = new ReqIF10Parser();
-			parser.setRemoveTemporaries(true);
-			parser.setRemoveToolExtensions(true);
-			parser.setReqIFFilename("chapter3");	
-			ReqIF r = parser.parseReqIFContent();
-			EList<Specification> list = r.getCoreContent().getSpecifications();
-
-			for(TRCRequirement req : trcList) {
 				String id = req.getId();
 
 				for (Specification spec : list) {
@@ -55,10 +53,7 @@ public class ReqIFFileInteraction {
 					}
 				}
 			}
-
-			infoIsLoaded = true;
 		}
-
 	}
 
 	private static SpecHierarchy descend(final String id, final EList<SpecHierarchy> specs) {

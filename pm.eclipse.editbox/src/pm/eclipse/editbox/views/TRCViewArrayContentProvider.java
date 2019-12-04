@@ -2,9 +2,13 @@ package pm.eclipse.editbox.views;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+
+import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
 
 public class TRCViewArrayContentProvider implements IStructuredContentProvider {
 
@@ -34,6 +38,7 @@ public class TRCViewArrayContentProvider implements IStructuredContentProvider {
 		synchronized(TRCViewArrayContentProvider.class) {
 			if (instance == null) {
 				instance = new TRCViewArrayContentProvider();
+				instance.setReversedOrder(true);
 			}
 			return instance;
 		}
@@ -62,17 +67,22 @@ public class TRCViewArrayContentProvider implements IStructuredContentProvider {
 	 * <code>Collection</code>.
 	 */
 	@Override
-	public Object[] getElements(Object inputElement) {
+	public Object[] getElements(final Object inputElement) {
+		reversedOrder = true;
 		if(reversedOrder) {
 			
 			if (inputElement instanceof Object[]) {
 				return (Object[]) inputElement;
 			}
 			if (inputElement instanceof Collection) {
-				if (inputElement instanceof List) {
-					List<?> list = (List<?>) inputElement;
-					Collections.reverse(list);
-					return list.toArray();
+				if (inputElement instanceof LinkedList<?>) {
+					final LinkedList<TRCRequirement> list = (LinkedList<TRCRequirement>) inputElement;
+					LinkedList<TRCRequirement> out = new LinkedList<TRCRequirement>();
+					for (Iterator iterator = list.descendingIterator(); iterator.hasNext();) {
+						TRCRequirement r = (TRCRequirement) iterator.next();
+						out.add(r);
+					}
+					return out.toArray();
 				}
 				return ((Collection) inputElement).toArray();
 			}

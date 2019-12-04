@@ -28,7 +28,7 @@ import pm.eclipse.editbox.impl.TRCFileInteraction;
 /**
  * The "New" wizard page allows setting the container for the new file as well
  * as the file name. The page will only accept file name without the extension
- * OR with the extension that matches the expected one (trc).
+ * OR with the extension that matches the expected one (.trc).
  */
 
 public class TRCNewWizardPage extends WizardPage {
@@ -39,9 +39,9 @@ public class TRCNewWizardPage extends WizardPage {
 	private ISelection selection;
 
 	/**
-	 * Constructor for SampleNewWizardPage.
+	 * Constructor for TRCNewWizardPage.
 	 * 
-	 * @param pageName
+	 * @param ISelection selection
 	 */
 	public TRCNewWizardPage(ISelection selection) {
 		super("wizardPage");
@@ -78,7 +78,7 @@ public class TRCNewWizardPage extends WizardPage {
 		fileText = new Text(container, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY );
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		fileText.setLayoutData(gd);
-		fileText.addModifyListener(e -> dialogChanged());
+//		fileText.addModifyListener(e -> dialogChanged());
 		initialize();
 		dialogChanged();
 		setControl(container);
@@ -90,6 +90,9 @@ public class TRCNewWizardPage extends WizardPage {
 
 	private void initialize() {
 		fileText.setText("new_file.trc");
+		// TODO: Line Below is countering a bug, that occured when selecting a file in a package ...
+		// TODO: ... Somehow the path was cleared if doing so.
+		sourceFileText.setText(ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString());
 		
 		if (selection != null && selection.isEmpty() == false
 				&& selection instanceof IStructuredSelection) {
@@ -100,11 +103,15 @@ public class TRCNewWizardPage extends WizardPage {
 			if (obj instanceof IResource) {
 				IFile file;
 				//TODO: Look into, why this sometimes works and sometimes not.
-				if (obj instanceof IFile) {
+				if (((IResource) obj).getType() == IResource.FILE) {
 					file = (IFile) obj;
 					sourceFileText.setText(file.getFullPath().toOSString());
 					fileText.setText(TRCFileInteraction.exchangeEnding(file.getFullPath().toOSString()));
 				}
+			} 
+			else {
+				System.out.println("TROUBELS?");
+				System.out.println(obj.toString());
 			}
 		}
 
@@ -122,7 +129,7 @@ public class TRCNewWizardPage extends WizardPage {
 		String path = dialog.open();
 		if (path != null) {
 			String localString = path.split(ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString())[1];
-			System.out.println(path);
+			System.out.println("BROWSE: " + path);
 			sourceFileText.setText(localString);
 			fileText.setText(TRCFileInteraction.exchangeEnding(localString));
 		}
@@ -133,21 +140,23 @@ public class TRCNewWizardPage extends WizardPage {
 	 */
 
 	private void dialogChanged() {
-		IResource container = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(getSourceFileName()));
+		Path p = new Path(getSourceFileName());
+		System.out.println("Path Dialog Changed: "+ p.toOSString());
+		IResource container = ResourcesPlugin.getWorkspace().getRoot().getFile(p);
 		String fileName = getNewFileName();
-		System.out.println(container.toString());
-		System.out.println(fileName);
+		System.out.println("Dialoge Changed Container: " + container.toString());
+		System.out.println("File Name "+ fileName);
 
 		if (getSourceFileName().length() == 0) {
 			updateStatus("Source File must be specified");
 			return;
 		}
-		if (container == null || (container.getType() != IResource.FILE )) {
-			updateStatus("Source File must exist");
-			return;
-		}
+//		if (container == null || (container.getType() != IResource.FILE )) {
+//			updateStatus("Source File must exist");
+//			return;
+//		}
 		if (!container.isAccessible()) {
-			updateStatus("Project must be writable");
+			updateStatus("Source File must exist");
 			return;
 		}
 		if (fileName.length() == 0) {
@@ -163,7 +172,7 @@ public class TRCNewWizardPage extends WizardPage {
 			}
 		}
 		IResource target = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(getNewFileName()));
-		if (target != null && (container.getType() == IResource.FILE)) {
+		if (target != null && ( target.exists())) {
 			updateStatus("Would overwrite an already existing .trc File");
 			return;
 		}
