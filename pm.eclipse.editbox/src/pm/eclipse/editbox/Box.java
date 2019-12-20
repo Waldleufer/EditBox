@@ -7,6 +7,8 @@ import java.util.List;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 
+import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
+
 public class Box {
 	/**
 	 *  start and end represent vertical positioning. Offset is the horizontal offset
@@ -32,7 +34,7 @@ public class Box {
 	private List<Box> children;
 	public Object data;
 	
-	private ArrayList<String> requirements = new ArrayList<String>();  // List of all RequirementIDs highlighted in this box
+	private TRCRequirement requirement;  // Requirement represented in this box
 	
 	@Override
 	public String toString() {
@@ -42,12 +44,12 @@ public class Box {
 	/**
 	 * Adds the given Requirement ID to the List
 	 */
-	public void addRequirement(String reqId) {
-		requirements.add(reqId);
+	public void setRequirement(TRCRequirement requirement) {
+		this.requirement = requirement;
 	}
 	
-	public ArrayList<String> getRequirements() {
-		return requirements;
+	public TRCRequirement getRequirement() {
+		return requirement;
 	}
 
 	public void setColor(Color color) {

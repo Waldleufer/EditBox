@@ -200,8 +200,8 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 				}
 			}
 			for(Box b : currentBoxes) {
-				b.addRequirement(req.getId()); // Make every box aware of the ReqID it represents
-				System.err.println(b.toString() + " " + b.getRequirements().toString());
+				b.setRequirement(req); // Make every box aware of the ReqID it represents
+				System.err.println(b.toString() + " " + b.getRequirement().toString());
 			}
 			boxes.add(currentBoxes);
 		}

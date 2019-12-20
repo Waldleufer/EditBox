@@ -10,6 +10,7 @@ import java.util.List;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.TextChangeListener;
@@ -49,7 +50,6 @@ import pm.eclipse.editbox.IBoxProvider;
 import pm.eclipse.editbox.IBoxSettings;
 import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
 import pm.eclipse.editbox.views.TRCView;
-import pm.eclipse.editbox.views.TRCViewArrayContentProvider;
 
 public class BoxDecoratorImpl implements IBoxDecorator {
 
@@ -490,19 +490,36 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		boolean redraw = false;
 
 		Box newCurrent = null;
+		
+		LinkedList<TRCRequirement> newSelection = new LinkedList<TRCRequirement>();
+		
 		for (Box b : visibleBoxes()) {
 			if (contains(b.rec,x, y)) {
 				if (!b.isOn) {
 					b.isOn = true;
 					redraw = true;
 				}
+				if(!newSelection.contains(b.getRequirement())) {
+					//Notifies the TRC View to mark these as selected.
+					newSelection.add(b.getRequirement());						
+				}
 				if (newCurrent == null || newCurrent.offset < b.offset)
 					newCurrent = b;
 			} else if (b.isOn) {
 				b.isOn = false;
+				newSelection.remove(b.getRequirement());
+				if(newSelection.isEmpty()) {
+					TRCView.getViewer().setSelection(new StructuredSelection(), true);	
+				}
 				redraw = true;
 			}
 		}
+		if(!newSelection.isEmpty()) {
+			TRCView.getViewer().setSelection(new StructuredSelection(newSelection), true);			
+		} else {
+			// No change, do nothing.
+		}
+		
 		if (!redraw)
 			redraw = newCurrent != currentBox;
 		currentBox = newCurrent;
@@ -697,7 +714,8 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 
 
 			for (TRCRequirement r : reqs) {
-				System.out.println("Requirement from Table: " + r.toString());					
+//				TODO: remove DEBUGs many Sysouts below:
+//				System.out.println("Requirement from Table: " + r.toString());					
 				
 				boolean active = r.isActive();
 				boolean changeHandled = false;
@@ -709,7 +727,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 
 				// No occurrence of this requirement yet -> Create new pair if active
 				if(pairs.size() <= 0) {
-					System.out.println("pairs.size() == 0");
+//					System.out.println("pairs.size() == 0");
 					if (active) {
 						int[] changed = {positionOfChange, positionOfChange+amountOfChange};
 						pairs.add(changed);
@@ -725,7 +743,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 							 * before the current box and if we missed to create that box. 
 							 */
 							if(active && !changeHandled) {
-								System.out.println("Active + Missed first Box");
+//								System.out.println("Active + Missed first Box");
 								// We missed to create one box before the current one
 								int[] changed = {positionOfChange, positionOfChange+amountOfChange};
 								toBeAddedFirst = changed;
@@ -737,7 +755,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 						} else if (positionOfChange == pair[0]) {
 							//change is happening at the start of the current box
 							if (active) {
-								System.out.println("Active + Inside Box Change! (Start)");
+//								System.out.println("Active + Inside Box Change! (Start)");
 								//Change occurs "inside" of the current box.
 								pair[1] = (pair[1] + amountOfChange);
 								changeHandled = true;
@@ -750,13 +768,13 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 						else if(positionOfChange < pair[1]) {
 							//Change occurs inside of the current box.
 							if (active) {
-								System.out.println("Active + Inside Box Change!");
+//								System.out.println("Active + Inside Box Change!");
 								//box end needs to be altered. 
 								pair[1] = (pair[1] + amountOfChange);
 								changeHandled = true;
 							} else {
 								// Split occurring
-								System.out.println("Split!");
+//								System.out.println("Split!");
 								splitIndex = pairs.indexOf(pair);
 								int[] changed1 = {pair[0]                          , positionOfChange};
 								int[] changed2 = {positionOfChange + amountOfChange, pair[1]         };
@@ -767,7 +785,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 							//Change occurs at the end of the box.
 							//change is happening at the start of the current box
 							if (active) {
-								System.out.println("Active + Inside Box Change! (End)");
+//								System.out.println("Active + Inside Box Change! (End)");
 								//Change occurs "inside" of the current box.
 								pair[1] = (pair[1] + amountOfChange);
 								changeHandled = true;
@@ -785,9 +803,9 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 						pairs.addFirst(toBeAddedFirst);
 					} else if (splitIndex >= 0) {
 						pairs.set(splitIndex, splitright);
-						System.out.println(pairs.toString());
+//						System.out.println(pairs.toString());
 						pairs.add(splitIndex, splitleft);
-						System.out.println(pairs.toString());
+//						System.out.println(pairs.toString());
 					}
 
 					r.setPositions(pairs);	
@@ -799,13 +817,13 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 					int[] nextPair = null;
 					Iterator<int[]> iterator = pairs.iterator();
 					if (iterator.hasNext()) {
-						System.out.println("One Element found");
+//						System.out.println("One Element found");
 						nextPair = (int[]) iterator.next();
 					}
 
 					// Start at comparing the first and the second pair
 					while (iterator.hasNext()) {
-						System.out.println("Next Element found");
+//						System.out.println("Next Element found");
 						pair = nextPair;
 						nextPair = (int[]) iterator.next();
 
@@ -815,7 +833,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 							//Merge two boxes
 
 							if (pair[1] < nextPair[1]) {
-								System.out.println("Omnomnom - eating some pairs");
+//								System.out.println("Omnomnom - eating some pairs");
 								int[] toAdd = {pair[0], nextPair[1]};
 								while(iterator.hasNext()) { //eating all boxes in between
 									nextPair = iterator.next();
@@ -835,20 +853,20 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 					if (nextPair[1] <= nextPair[0]) {
 						// Do not add the pair - pair is not valid
 					} else {
-						System.out.println("Last | Single Element found");
+//						System.out.println("Last | Single Element found");
 						newpairs.add(nextPair);
 					}
 
-					System.out.print("    Pairs:");
+//					System.out.print("    Pairs:");
 					for(int[] p : pairs) {
 						System.out.print(" " + Arrays.toString(p));
 					}
-					System.out.println();
-					System.out.print("New Pairs:");
+//					System.out.println();
+//					System.out.print("New Pairs:");
 					for(int[] p : newpairs) {
-						System.out.print(" " + Arrays.toString(p));
+//						System.out.print(" " + Arrays.toString(p));
 					}
-					System.out.println();
+//					System.out.println();
 					r.setPositions(newpairs);
 				}		
 			}
