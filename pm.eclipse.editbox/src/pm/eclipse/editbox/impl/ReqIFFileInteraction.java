@@ -20,6 +20,13 @@ public class ReqIFFileInteraction {
 	public static final int SIMILAR = 0;
 	public static final int EQUAL = 1;
 
+	
+	/**
+	 * TODO: The first run must to set all requirements anew. Otherwise changes in the ReqIF File 
+	 * will never be acknowledged.
+	 * 
+	 * @param trcList the List of the Requirements whose Info needs to be set.
+	 */
 	public static void setInfos(LinkedList<TRCRequirement> trcList) {
 
 		ReqIF10Parser parser = new ReqIF10Parser();

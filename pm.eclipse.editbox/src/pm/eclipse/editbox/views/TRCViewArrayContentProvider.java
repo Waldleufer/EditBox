@@ -7,10 +7,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 
 import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
 
-public class TRCViewArrayContentProvider implements IStructuredContentProvider {
+public class TRCViewArrayContentProvider implements ITreeContentProvider {
 
 	private static TRCViewArrayContentProvider instance;
 	private boolean reversedOrder = true;  //Default: true
@@ -31,8 +34,6 @@ public class TRCViewArrayContentProvider implements IStructuredContentProvider {
 	 * clients.
 	 *
 	 * @return an instance of TRCViewArrayContentProvider
-	 *
-	 * @since 3.5
 	 */
 	public static TRCViewArrayContentProvider getInstance() {
 		synchronized(TRCViewArrayContentProvider.class) {
@@ -78,7 +79,7 @@ public class TRCViewArrayContentProvider implements IStructuredContentProvider {
 				if (inputElement instanceof LinkedList<?>) {
 					final LinkedList<TRCRequirement> list = (LinkedList<TRCRequirement>) inputElement;
 					LinkedList<TRCRequirement> out = new LinkedList<TRCRequirement>();
-					for (Iterator iterator = list.descendingIterator(); iterator.hasNext();) {
+					for (Iterator<TRCRequirement> iterator = list.descendingIterator(); iterator.hasNext();) {
 						TRCRequirement r = (TRCRequirement) iterator.next();
 						out.add(r);
 					}
@@ -99,6 +100,31 @@ public class TRCViewArrayContentProvider implements IStructuredContentProvider {
 			return new Object[0];
 		}
 
+	}
+
+
+	@Override
+	public Object[] getChildren(Object parentElement) {
+		if (parentElement instanceof TRCRequirement) {
+			String[] out = {((TRCRequirement) parentElement).getInfo()};
+			return out;
+		}
+		return null;
+	}
+
+
+	@Override
+	public Object getParent(Object element) {
+		return null;
+	}
+
+
+	@Override
+	public boolean hasChildren(Object element) {
+		if (element instanceof TRCRequirement) {
+			return true;
+		}
+		return false;
 	}
 
 }

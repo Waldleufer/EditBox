@@ -175,6 +175,10 @@ public class TRCFileInteraction {
 		new Throwable("DEBUG: TRCRequirement: " + a.toString() +"\n + TRCRequirement: " + b.toString()).printStackTrace();
 	}
 	
+	public static void WriteReversedTRCsToFile(LinkedList<TRCRequirement> trcReqs) { 
+		WriteReversedTRCsToFile(trcReqs, BoxDecoratorImpl.getCurrentActivePath());
+	}
+	
 	/**
 	 * The TRCView handles the Requirements in the reversed order. In order to save these, the list has to be reversed.
 	 * 
@@ -202,6 +206,9 @@ public class TRCFileInteraction {
         }
     }
 	
+	public static void WriteTRCsToFile(LinkedList<TRCRequirement> trcReqs) {
+		WriteTRCsToFile(trcReqs, BoxDecoratorImpl.getCurrentActivePath());
+	}
 	
 	/**
 	 * 
@@ -230,6 +237,10 @@ public class TRCFileInteraction {
             ex.printStackTrace();
         }
     }
+	
+	public static LinkedList<TRCRequirement> ReadTRCsFromFile() {
+		return ReadTRCsFromFile(BoxDecoratorImpl.getCurrentActivePath());
+	}
     
 	/**
 	 * Opens the corresponding .trc file to the file at filePath and reads its contents.
@@ -241,7 +252,7 @@ public class TRCFileInteraction {
     	checkWindowChanged();
     	
     	System.out.println("Initialised?: " + TRCView.isInitialized());
-//    	new Throwable("I Hate to do this printStackTrace thing").printStackTrace();
+    	new Throwable("I Hate to do this printStackTrace thing").printStackTrace();
     	
     	
     	if (TRCView.isInitialized()) {

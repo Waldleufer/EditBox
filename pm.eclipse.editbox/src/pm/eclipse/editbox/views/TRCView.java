@@ -78,11 +78,13 @@ import org.eclipse.jface.viewers.*;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.core.runtime.IPath;
@@ -94,10 +96,14 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DragDetectEvent;
 import org.eclipse.swt.events.DragDetectListener;
-
 
 /**
  * This sample class demonstrates how to plug-in a new
@@ -126,8 +132,8 @@ public class TRCView extends ViewPart {
 
 	private static IWorkbench workbench = PlatformUI.getWorkbench();
 
-	private static CheckboxTableViewer viewer;
-	private Table table;
+	private static CheckboxTreeViewer viewer;
+	private Tree tree;
 	private static boolean initialized = false;
 
 	private Action actionSetRequirementBoxes;
@@ -135,11 +141,11 @@ public class TRCView extends ViewPart {
 	private Action doubleClickAction;
 	private Action dragAction;
 	
-	public Table getTable() {
-		return table;
+	public Tree getTable() {
+		return tree;
 	}
 
-	public static CheckboxTableViewer getViewer() {
+	public static CheckboxTreeViewer getViewer() {
 		return viewer;
 	}
 
@@ -161,14 +167,22 @@ public class TRCView extends ViewPart {
 					return ((TRCRequirement) obj).getId();
 				} else if (index == 1) {
 					return ((TRCRequirement) obj).getInfo();
+				}	
+			}
+			if (obj instanceof String) {
+				if (index == 1) {
+					int width = TRCView.getViewer().getTree().getColumn(1).getWidth();
+					return "width: " + width + " " + (String) obj;
+				} else {
+					return "";
 				}
-				
 			}
 			return getText(obj);
 		}
+		
 		@Override
-		public Image getColumnImage(Object obj, int index) {
-			return getImage(obj);
+		public String getText(Object obj) {
+			return super.getText(obj);
 		}
 
 		@Override
@@ -200,33 +214,9 @@ public class TRCView extends ViewPart {
 			return super.useNativeToolTip(object);
 		}
 
-
-	}
-
-	private class TableCellModifier implements ICellModifier {
-		private TableViewer fViewer;
-
-		public TableCellModifier(TableViewer viewer) {
-			fViewer = viewer;
-		}
-
-		public boolean canModify(Object element, String property) {
-			if (property.equals("Color") || property.equals("Name")) {
-				return true;
-			}
-			return false;
-		}
-
-		public void modify(Object element, String property, Object value) {
-		}
-
-		public Object getValue(Object element, String property) {
-			if (property.equals("Color")) {
-				return new RGB(255, 0, 0);
-			} else if (property.equals("Name")) {
-				return ((ITableLabelProvider)
-						fViewer.getLabelProvider()).getColumnText(element, 0);
-			}
+		@Override
+		public Image getColumnImage(Object element, int columnIndex) {
+			// TODO Auto-generated method stub
 			return null;
 		}
 	}
@@ -237,7 +227,6 @@ public class TRCView extends ViewPart {
 	 */
 	public static void updateViewer(LinkedList<TRCRequirement> requirements) {
 
-		viewer.setAllGrayed(false);
 		viewer.setInput(requirements);
 
 		for (TRCRequirement trcRequirement : requirements) {
@@ -247,10 +236,6 @@ public class TRCView extends ViewPart {
 		refreshed();
 
 		TRCView.setInitialized(true);
-
-		// Line below for testing: prints file Path of currently opened file
-		// viewer.setInput(new String[] { BoxDecoratorImpl.getCurrentActivePath().toString() });			
-
 	}
 
 
@@ -262,7 +247,6 @@ public class TRCView extends ViewPart {
 		if(requirements == null) {
 			System.out.println("Requirements == null");
 			viewer.setInput(new LinkedList<TRCRequirement>());
-			viewer.setAllGrayed(true);
 			refreshed();
 			return null;
 		}
@@ -274,37 +258,37 @@ public class TRCView extends ViewPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		//viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-		table = new Table(parent, SWT.BORDER
-				| SWT.MULTI
+		tree = new Tree(parent, SWT.MULTI
 				| SWT.CHECK
 				| SWT.V_SCROLL
 				| SWT.FULL_SELECTION );
 		
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
+		tree.setHeaderVisible(true);
+		tree.setLinesVisible(true);
 		
-		TableColumn column = new TableColumn(table, SWT.BORDER, 0);
+
+		TreeColumn column = new TreeColumn(tree, SWT.BORDER | SWT.WRAP, 0);
 		column.setText("Requirement ID");
 		column.setAlignment(SWT.LEFT);
 		
 		
-		TableColumn column2 = new TableColumn(table, SWT.BORDER, 1);
+		TreeColumn column2 = new TreeColumn(tree, SWT.BORDER | SWT.WRAP, 1);
 		column2.setText("Info");
 		column2.setAlignment(SWT.LEFT);
 		
-		//TODO: Layout can be improved: Size of Columns should automatically adapt to Size of first column
-		//TODO: Cells content in Info column should be wrapped.
+		//TODO: Layout might be improvable: Size of Columns should automatically adapt to Size of first column
+		//TODO: Cells content in Info column should be wrapped or extended or else.
 		
 		TableLayout tableLayout = new TableLayout(true);
-		tableLayout.addColumnData(new ColumnWeightData(20));
-		tableLayout.addColumnData(new ColumnWeightData(80));
-		table.setLayout(tableLayout);
+		tableLayout.addColumnData(new ColumnWeightData(15));
+		tableLayout.addColumnData(new ColumnWeightData(85));
+		tree.setLayout(tableLayout);
 		
 		
-		viewer = new CheckboxTableViewer(table);
+		viewer = new CheckboxTreeViewer(tree);
 
 		viewer.setContentProvider(TRCViewArrayContentProvider.getInstance());
-//		updateViewer();  Do not update here as Build Boxes will set the content in a second
+//		updateViewer();  // Do not update here as Build Boxes will set the content in a second
 		//Reverting Display Order
 		//		TRCViewArrayContentProvider t = (TRCViewArrayContentProvider) viewer.getContentProvider();
 		//		t.setReversedOrder(true);
@@ -318,34 +302,33 @@ public class TRCView extends ViewPart {
 		makeActions();
 		hookContextMenu();
 		hookDoubleClickAction();
-		//hookDragAction();  // experimental TODO: remove?
 		contributeToActionBars();
 
-		// Newly found: // Advanced Styling of table
+		// Newly found: // Advanced Styling of tree
 		//		
-//				table.setHeaderVisible(true);
-//				table.setLinesVisible(true);
-//				table.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL |
+//				tree.setHeaderVisible(true);
+//				tree.setLinesVisible(true);
+//				tree.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL |
 //				GridData.FILL_BOTH));
 //		
-//				TableColumn column = new TableColumn(table, SWT.NONE, 0);
+//				TableColumn column = new TableColumn(tree, SWT.NONE, 0);
 //				column.setText("Name");
 //				column.setAlignment(SWT.LEFT);
 //				column.setWidth(300);
 //		
-//				column = new TableColumn(table, SWT.NONE, 1);
+//				column = new TableColumn(tree, SWT.NONE, 1);
 //				column.setText("Color");
 //				column.setAlignment(SWT.LEFT);
 //				column.setWidth(100);
 		//
-		//		//TableViewer tableViewer = new TableViewer(table);
+		//		//TableViewer tableViewer = new TableViewer(tree);
 		//		viewer.setUseHashlookup(true);
 		//		viewer.setColumnProperties(new String[] { "Name", "Color" });
 		//
 		//		CellEditor[] editors =
 		//		new CellEditor[viewer.getColumnProperties().length];
-		//		editors[0] = new TextCellEditor(table);
-		//		editors[1] = new ColorCellEditor(table);
+		//		editors[0] = new TextCellEditor(tree);
+		//		editors[1] = new ColorCellEditor(tree);
 		//		viewer.setCellEditors(editors);
 		//
 		//		//viewer.setLabelProvider(new TableLabelProvider());
@@ -362,12 +345,91 @@ public class TRCView extends ViewPart {
 
 
 	private void hookListeners() {
-		table.addListener(SWT.EraseItem, new Listener() {
+		
+		int TEXT_MARGIN = 10;
+		
+		tree.addListener(SWT.MeasureItem, event -> {
+			/**
+			 * Check whether the Item is a root or the second line. Format the second line accordingly.
+			 * TODO: Format only the second lines ... somehow
+			 */
+			TreeItem item = (TreeItem) event.item;
+			String text = item.getText(event.index);
+			int displaywidth = item.getTextBounds(1).width;
+			int textwidth = event.width;
+			System.out.println("Length: " + text.length());
+			System.out.println("width: " + textwidth);
+			System.out.println("displaywidth: " + displaywidth);
+			if(textwidth > displaywidth) {
+				String line = "";
+				int spaceAt = text.indexOf(" ");
+				String currentLine = text.substring(0, spaceAt);
+				String lineBefore = "";
+				int progressor = 0;
+				boolean reachedEnd = false;
+				while(!reachedEnd) {
+					
+					do {
+						spaceAt = text.indexOf(" ", spaceAt + 1);
+						if(spaceAt == -1) {
+							reachedEnd = true;
+							break;
+						}
+						lineBefore = currentLine;
+						currentLine = text.substring(progressor, spaceAt);
+						System.out.println("continueing?");
+						System.out.println("Textwidth: " + event.gc.textExtent(currentLine).x);
+					} while (event.gc.textExtent(currentLine).x < displaywidth);
+					progressor = progressor + lineBefore.length();
+					currentLine = lineBefore;
+					if(line.equals("")) {
+						line += lineBefore;
+					} else {
+						line += "\n" + lineBefore;
+					}
+					
+				}
+				item.setText(1, line);
+			}
+
+			Point size = event.gc.textExtent(text);
+//			if(item.getParentItem() != null) {
+//				event.width = size.x + 2 * TEXT_MARGIN;
+//				event.height = Math.max(event.height, size.y + TEXT_MARGIN);				
+//			} else {
+				event.width = size.x;
+				event.height = size.y;	
+				System.out.println("Height:" + event.height);
+//			}
+		});
+		tree.addListener(SWT.EraseItem, event -> event.detail &= ~SWT.FOREGROUND);
+		tree.addListener(SWT.PaintItem, event -> {
+			TreeItem item = (TreeItem) event.item;
+			String text = item.getText(event.index);
+			/* center column 1 vertically */
+			int yOffset = 0;
+			/**
+			 * Check whether the Item is a root or the second line. Make the second line wrap text.
+			 */
+//			if (item.getParentItem() != null) {
+//				Point size = event.gc.textExtent(text);
+//				yOffset = Math.max(0, (event.height - size.y) / 2);
+//				event.gc.drawText(text, event.x + TEXT_MARGIN, event.y + yOffset, true);
+//			} else {
+				event.gc.drawText(text, event.x, event.y, true);
+//			}
+		});
+		
+		/**
+		 * Adds a Listener that creates a custom selection Highlighting
+		 * TODO: It is getting Overwritten by the Requirement Color
+		 */
+		tree.addListener(SWT.EraseItem, new Listener() {
 			public void handleEvent(Event event) {
 
 				event.detail &= ~SWT.HOT;
 				if ((event.detail & SWT.SELECTED) == 0) return; /* item not selected */
-				int clientWidth = table.getClientArea().width;
+				int clientWidth = tree.getClientArea().width;
 				GC gc = event.gc;
 				Color oldForeground = gc.getForeground();
 				Color oldBackground = gc.getBackground();
@@ -385,9 +447,6 @@ public class TRCView extends ViewPart {
 			}
 		});
 
-		//DragDetectListener listener;
-		//table.addDragDetectListener(listener);
-
 		viewer.addCheckStateListener(new ICheckStateListener() {
 
 			@Override
@@ -397,8 +456,8 @@ public class TRCView extends ViewPart {
 					TRCRequirement req = (TRCRequirement) checkChanged;
 					req.setActive(event.getChecked());
 				}
-				CheckboxTableViewer viewerz = 
-						event == null ? null : (CheckboxTableViewer) event.getSource();
+				CheckboxTreeViewer viewerz = 
+						event == null ? null : (CheckboxTreeViewer) event.getSource();
 				LinkedList<TRCRequirement> reqs = 
 						viewerz == null ? null : (LinkedList<TRCRequirement>) viewerz.getInput();
 				if (reqs != null && reqs instanceof List) {
@@ -413,17 +472,6 @@ public class TRCView extends ViewPart {
 
 	}
 
-
-	private void hookDragAction() {
-		table.addDragDetectListener(new DragDetectListener() {
-
-			@Override
-			public void dragDetected(DragDetectEvent e) {
-				dragAction.run();	
-			}
-		});
-
-	}
 
 	private void hookContextMenu() {
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
@@ -499,13 +547,14 @@ public class TRCView extends ViewPart {
 
 		action2 = new Action() {
 			public void run() {
-				showMessage("Action 2 executed");
+//				showMessage("Moved Requirement up");
+				moveRequirementOneUp();
 			}
 		};
-		action2.setText("Action 2");
-		action2.setToolTipText("Action 2 tooltip");
+		action2.setText("1 up");
+		action2.setToolTipText("Move the selected Requirement 1 up");
 		action2.setImageDescriptor(workbench.getSharedImages().
-				getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
+				getImageDescriptor(ISharedImages.IMG_TOOL_UNDO));
 		doubleClickAction = new Action() {
 			public void run() {
 				showColorDialoge();
@@ -518,6 +567,39 @@ public class TRCView extends ViewPart {
 				showMessage("Drag detected on "+obj.toString());
 			}
 		};
+	}
+
+	protected void moveRequirementOneUp() {
+		IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+		IStructuredSelection selected = viewer.getStructuredSelection();
+		if (selected != null) {
+			Object obj = selected.getFirstElement();
+			if (obj instanceof TRCRequirement) {
+				TRCRequirement r = (TRCRequirement) obj;
+				LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
+				LinkedList<TRCRequirement> out = new LinkedList<TRCRequirement>();
+				for (Iterator iterator = reqs.iterator(); iterator.hasNext();) {
+					TRCRequirement trcRequirement = (TRCRequirement) iterator.next();
+					if(trcRequirement.getId().equals(r.getId())) {
+						if(iterator.hasNext()) {
+							TRCRequirement after = (TRCRequirement) iterator.next();
+							out.add(after);
+							out.add(r);
+						} else {
+							out.add(r);
+						}
+					} else {
+						out.add(trcRequirement);
+					}
+				}
+				
+				TRCFileInteraction.WriteReversedTRCsToFile(out);
+				BoxDecoratorImpl.change();
+				updateViewer(out);
+				
+			}
+		}
+		
 	}
 
 	private void hookDoubleClickAction() {
@@ -539,7 +621,7 @@ public class TRCView extends ViewPart {
 	 * 
 	 * After the change: 
 	 *   - enforces Redraw of boxes
-	 *   - enforces Redraw of the View's table
+	 *   - enforces Redraw of the View's tree
 	 */
 	private void showColorDialoge() {
 		IPath path = BoxDecoratorImpl.getCurrentActivePath();
@@ -563,29 +645,7 @@ public class TRCView extends ViewPart {
 			TRCFileInteraction.WriteTRCsToFile(requirements, path);
 			BoxDecoratorImpl.change();
 			
-			refreshed();  // This should do the same as the commented section below. // TODO: Remove section below and this comment
-
-//			IWorkbenchWindow window = 
-//					workbench == null ? null : workbench.getActiveWorkbenchWindow();
-//			IWorkbenchPage activePage = 
-//					window == null ? null : window.getActivePage();		
-//			IEditorPart editor = 
-//					activePage == null ? null : activePage.getActiveEditor();
-//			if (editor != null) {
-//				editor.setFocus();
-//			}
-//			IViewReference[] references = activePage.getViewReferences();
-//			for ( IViewReference v : references) {
-//				if(v.getPartName().equals("TRC View")) {
-//					IViewPart p = v.getView(true);
-//					if (p instanceof TRCView) {
-//						TRCView trcView = (TRCView) p;
-//						trcView.table.deselectAll();  //TODO: do you want to deselect all? or should the eddited one remain highlighted?
-//						trcView.table.removeAll(); //This enforces redrawing with the updated values
-//					}
-//					p.setFocus();
-//				}
-//			}
+			refreshed();
 		}
 		else {
 			showMessage("Object is no instance of TRCRequirment: Double-click detected on "+obj.toString());	
@@ -600,9 +660,9 @@ public class TRCView extends ViewPart {
 	
 	public static void refreshed() {
 		System.out.println("Refreshed");
-		viewer.getTable().getParent().pack();
-		viewer.getTable().getParent().layout(true);
-		viewer.getTable().setFocus();
+		viewer.getTree().getParent().pack();
+		viewer.getTree().getParent().layout(true);
+		viewer.getTree().setFocus();
 		IWorkbenchWindow window = 
 				workbench == null ? null : workbench.getActiveWorkbenchWindow();
 		IWorkbenchPage activePage = 
