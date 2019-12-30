@@ -130,51 +130,7 @@ public class TRCFileInteraction {
 		}
 		
 	}
-	
-	public static final Path ANCHOR = Paths.get("/Users/Martin/Uni/Bachelorarbeit/runtime-EclipseApplication");
-	
-	/**
-	 * Creating a test Purpose .trc File
-	 * @param filePath - the IPath of the .trc file
-	 * 
-	 */
-	public static void debug(IPath filePath) {
 		
-		System.err.println("DEBUGGING");
-		
-//		String path = filePath.toOSString();
-//    	String name = exchangeEnding(path);
-		
-    	LinkedList<TRCRequirement> requirements = new LinkedList<TRCRequirement>();
-		LinkedList<int[]> foo = new LinkedList<int[]>();
-		//int[] a1 = {0, 1543};
-		//int[] a2 = {13, 28};
-		int[] a2 = {34, 210};
-		int[] a3 = {809, 940};
-		int[] a4 = {211, 1484};
-		int[] a5 = {1487, 1539};
-//		int[] b = {0, 212};
-		//foo.add(a1);
-		foo.add(a2);
-		foo.add(a3);
-		foo.add(a4);
-		foo.add(a5); 
-//		foo.add(b);
-	    TRCRequirement a = new TRCRequirement("R01", foo);
-	    //a.setColor(new Color(null, 250, 1, 1, 100));
-	    //TRCRequirement b = new TRCRequirement("R02", positions)
-	   
-	    LinkedList<int[]> bar = new LinkedList<int[]>();
-	    int[] b1 = {250, 1200}; //currently not used
-	    bar.add(b1);
-	    TRCRequirement b = new TRCRequirement("R02", bar);
-	   // b.setColor(new Color(null, 1, 150, 1, 100));
-	    requirements.add(b);
-	    requirements.add(a);
-		WriteTRCsToFile(requirements, filePath);
-		new Throwable("DEBUG: TRCRequirement: " + a.toString() +"\n + TRCRequirement: " + b.toString()).printStackTrace();
-	}
-	
 	public static void WriteReversedTRCsToFile(LinkedList<TRCRequirement> trcReqs) { 
 		WriteReversedTRCsToFile(trcReqs, BoxDecoratorImpl.getCurrentActivePath());
 	}
@@ -331,15 +287,6 @@ public class TRCFileInteraction {
 		return reqs;
 	}
 
-	/** @deprecated
-     * 
-     * @param path The relative path in the project Directory
-     * @return the absolute system path
-     */
-    public static String computePath(String path) {
-    	return ANCHOR.resolve(path.substring(1)).toString();
-    }
-    
     /**
      * 
      * @param filenameOrPath ending with .*
