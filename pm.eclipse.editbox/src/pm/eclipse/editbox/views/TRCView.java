@@ -282,9 +282,6 @@ public class TRCView extends ViewPart {
 				String finalText = "";
 				int displaywidth = item.getTextBounds(1).width;
 				int textwidth = event.width;
-				System.out.println("Length: " + text.length());
-				System.out.println("width: " + textwidth);
-				System.out.println("displaywidth: " + displaywidth);
 				
 				if( textwidth > displaywidth ) {
 					int i = 1; // first Line, 2nd line, ...
@@ -349,10 +346,10 @@ public class TRCView extends ViewPart {
 					}
 
 					item.setText(1, finalText);
+					//Setting the correct height and width for the SWT.PaintItem Job
 					Point size = event.gc.textExtent(finalText);
 					event.width = size.x;
 					event.height = size.y;	
-					System.out.println("Height:" + event.height);
 				}
 			}
 		});
@@ -360,18 +357,11 @@ public class TRCView extends ViewPart {
 		table.addListener(SWT.PaintItem, event -> {
 			TableItem item = (TableItem) event.item;
 			String text = item.getText(event.index);
-			/* center column 1 vertically */
+			/* center all columns vertically */
 			int yOffset = 0;
-			/**
-			 * Check whether the Item is a root or the second line. Make the second line wrap text.
-			 */
-//			if (item.getParentItem() != null) {
-//				Point size = event.gc.textExtent(text);
-//				yOffset = Math.max(0, (event.height - size.y) / 2);
-//				event.gc.drawText(text, event.x + TEXT_MARGIN, event.y + yOffset, true);
-//			} else {
-				event.gc.drawText(text, event.x, event.y, true);
-//			}
+				Point size = event.gc.textExtent(text);
+				yOffset = Math.max(0, (event.height - size.y) / 2);
+				event.gc.drawText(text, event.x, event.y + yOffset, true);
 		});
 		
 		/**
