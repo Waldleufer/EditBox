@@ -32,7 +32,6 @@ public class ReqIFFileInteraction {
 		ReqIF10Parser parser = new ReqIF10Parser();
 		parser.setRemoveTemporaries(true);
 		parser.setRemoveToolExtensions(true);
-		parser.setReqIFFilename("chapter3");	
 		ReqIF r = parser.parseReqIFContent();
 		EList<Specification> list = r.getCoreContent().getSpecifications();
 

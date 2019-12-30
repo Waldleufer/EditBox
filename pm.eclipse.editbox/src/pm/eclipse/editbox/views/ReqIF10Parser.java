@@ -38,13 +38,13 @@ public final class ReqIF10Parser {
 	private boolean removeTemporaries = true;
 
 	public ReqIF parseReqIFContent() {
-		String wkFile = this.getReqIFFilename();
-		// ***** Debug start ****** //
+//		String wkFile = this.getReqIFFilename();  // Could be used to set the ReqIF File name programmatically
+		// ***** Config start ****** //
 		
-		wkFile = "/Users/Martin/Uni/Bachelorarbeit/runtime-EclipseApplication/TestTest1/reqif/chapter3.reqif";
+		String wkFile = "/Users/Martin/Uni/Bachelorarbeit/runtime-EclipseApplication/TestTest1/reqif/chapter3.reqif";
 //		wkFile = "/Users/Martin/Uni/Bachelorarbeit/runtime-EclipseApplication/TestTest1/reqif/TestTest1.reqif";
 		this.setReqIFFilename(wkFile);
-		// ***** Debug  end  ****** //
+		// ***** Config  end  ****** //
 		 
 		if (isRemoveToolExtensions()) {
 			ToolExRemover remover = new ToolExRemover();
