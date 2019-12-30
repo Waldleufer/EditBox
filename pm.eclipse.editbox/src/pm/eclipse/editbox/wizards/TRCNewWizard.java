@@ -7,6 +7,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.core.runtime.*;
 import org.eclipse.jface.operation.*;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.stream.Stream;
 
@@ -19,6 +20,7 @@ import org.eclipse.ui.*;
 import org.eclipse.ui.ide.IDE;
 
 import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
+import pm.eclipse.editbox.views.TRCView;
 
 /**
  * This is a sample new wizard. Its role is to create a new file 
@@ -33,6 +35,7 @@ public class TRCNewWizard extends Wizard implements INewWizard {
 	private TRCNewWizardPage newWisardPage;
 	private TRCWizardSelectRequirementsPage selectRequirementsPage;
 	private ISelection selection;
+	private String reqIds;
 
 	/**
 	 * Constructor for TRCNewWizard.
@@ -49,7 +52,7 @@ public class TRCNewWizard extends Wizard implements INewWizard {
 	public void addPages() {
 		newWisardPage = new TRCNewWizardPage(selection);
 		addPage(newWisardPage);
-		selectRequirementsPage = new TRCWizardSelectRequirementsPage();
+		selectRequirementsPage = new TRCWizardSelectRequirementsPage(newWisardPage);
 		addPage(selectRequirementsPage);
 	}
 
@@ -108,12 +111,12 @@ public class TRCNewWizard extends Wizard implements INewWizard {
 		final String absolut = file.getLocation().toOSString();
 		System.out.println("ABSOLUT: " + absolut);
 		try {
-			LinkedList<TRCRequirement> trcReqs = getTRCReqs(requirementIDs);
+			LinkedList<TRCRequirement> trcReqs = getTRCReqs(requirementIDs, selectRequirementsPage.getOldRequirements());
 			FileOutputStream fileOut = new FileOutputStream(absolut);
             ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
             objectOut.writeObject(trcReqs);
             objectOut.close();
-            fileOut.close(); //TODO: Neccesarry?
+            fileOut.close();
 		} catch (IOException e) {
 			throwCoreException(e.getMessage());
 		}
@@ -133,14 +136,28 @@ public class TRCNewWizard extends Wizard implements INewWizard {
 	/**
 	 * We will initialise file contents with the specified requirement IDs.
 	 * @param ids - the String Array containing the IDs
+	 * @param oldRequirements - the Requirements found in the already existing .trc file, or null if there are none.
 	 */
 
-	private LinkedList<TRCRequirement> getTRCReqs(String[] ids) {
+	private LinkedList<TRCRequirement> getTRCReqs(String[] ids, LinkedList<TRCRequirement> oldRequirements) {
 		LinkedList<TRCRequirement> trcReqs = new LinkedList<TRCRequirement>();
 		for(String id : ids) {
-			TRCRequirement trcReq = new TRCRequirement(id, new LinkedList<int[]>());
-			System.out.println("Creating: " + trcReq.toString());
-			trcReqs.add(trcReq);
+			if (oldRequirements != null) {
+				boolean added = false;
+				for (TRCRequirement r : oldRequirements) {
+					if (r.getId().equals(id)) {
+						trcReqs.add(r);
+						added = true;
+					}
+				}
+				if (!added) {
+					TRCRequirement trcReq = new TRCRequirement(id, new LinkedList<int[]>());
+					trcReqs.add(trcReq);	
+				}
+			} else {
+				TRCRequirement trcReq = new TRCRequirement(id, new LinkedList<int[]>());
+				trcReqs.add(trcReq);				
+			}
 		}
 		return trcReqs;
 	}
