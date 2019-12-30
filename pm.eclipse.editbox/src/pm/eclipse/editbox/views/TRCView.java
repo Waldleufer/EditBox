@@ -391,8 +391,6 @@ public class TRCView extends ViewPart {
 					event.width = size.x;
 					event.height = size.y;	
 					System.out.println("Height:" + event.height);
-				} else { // Line fits
-//					item.getParent().setToolTipText(item.getText(1));					
 				}
 			}
 		});
