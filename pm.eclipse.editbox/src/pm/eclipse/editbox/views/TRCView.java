@@ -391,7 +391,7 @@ public class TRCView extends ViewPart {
 					event.width = size.x;
 					event.height = size.y;	
 					System.out.println("Height:" + event.height);
-				} 
+				}
 			}
 		});
 		table.addListener(SWT.EraseItem, event -> event.detail &= ~SWT.FOREGROUND);
