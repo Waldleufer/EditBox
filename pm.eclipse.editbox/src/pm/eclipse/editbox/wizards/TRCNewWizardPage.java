@@ -110,7 +110,7 @@ public class TRCNewWizardPage extends WizardPage {
 				}
 			} 
 			else {
-				System.out.println("TROUBELS?");
+				System.out.println("Error:");
 				System.out.println(obj.toString());
 			}
 		}
@@ -173,7 +173,6 @@ public class TRCNewWizardPage extends WizardPage {
 		}
 		IResource target = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(getNewFileName()));
 		if (target != null && ( target.exists())) {
-			updateStatus("Would overwrite an already existing .trc File");
 			return;
 		}
 //		if (fileName.replace('\\', '/').indexOf('/', 1) > 0) {

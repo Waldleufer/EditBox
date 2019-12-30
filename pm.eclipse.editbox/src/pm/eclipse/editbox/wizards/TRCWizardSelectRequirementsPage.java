@@ -1,5 +1,10 @@
 package pm.eclipse.editbox.wizards;
 
+import java.util.Collections;
+import java.util.LinkedList;
+
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -9,6 +14,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import pm.eclipse.editbox.impl.TRCFileInteraction;
+import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
+
 /**
  * The "New" wizard page allows setting the container for the new file as well
  * as the file name. The page will only accept file name without the extension
@@ -17,14 +25,17 @@ import org.eclipse.swt.widgets.Text;
 
 public class TRCWizardSelectRequirementsPage extends WizardPage {
 	private Text requirementIDsText;
+	private TRCNewWizardPage newWisardPage;
+	private LinkedList<TRCRequirement> reqs;
 
 	/**
 	 * Constructor for TRCWizardSelectRequirementsPage.
 	 */
-	public TRCWizardSelectRequirementsPage() {
+	public TRCWizardSelectRequirementsPage(TRCNewWizardPage newWisardPage) {
 		super("wizardPage");
 		setTitle("Traceability Data File");
 		setDescription("Please specify the Requirements you want to parse in this file");
+		this.newWisardPage = newWisardPage;
 	}
 
 	@Override
@@ -41,7 +52,16 @@ public class TRCWizardSelectRequirementsPage extends WizardPage {
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		requirementIDsText.setLayoutData(gd);
 		requirementIDsText.addModifyListener(e -> dialogChanged());
-
+		IPath path = new Path(newWisardPage.getNewFileName());
+		reqs = TRCFileInteraction.ReadTRCsFromFile(path);
+		Collections.reverse(reqs);
+		String reqIDs = "";
+		if(reqs != null) {
+			for (TRCRequirement r : reqs) {
+				reqIDs += r.getId() + "\n";
+			}			
+		}
+		requirementIDsText.setText(reqIDs);
 		dialogChanged();
 		setControl(container);
 	}
@@ -57,7 +77,7 @@ public class TRCWizardSelectRequirementsPage extends WizardPage {
 			return;
 		}
 		//TODO: Validation
-		//TODO: Select from SPEC File
+		//TODO: Select from ReqIF File
 		updateStatus(null);
 	}
 
@@ -73,5 +93,9 @@ public class TRCWizardSelectRequirementsPage extends WizardPage {
 			out[i] = out[i].trim();
 		}
 		return out;
+	}
+	
+	public LinkedList<TRCRequirement> getOldRequirements() {
+		return reqs;
 	}
 }

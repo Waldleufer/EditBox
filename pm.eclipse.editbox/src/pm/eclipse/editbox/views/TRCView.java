@@ -76,9 +76,9 @@ public class TRCView extends ViewPart {
 	private static boolean initialized = false;
 
 	private Action actionSetRequirementBoxes;
-	private Action action2;
+	private Action actionMoveRequirementUp;
+	private Action actionMoveRequirementDown;
 	private Action doubleClickAction;
-	private Action dragAction;
 	
 	public Table getTable() {
 		return table;
@@ -256,6 +256,8 @@ public class TRCView extends ViewPart {
 		hookContextMenu();
 		hookDoubleClickAction();
 		contributeToActionBars();
+<<<<<<< HEAD
+=======
 
 		// Newly found: // Advanced Styling of table
 		//		
@@ -294,6 +296,7 @@ public class TRCView extends ViewPart {
 		//		list.add(new String[] { "IBM", "Blue" });
 		//		viewer.setInput(list);
 
+>>>>>>> be97f6473bebdafd3c75ea46534e7086742c84a1
 	}
 
 
@@ -414,13 +417,16 @@ public class TRCView extends ViewPart {
 		
 		/**
 		 * Adds a Listener that creates a custom selection Highlighting
-		 * TODO: It is getting Overwritten by the Requirement Color
+		 * As the Colour is specified by the Requirements, we only change the Foreground Colour 
+		 * By Setting SWT.HOT
 		 */
 		table.addListener(SWT.EraseItem, new Listener() {
 			public void handleEvent(Event event) {
 
 				event.detail &= ~SWT.HOT;
 				if ((event.detail & SWT.SELECTED) == 0) return; /* item not selected */
+<<<<<<< HEAD
+=======
 				int clientWidth = table.getClientArea().width;
 				GC gc = event.gc;
 				Color oldForeground = gc.getForeground();
@@ -435,6 +441,7 @@ public class TRCView extends ViewPart {
 
 				gc.setForeground(oldForeground);
 				gc.setBackground(oldBackground);
+>>>>>>> be97f6473bebdafd3c75ea46534e7086742c84a1
 				event.detail &= ~SWT.SELECTED;
 			}
 		});
@@ -448,8 +455,8 @@ public class TRCView extends ViewPart {
 					TRCRequirement req = (TRCRequirement) checkChanged;
 					req.setActive(event.getChecked());
 				}
-				CheckboxTreeViewer viewerz = 
-						event == null ? null : (CheckboxTreeViewer) event.getSource();
+				CheckboxTableViewer viewerz = 
+						event == null ? null : (CheckboxTableViewer) event.getSource();
 				LinkedList<TRCRequirement> reqs = 
 						viewerz == null ? null : (LinkedList<TRCRequirement>) viewerz.getInput();
 				if (reqs != null && reqs instanceof List) {
@@ -487,19 +494,22 @@ public class TRCView extends ViewPart {
 	private void fillLocalPullDown(IMenuManager manager) {
 		manager.add(actionSetRequirementBoxes);
 		manager.add(new Separator());
-		manager.add(action2);
+		manager.add(actionMoveRequirementUp);
+		manager.add(actionMoveRequirementDown);
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
 		manager.add(actionSetRequirementBoxes);
-		manager.add(action2);
+		manager.add(actionMoveRequirementUp);
+		manager.add(actionMoveRequirementDown);
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(actionSetRequirementBoxes);
-		manager.add(action2);
+		manager.add(actionMoveRequirementUp);
+		manager.add(actionMoveRequirementDown);
 	}
 
 	/**
@@ -508,9 +518,7 @@ public class TRCView extends ViewPart {
 	private void makeActions() {
 		actionSetRequirementBoxes = new Action() {
 			public void run() {
-				//				showMessage("Set Requirement(s) now executing");
 				setRequirementBoxes();
-				//				showMessage("Set Requirement(s) executed");
 			}
 
 			private void setRequirementBoxes() {
@@ -537,32 +545,39 @@ public class TRCView extends ViewPart {
 		actionSetRequirementBoxes.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
 				getImageDescriptor(ISharedImages.IMG_OBJ_FILE));
 
-		action2 = new Action() {
+		actionMoveRequirementUp = new Action() {
 			public void run() {
 //				showMessage("Moved Requirement up");
 				moveRequirementOneUp();
 			}
 		};
-		action2.setText("1 up");
-		action2.setToolTipText("Move the selected Requirement 1 up");
-		action2.setImageDescriptor(workbench.getSharedImages().
+		actionMoveRequirementUp.setText("1 up");
+		actionMoveRequirementUp.setToolTipText("Move the selected Requirement 1 Layer up");
+		actionMoveRequirementUp.setImageDescriptor(workbench.getSharedImages().
 				getImageDescriptor(ISharedImages.IMG_TOOL_UNDO));
+		
+		
+		actionMoveRequirementDown = new Action() {
+			public void run() {
+//				showMessage("Moved Requirement up");
+				moveRequirementOneDown();
+			}
+		};
+		actionMoveRequirementDown.setText("1 down");
+		actionMoveRequirementDown.setToolTipText("Move the selected Requirement 1 Layer down");
+		actionMoveRequirementDown.setImageDescriptor(workbench.getSharedImages().
+				getImageDescriptor(ISharedImages.IMG_TOOL_REDO));
+
+		
+		
 		doubleClickAction = new Action() {
 			public void run() {
 				showColorDialoge();
 			}
 		};
-		dragAction = new Action() {
-			public void run() {
-				IStructuredSelection selection = viewer.getStructuredSelection();
-				Object obj = selection.getFirstElement();
-				showMessage("Drag detected on "+obj.toString());
-			}
-		};
 	}
 
 	protected void moveRequirementOneUp() {
-		IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
 		IStructuredSelection selected = viewer.getStructuredSelection();
 		if (selected != null) {
 			Object obj = selected.getFirstElement();
@@ -570,7 +585,7 @@ public class TRCView extends ViewPart {
 				TRCRequirement r = (TRCRequirement) obj;
 				LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
 				LinkedList<TRCRequirement> out = new LinkedList<TRCRequirement>();
-				for (Iterator iterator = reqs.iterator(); iterator.hasNext();) {
+				for (Iterator<TRCRequirement> iterator = reqs.iterator(); iterator.hasNext();) {
 					TRCRequirement trcRequirement = (TRCRequirement) iterator.next();
 					if(trcRequirement.getId().equals(r.getId())) {
 						if(iterator.hasNext()) {
@@ -584,6 +599,45 @@ public class TRCView extends ViewPart {
 						out.add(trcRequirement);
 					}
 				}
+				
+				TRCFileInteraction.WriteReversedTRCsToFile(out);
+				BoxDecoratorImpl.change();
+				updateViewer(out);
+				
+			}
+		}
+		
+	}
+	
+	
+	//TODO: to TEST this.
+	/**
+	 * moves the currently selected Requirement one up.
+	 */
+	protected void moveRequirementOneDown() {
+		IStructuredSelection selected = viewer.getStructuredSelection();
+		if (selected != null) {
+			Object obj = selected.getFirstElement();
+			if (obj instanceof TRCRequirement) {
+				TRCRequirement r = (TRCRequirement) obj;
+				TRCRequirement last = null;
+				LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
+				LinkedList<TRCRequirement> out = new LinkedList<TRCRequirement>();
+				Iterator<TRCRequirement> iterator = reqs.iterator();
+				do  {
+					TRCRequirement trcRequirement = (TRCRequirement) iterator.next();
+					if(trcRequirement.getId().equals(r.getId())) {
+						if(last != null) {
+							out.add(trcRequirement);
+							continue;
+						}
+					} else {
+						if(last != null) {
+							out.add(last);							
+						}
+					}
+					last = trcRequirement;
+				} while (iterator.hasNext());
 				
 				TRCFileInteraction.WriteReversedTRCsToFile(out);
 				BoxDecoratorImpl.change();
