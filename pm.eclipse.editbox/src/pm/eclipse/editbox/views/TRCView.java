@@ -374,21 +374,6 @@ public class TRCView extends ViewPart {
 
 				event.detail &= ~SWT.HOT;
 				if ((event.detail & SWT.SELECTED) == 0) return; /* item not selected */
-
-				int clientWidth = table.getClientArea().width;
-				GC gc = event.gc;
-				Color oldForeground = gc.getForeground();
-				Color oldBackground = gc.getBackground();
-				gc.setBackground(event.display.getSystemColor(SWT.COLOR_YELLOW));
-				gc.setForeground(event.display.getSystemColor(SWT.COLOR_BLUE));
-				//gc.fillGradientRectangle(event.x, event.y, event.width, event.height, false);
-				gc.fillGradientRectangle(0, event.y, clientWidth, event.height, true);
-				//gc.drawRectangle(event.x, event.y, event.width, event.height);
-				System.out.println("MAGIC: " + event.x +  " " + event.y + " " + clientWidth + " " + event.height);
-				//gc.fillGradientRectangle(0, event.y, clientWidth, event.height, false);
-
-				gc.setForeground(oldForeground);
-				gc.setBackground(oldBackground);
 				event.detail &= ~SWT.SELECTED;
 			}
 		});
