@@ -256,6 +256,47 @@ public class TRCView extends ViewPart {
 		hookContextMenu();
 		hookDoubleClickAction();
 		contributeToActionBars();
+<<<<<<< HEAD
+=======
+
+		// Newly found: // Advanced Styling of table
+		//		
+//				table.setHeaderVisible(true);
+//				table.setLinesVisible(true);
+//				table.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL |
+//				GridData.FILL_BOTH));
+//		
+//				TableColumn column = new TableColumn(table, SWT.NONE, 0);
+//				column.setText("Name");
+//				column.setAlignment(SWT.LEFT);
+//				column.setWidth(300);
+//		
+//				column = new TableColumn(table, SWT.NONE, 1);
+//				column.setText("Color");
+//				column.setAlignment(SWT.LEFT);
+//				column.setWidth(100);
+		//
+		//		//TableViewer tableViewer = new TableViewer(table);
+		//		viewer.setUseHashlookup(true);
+		//		viewer.setColumnProperties(new String[] { "Name", "Color" });
+		//
+		//		CellEditor[] editors =
+		//		new CellEditor[viewer.getColumnProperties().length];
+		//		editors[0] = new TextCellEditor(table);
+		//		editors[1] = new ColorCellEditor(table);
+		//		viewer.setCellEditors(editors);
+		//
+		//		//viewer.setLabelProvider(new TableLabelProvider());
+		//		//viewer.setContentProvider(new TableContentProvider());
+		//		viewer.setCellModifier(new TableCellModifier(viewer));
+		//
+		//		List list = new ArrayList();
+		//		list.add(new String[] { "Tree", "Green" });
+		//		list.add(new String[] { "Sun", "Yellow" });
+		//		list.add(new String[] { "IBM", "Blue" });
+		//		viewer.setInput(list);
+
+>>>>>>> be97f6473bebdafd3c75ea46534e7086742c84a1
 	}
 
 
@@ -384,6 +425,23 @@ public class TRCView extends ViewPart {
 
 				event.detail &= ~SWT.HOT;
 				if ((event.detail & SWT.SELECTED) == 0) return; /* item not selected */
+<<<<<<< HEAD
+=======
+				int clientWidth = table.getClientArea().width;
+				GC gc = event.gc;
+				Color oldForeground = gc.getForeground();
+				Color oldBackground = gc.getBackground();
+				gc.setBackground(event.display.getSystemColor(SWT.COLOR_YELLOW));
+				gc.setForeground(event.display.getSystemColor(SWT.COLOR_BLUE));
+				//gc.fillGradientRectangle(event.x, event.y, event.width, event.height, false);
+				gc.fillGradientRectangle(0, event.y, clientWidth, event.height, true);
+				//gc.drawRectangle(event.x, event.y, event.width, event.height);
+				System.out.println("MAGIC: " + event.x +  " " + event.y + " " + clientWidth + " " + event.height);
+				//gc.fillGradientRectangle(0, event.y, clientWidth, event.height, false);
+
+				gc.setForeground(oldForeground);
+				gc.setBackground(oldBackground);
+>>>>>>> be97f6473bebdafd3c75ea46534e7086742c84a1
 				event.detail &= ~SWT.SELECTED;
 			}
 		});
