@@ -254,21 +254,11 @@ public class TRCFileInteraction {
     	System.out.println("Initialised?: " + TRCView.isInitialized());
     	new Throwable("I Hate to do this printStackTrace thing").printStackTrace();
     	
-    	
+    	// Try the shortcut. Don't read from file, take Requirements from View.
     	if (TRCView.isInitialized()) {
-    		//Shortcut
-    		LinkedList<TRCRequirement> reverseReqs;
     		LinkedList<TRCRequirement> reqs;
-    		
     		try {
-				//displayed Order is reversed so we use a descending Iterator.
     			reqs = (LinkedList<TRCRequirement>) TRCView.getViewer().getInput();	
-//    			reqs = new LinkedList<TRCRequirement>();
-//    			
-//    			for (Iterator<TRCRequirement> descIterator = reverseReqs.descendingIterator(); descIterator.hasNext();) {
-//    				TRCRequirement r = (TRCRequirement) descIterator.next();
-//    				reqs.add(r);
-//    			}
     			return reqs;
 			} catch (Exception e) {
 				System.err.println("Not Initialised, due to: " + e.getMessage());
@@ -276,34 +266,28 @@ public class TRCFileInteraction {
     	}
     	
     	String stringPath = exchangeEnding(filePath.toOSString());
-    	IPath path = new org.eclipse.core.runtime.Path(stringPath);
     	
     	//Localise:
     	String local = stringPath.split(ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString())[1];
     	System.out.println("LOCAL: "+ local);
-    	IPath localpath = new org.eclipse.core.runtime.Path(local);
     	
         try {
-        	
-        	
             FileInputStream fis = new FileInputStream(stringPath);
-            System.err.println("one");
             ObjectInputStream ois = new ObjectInputStream(fis);
-            System.err.println("two");
             Object read = ois.readObject();	
             LinkedList<TRCRequirement> list = null;
             if (read == null) {
 				new Throwable("read = null").printStackTrace();
 			} else {
-				if (read instanceof LinkedList) {
-					list = (LinkedList<TRCRequirement>) read;
+				if (read instanceof LinkedList<?>) {
+					if (read != null) {
+						list = (LinkedList<TRCRequirement>) read;						
+					}
 				}			
 			}
-            System.err.println("three");
-            //TRCRequirement[] trcsFromSavedFile = (TRCRequirement[]) ois.readObject();
             ois.close();
-            fis.close(); //TODO: Neccesarry?
-//            System.out.println("The OBJECT is: " + debugs[0].toString());
+            fis.close();
+            
             System.out.println("The Object was succesfully read from the file: " + stringPath);
             
             LinkedList<TRCRequirement> reqs = new LinkedList<TRCRequirement>();
@@ -313,7 +297,7 @@ public class TRCFileInteraction {
 				reqs.add(r);
 			}
             
-            //TODO: Eventually launch a thread who does the following
+            //TODO: Eventually launch a thread who gets the Info from the ReqIF File in Background
             ReqIFFileInteraction.setInfos(reqs);
 
             return reqs;
