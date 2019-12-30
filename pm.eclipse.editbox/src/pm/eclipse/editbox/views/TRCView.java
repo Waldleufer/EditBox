@@ -2,70 +2,6 @@ package pm.eclipse.editbox.views;
 
 import org.eclipse.swt.widgets.ColorDialog;
 
-//import java.util.*;
-//
-//import javax.inject.Inject;
-//
-//import org.eclipse.jface.viewers.ArrayContentProvider;
-//import org.eclipse.jface.viewers.ColumnLabelProvider;
-//import org.eclipse.jface.viewers.TableViewer;
-//import org.eclipse.jface.viewers.TableViewerColumn;
-//import org.eclipse.swt.SWT;
-//import org.eclipse.swt.graphics.Image;
-//import org.eclipse.swt.widgets.Composite;
-//import org.eclipse.ui.ISharedImages;
-//import org.eclipse.ui.IWorkbench;
-//import org.eclipse.ui.part.ViewPart;
-//
-//public class TRCView extends ViewPart {
-//	public static final String ID = "pm.eclipse.editbox.views.TRCView";
-//
-//	@Inject IWorkbench workbench;
-//	
-//	private TableViewer viewer;
-//	
-//	private class StringLabelProvider extends ColumnLabelProvider {
-//		@Override
-//		public String getText(Object element) {
-//			return super.getText(element);
-//		}
-//
-//		@Override
-//		public Image getImage(Object obj) {
-//			return workbench.getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
-//		}
-//
-//	}
-//
-//	@Override
-//	public void createPartControl(Composite parent) {
-//		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-//		viewer.getTable().setLinesVisible(true);
-//
-//		TableViewerColumn column = new TableViewerColumn(viewer, SWT.NONE);
-//		column.setLabelProvider(new StringLabelProvider());
-//
-//		viewer.getTable().getColumn(0).setWidth(200);
-//		
-//		viewer.setContentProvider(ArrayContentProvider.getInstance());
-//		
-//		// Provide the input to the ContentProvider
-//		viewer.setInput(createInitialDataModel());
-//	}
-//
-//
-//	@Override
-//	public void setFocus() {
-//		viewer.getControl().setFocus();
-//	}
-//	
-//	private List<String> createInitialDataModel() {
-//		return Arrays.asList("One", "Two", "Three");
-//	}
-//}
-
-
-
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -80,6 +16,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 
@@ -91,6 +28,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.*;
 import org.eclipse.jface.action.*;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.ui.*;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
@@ -101,6 +39,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DragDetectEvent;
 import org.eclipse.swt.events.DragDetectListener;
@@ -132,8 +71,8 @@ public class TRCView extends ViewPart {
 
 	private static IWorkbench workbench = PlatformUI.getWorkbench();
 
-	private static CheckboxTreeViewer viewer;
-	private Tree tree;
+	private static CheckboxTableViewer viewer;
+	private static Table table;
 	private static boolean initialized = false;
 
 	private Action actionSetRequirementBoxes;
@@ -141,11 +80,11 @@ public class TRCView extends ViewPart {
 	private Action doubleClickAction;
 	private Action dragAction;
 	
-	public Tree getTable() {
-		return tree;
+	public Table getTable() {
+		return table;
 	}
 
-	public static CheckboxTreeViewer getViewer() {
+	public static CheckboxTableViewer getViewer() {
 		return viewer;
 	}
 
@@ -171,7 +110,7 @@ public class TRCView extends ViewPart {
 			}
 			if (obj instanceof String) {
 				if (index == 1) {
-					int width = TRCView.getViewer().getTree().getColumn(1).getWidth();
+					int width = TRCView.getViewer().getTable().getColumn(1).getWidth();
 					return "width: " + width + " " + (String) obj;
 				} else {
 					return "";
@@ -228,6 +167,8 @@ public class TRCView extends ViewPart {
 	public static void updateViewer(LinkedList<TRCRequirement> requirements) {
 
 		viewer.setInput(requirements);
+		
+		table.layout();
 
 		for (TRCRequirement trcRequirement : requirements) {
 			viewer.setChecked(trcRequirement, trcRequirement.isActive());
@@ -257,35 +198,47 @@ public class TRCView extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
+		
+		FillLayout layer = new FillLayout(SWT.VERTICAL);
+		parent.setLayout(layer);
+		
 		//viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-		tree = new Tree(parent, SWT.MULTI
+		table = new Table(parent, SWT.MULTI
 				| SWT.CHECK
 				| SWT.V_SCROLL
 				| SWT.FULL_SELECTION );
 		
-		tree.setHeaderVisible(true);
-		tree.setLinesVisible(true);
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
 		
-
-		TreeColumn column = new TreeColumn(tree, SWT.BORDER | SWT.WRAP, 0);
-		column.setText("Requirement ID");
-		column.setAlignment(SWT.LEFT);
-		
-		
-		TreeColumn column2 = new TreeColumn(tree, SWT.BORDER | SWT.WRAP, 1);
-		column2.setText("Info");
-		column2.setAlignment(SWT.LEFT);
 		
 		//TODO: Layout might be improvable: Size of Columns should automatically adapt to Size of first column
 		//TODO: Cells content in Info column should be wrapped or extended or else.
-		
+		/**
+		 * Set the Table Layout
+		 */
+//		table.getColumn(0).pack();
+		int tablewidth = table.getParent().getClientArea().width;
 		TableLayout tableLayout = new TableLayout(true);
-		tableLayout.addColumnData(new ColumnWeightData(15));
-		tableLayout.addColumnData(new ColumnWeightData(85));
-		tree.setLayout(tableLayout);
+		TableColumn column = new TableColumn(table, SWT.BORDER | SWT.WRAP, 0);
+		column.setText("Requirement ID");
+		column.setAlignment(SWT.LEFT);
+		
+		TableColumn column2 = new TableColumn(table, SWT.BORDER | SWT.WRAP, 1);
+		column2.setText("Info");
+		column2.setAlignment(SWT.LEFT);
+		
+		tableLayout.addColumnData(new ColumnWeightData(15, (int)(tablewidth/10)));
+		tableLayout.addColumnData(new ColumnWeightData(85, (int)(tablewidth*7/10)));
+		table.setLayout(tableLayout);
+		
+//		TableLayout tableLayout = new TableLayout(true);
+//		tableLayout.addColumnData(new ColumnWeightData(15));
+////		tableLayout.addColumnData(new ColumnWeightData(85));
+//		table.setLayout(tableLayout);
 		
 		
-		viewer = new CheckboxTreeViewer(tree);
+		viewer = new CheckboxTableViewer(table);
 
 		viewer.setContentProvider(TRCViewArrayContentProvider.getInstance());
 //		updateViewer();  // Do not update here as Build Boxes will set the content in a second
@@ -304,31 +257,31 @@ public class TRCView extends ViewPart {
 		hookDoubleClickAction();
 		contributeToActionBars();
 
-		// Newly found: // Advanced Styling of tree
+		// Newly found: // Advanced Styling of table
 		//		
-//				tree.setHeaderVisible(true);
-//				tree.setLinesVisible(true);
-//				tree.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL |
+//				table.setHeaderVisible(true);
+//				table.setLinesVisible(true);
+//				table.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL |
 //				GridData.FILL_BOTH));
 //		
-//				TableColumn column = new TableColumn(tree, SWT.NONE, 0);
+//				TableColumn column = new TableColumn(table, SWT.NONE, 0);
 //				column.setText("Name");
 //				column.setAlignment(SWT.LEFT);
 //				column.setWidth(300);
 //		
-//				column = new TableColumn(tree, SWT.NONE, 1);
+//				column = new TableColumn(table, SWT.NONE, 1);
 //				column.setText("Color");
 //				column.setAlignment(SWT.LEFT);
 //				column.setWidth(100);
 		//
-		//		//TableViewer tableViewer = new TableViewer(tree);
+		//		//TableViewer tableViewer = new TableViewer(table);
 		//		viewer.setUseHashlookup(true);
 		//		viewer.setColumnProperties(new String[] { "Name", "Color" });
 		//
 		//		CellEditor[] editors =
 		//		new CellEditor[viewer.getColumnProperties().length];
-		//		editors[0] = new TextCellEditor(tree);
-		//		editors[1] = new ColorCellEditor(tree);
+		//		editors[0] = new TextCellEditor(table);
+		//		editors[1] = new ColorCellEditor(table);
 		//		viewer.setCellEditors(editors);
 		//
 		//		//viewer.setLabelProvider(new TableLabelProvider());
@@ -348,63 +301,102 @@ public class TRCView extends ViewPart {
 		
 		int TEXT_MARGIN = 10;
 		
-		tree.addListener(SWT.MeasureItem, event -> {
+		/**
+		 * adding Text wrapping / 2 Line Info
+		 */
+		table.addListener(SWT.MeasureItem, event -> {
 			/**
-			 * Check whether the Item is a root or the second line. Format the second line accordingly.
+			 * Check The Column of the Event. Format Info Column in two lines
 			 * TODO: Format only the second lines ... somehow
 			 */
-			TreeItem item = (TreeItem) event.item;
-			String text = item.getText(event.index);
-			int displaywidth = item.getTextBounds(1).width;
-			int textwidth = event.width;
-			System.out.println("Length: " + text.length());
-			System.out.println("width: " + textwidth);
-			System.out.println("displaywidth: " + displaywidth);
-			if(textwidth > displaywidth) {
-				String line = "";
-				int spaceAt = text.indexOf(" ");
-				String currentLine = text.substring(0, spaceAt);
-				String lineBefore = "";
-				int progressor = 0;
-				boolean reachedEnd = false;
-				while(!reachedEnd) {
-					
-					do {
-						spaceAt = text.indexOf(" ", spaceAt + 1);
-						if(spaceAt == -1) {
-							reachedEnd = true;
-							break;
-						}
-						lineBefore = currentLine;
-						currentLine = text.substring(progressor, spaceAt);
-						System.out.println("continueing?");
-						System.out.println("Textwidth: " + event.gc.textExtent(currentLine).x);
-					} while (event.gc.textExtent(currentLine).x < displaywidth);
-					progressor = progressor + lineBefore.length();
-					currentLine = lineBefore;
-					if(line.equals("")) {
-						line += lineBefore;
-					} else {
-						line += "\n" + lineBefore;
-					}
-					
-				}
-				item.setText(1, line);
-			}
+			final int MAX_LINES = 2;
+			if(event.index == 1) {
 
-			Point size = event.gc.textExtent(text);
-//			if(item.getParentItem() != null) {
-//				event.width = size.x + 2 * TEXT_MARGIN;
-//				event.height = Math.max(event.height, size.y + TEXT_MARGIN);				
-//			} else {
-				event.width = size.x;
-				event.height = size.y;	
-				System.out.println("Height:" + event.height);
-//			}
+				TableItem item = (TableItem) event.item;
+				final String text = item.getText(event.index);
+
+				item.getParent().setToolTipText(((TRCRequirement) item.getData()).getInfo());		
+				
+				String finalText = "";
+				int displaywidth = item.getTextBounds(1).width;
+				int textwidth = event.width;
+				System.out.println("Length: " + text.length());
+				System.out.println("width: " + textwidth);
+				System.out.println("displaywidth: " + displaywidth);
+				
+				if( textwidth > displaywidth ) {
+					int i = 1; // first Line, 2nd line, ...
+					int spaceFoundAtIndex = 0;
+					int lineProgressionIndex = 0;
+					String finalTextLine = "";
+					String currentBuildingTextLine = "";
+					String more = " ...";
+					boolean reachedEnd = false;
+					
+					while(!reachedEnd) {
+						
+						do {
+							finalTextLine = currentBuildingTextLine;
+							spaceFoundAtIndex = text.indexOf(" ", spaceFoundAtIndex + 1); //+1 to avoid  finding same space over and over again
+							if(spaceFoundAtIndex == -1 || spaceFoundAtIndex > text.length()) {
+								reachedEnd = true;
+								currentBuildingTextLine = text.substring(lineProgressionIndex);
+								break;
+								//We found the end of the text
+							}
+							currentBuildingTextLine = text.substring(lineProgressionIndex, spaceFoundAtIndex);
+						} while (!reachedEnd && event.gc.textExtent(currentBuildingTextLine).x < displaywidth);
+						
+						//the line was to long; finalTextLine is a line that fits
+						if (! reachedEnd ) {
+							lineProgressionIndex += finalTextLine.length();
+							if(i <= 1) {
+								finalText = finalTextLine;
+							} else if (i < MAX_LINES){
+								finalText += "\n" + finalTextLine;
+							} else if (i == MAX_LINES) {
+								if(event.gc.textExtent(finalTextLine+more+more).x < displaywidth) {
+									finalText += "\n" + finalTextLine + more;	
+								} else {
+									finalText += "\n" + finalTextLine;
+								}
+							}
+							
+						} else {  // We reached End of Text
+							String endText = "";
+							if(event.gc.textExtent(currentBuildingTextLine).x < displaywidth ) {
+								endText += currentBuildingTextLine;								
+							} else {
+								endText += finalTextLine;
+							}
+							
+							if(i <= 1) {
+								finalText = endText;
+								if(currentBuildingTextLine.length() > finalTextLine.length()) {
+									//We might have missed a word or two.
+									finalText += "\n" + currentBuildingTextLine.substring(finalTextLine.length());
+								}
+							} else if (i < MAX_LINES){
+								finalText += "\n" + endText;
+							} else if (i == MAX_LINES) {
+								finalText += "\n" + endText;
+							}	
+						}
+						
+						i++;
+					}
+
+					item.setText(1, finalText);
+					Point size = event.gc.textExtent(finalText);
+					event.width = size.x;
+					event.height = size.y;	
+					System.out.println("Height:" + event.height);
+				} 
+			}
 		});
-		tree.addListener(SWT.EraseItem, event -> event.detail &= ~SWT.FOREGROUND);
-		tree.addListener(SWT.PaintItem, event -> {
-			TreeItem item = (TreeItem) event.item;
+		table.addListener(SWT.EraseItem, event -> event.detail &= ~SWT.FOREGROUND);
+		table.addListener(SWT.PaintItem, event -> {
+			TableItem item = (TableItem) event.item;
 			String text = item.getText(event.index);
 			/* center column 1 vertically */
 			int yOffset = 0;
@@ -424,12 +416,12 @@ public class TRCView extends ViewPart {
 		 * Adds a Listener that creates a custom selection Highlighting
 		 * TODO: It is getting Overwritten by the Requirement Color
 		 */
-		tree.addListener(SWT.EraseItem, new Listener() {
+		table.addListener(SWT.EraseItem, new Listener() {
 			public void handleEvent(Event event) {
 
 				event.detail &= ~SWT.HOT;
 				if ((event.detail & SWT.SELECTED) == 0) return; /* item not selected */
-				int clientWidth = tree.getClientArea().width;
+				int clientWidth = table.getClientArea().width;
 				GC gc = event.gc;
 				Color oldForeground = gc.getForeground();
 				Color oldBackground = gc.getBackground();
@@ -621,7 +613,7 @@ public class TRCView extends ViewPart {
 	 * 
 	 * After the change: 
 	 *   - enforces Redraw of boxes
-	 *   - enforces Redraw of the View's tree
+	 *   - enforces Redraw of the View's table
 	 */
 	private void showColorDialoge() {
 		IPath path = BoxDecoratorImpl.getCurrentActivePath();
@@ -660,9 +652,8 @@ public class TRCView extends ViewPart {
 	
 	public static void refreshed() {
 		System.out.println("Refreshed");
-		viewer.getTree().getParent().pack();
-		viewer.getTree().getParent().layout(true);
-		viewer.getTree().setFocus();
+//		viewer.getTable().pack();
+		viewer.getTable().setFocus();
 		IWorkbenchWindow window = 
 				workbench == null ? null : workbench.getActiveWorkbenchWindow();
 		IWorkbenchPage activePage = 
