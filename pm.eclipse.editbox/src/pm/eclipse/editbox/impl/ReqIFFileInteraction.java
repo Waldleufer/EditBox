@@ -29,9 +29,12 @@ public class ReqIFFileInteraction {
 	 */
 	public static void setInfos(LinkedList<TRCRequirement> trcList) {
 
+		//TODO: Make it first time Refresh all Reqs
+		
 		ReqIF10Parser parser = new ReqIF10Parser();
 		parser.setRemoveTemporaries(true);
 		parser.setRemoveToolExtensions(true);
+		parser.setReqIFFilename("TRCOverlay.reqif");
 		ReqIF r = parser.parseReqIFContent();
 		EList<Specification> list = r.getCoreContent().getSpecifications();
 

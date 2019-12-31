@@ -224,8 +224,8 @@ public class TRCFileInteraction {
     	String stringPath = exchangeEnding(filePath.toOSString());
     	
     	//Localise:
-    	String local = stringPath.split(ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString())[1];
-    	System.out.println("LOCAL: "+ local);
+//    	String local = stringPath.split(ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString())[1];
+//    	System.out.println("LOCAL: "+ local);
     	
         try {
             FileInputStream fis = new FileInputStream(stringPath);

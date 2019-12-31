@@ -12,9 +12,14 @@
 package pm.eclipse.editbox.views;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -30,6 +35,10 @@ import org.eclipse.rmf.reqif10.datatypes.DatatypesPackage;
 import org.eclipse.rmf.reqif10.xhtml.XhtmlPackage;
 import org.eclipse.rmf.serialization.XMLPersistenceMappingResourceFactoryImpl;
 import org.eclipse.rmf.serialization.XMLPersistenceMappingResourceSetImpl;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.PlatformUI;
 
 public final class ReqIF10Parser {
 	private String reqIFFilename;
@@ -38,18 +47,27 @@ public final class ReqIF10Parser {
 	private boolean removeTemporaries = true;
 
 	public ReqIF parseReqIFContent() {
+		String path = System.getProperty("User.dir") + "/reqif";
+		IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+		IEditorInput input = editor.getEditorInput();
+		IPath p = null;
+		if (input instanceof IFileEditorInput) {
+			p = ((IFileEditorInput)input).getFile().getProject().getLocation();
+		}
+		String wkFile = p.toOSString() + "/reqif/" + reqIFFilename;
+		System.out.println("PATH: " + wkFile);
 //		String wkFile = this.getReqIFFilename();  // Could be used to set the ReqIF File name programmatically
 		// ***** Config start ****** //
 		
-		String wkFile = "/Users/Martin/Uni/Bachelorarbeit/runtime-EclipseApplication/TestTest1/reqif/chapter3.reqif";
+//		String wkFile = "/Users/Martin/Uni/Bachelorarbeit/runtime-EclipseApplication/TestTest1/reqif/chapter3.reqif";
 //		wkFile = "/Users/Martin/Uni/Bachelorarbeit/runtime-EclipseApplication/TestTest1/reqif/TestTest1.reqif";
-		this.setReqIFFilename(wkFile);
+//		this.setReqIFFilename(wkFile);
 		// ***** Config  end  ****** //
 		 
 		if (isRemoveToolExtensions()) {
 			ToolExRemover remover = new ToolExRemover();
 			remover.setDeleteOnExit(this.isRemoveTemporaries());
-			wkFile = remover.remove(this.getReqIFFilename());
+			wkFile = remover.remove(wkFile);
 		}
 
 		registerEPackageStd();
