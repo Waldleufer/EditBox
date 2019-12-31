@@ -304,7 +304,7 @@ public class TRCFileInteraction {
 	/**
 	 * 
 	 * @param reqs the current list of requirements
-	 * @return
+	 * @return the List of all active Requirements if there are any or an empty list.
 	 */
 	public static LinkedList<TRCRequirement> getActiveTRCRequirements(LinkedList<TRCRequirement> reqs) {
 		LinkedList<TRCRequirement> active = new LinkedList<TRCRequirement>();

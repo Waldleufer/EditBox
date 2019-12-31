@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.part.*;
 
+import pm.eclipse.editbox.EditBox;
 import pm.eclipse.editbox.impl.BoxDecoratorImpl;
 import pm.eclipse.editbox.impl.TRCFileInteraction;
 import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
@@ -38,6 +39,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StyledText;
@@ -68,6 +70,10 @@ public class TRCView extends ViewPart {
 	 * The ID of the view as specified by the extension.
 	 */
 	public static final String ID = "pm.eclipse.editbox.views.TRCView";
+
+	protected static final int CHECKBOX_CLEARED = -1;
+	protected static final int CHECKBOX_UNSELECTED = 0;
+	protected static final int CHECKBOX_SELECTED = 1;
 
 	private static IWorkbench workbench = PlatformUI.getWorkbench();
 
@@ -220,9 +226,59 @@ public class TRCView extends ViewPart {
 //		table.getColumn(0).pack();
 		int tablewidth = table.getParent().getClientArea().width;
 		TableLayout tableLayout = new TableLayout(true);
+		
+//		TableColumn column0 = new TableColumn(table, SWT.CHECK, 0);
+		
+		
 		TableColumn column = new TableColumn(table, SWT.BORDER | SWT.WRAP, 0);
 		column.setText("Requirement ID");
 		column.setAlignment(SWT.LEFT);
+		LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
+		LinkedList<TRCRequirement> active = TRCFileInteraction.getActiveTRCRequirements(reqs);
+		if (active.size() <= 0) {
+			column.setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_CLEARED).createImage());
+		} else if (active.size() > 0 && active.size() < reqs.size()) {
+			column.setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_UNSELECTED).createImage());
+		} else {
+			column.setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_SELECTED).createImage());
+		}
+
+		column.addListener(SWT.Selection, new Listener() {
+		    @Override
+		    public void handleEvent(Event event) {
+		    	
+		        int checkBoxFlag = TRCView.CHECKBOX_UNSELECTED;
+		        LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
+		        LinkedList<TRCRequirement> active = TRCFileInteraction.getActiveTRCRequirements(reqs);
+		        
+		        if (active.size() <= 0) {
+		        	checkBoxFlag = TRCView.CHECKBOX_CLEARED;
+		        } else if (active.size() > 0 && active.size() < reqs.size()) {
+		        	checkBoxFlag = TRCView.CHECKBOX_UNSELECTED;
+		        } else {
+		        	checkBoxFlag = TRCView.CHECKBOX_SELECTED;
+		        }
+
+		        if (checkBoxFlag == TRCView.CHECKBOX_CLEARED) {
+		        	//select all
+		        	for (TRCRequirement r : reqs) {
+						r.setActive(true);
+					}
+		        	viewer.setAllChecked(true);
+		        	column.setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_SELECTED).createImage());
+		        } else if (checkBoxFlag == TRCView.CHECKBOX_SELECTED || checkBoxFlag == TRCView.CHECKBOX_UNSELECTED){
+		        	//deselect all
+		        	for (TRCRequirement r : reqs) {
+						r.setActive(false);
+					}
+		        	viewer.setAllChecked(false);
+		        	column.setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_CLEARED).createImage());
+		        }
+		        
+		        TRCFileInteraction.WriteReversedTRCsToFile(reqs);
+
+		    }
+		});
 		
 		TableColumn column2 = new TableColumn(table, SWT.BORDER | SWT.WRAP, 1);
 		column2.setText("Info");
@@ -353,7 +409,6 @@ public class TRCView extends ViewPart {
 				}
 			}
 		});
-		table.addListener(SWT.EraseItem, event -> event.detail &= ~SWT.FOREGROUND);
 		table.addListener(SWT.PaintItem, event -> {
 			TableItem item = (TableItem) event.item;
 			String text = item.getText(event.index);
@@ -371,8 +426,8 @@ public class TRCView extends ViewPart {
 		 */
 		table.addListener(SWT.EraseItem, new Listener() {
 			public void handleEvent(Event event) {
-
 				event.detail &= ~SWT.HOT;
+				event.detail &= ~SWT.FOREGROUND;
 				if ((event.detail & SWT.SELECTED) == 0) return; /* item not selected */
 				event.detail &= ~SWT.SELECTED;
 			}
@@ -386,18 +441,20 @@ public class TRCView extends ViewPart {
 				if (checkChanged instanceof TRCRequirement) {
 					TRCRequirement req = (TRCRequirement) checkChanged;
 					req.setActive(event.getChecked());
+					LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
+					LinkedList<TRCRequirement> active = TRCFileInteraction.getActiveTRCRequirements(reqs);
+					if (active.size() <= 0) {
+						table.getColumn(0).setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_CLEARED).createImage());
+					} else if (active.size() > 0 && active.size() < reqs.size()) {
+						table.getColumn(0).setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_UNSELECTED).createImage());
+					} else {
+						table.getColumn(0).setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_SELECTED).createImage());
+					}
+					if (reqs != null && reqs instanceof List) {
+						TRCFileInteraction.WriteTRCsToFile(reqs, BoxDecoratorImpl.getCurrentActivePath());	
+					}
 				}
-				CheckboxTableViewer viewerz = 
-						event == null ? null : (CheckboxTableViewer) event.getSource();
-				LinkedList<TRCRequirement> reqs = 
-						viewerz == null ? null : (LinkedList<TRCRequirement>) viewerz.getInput();
-				if (reqs != null && reqs instanceof List) {
-					TRCFileInteraction.WriteTRCsToFile(reqs, BoxDecoratorImpl.getCurrentActivePath());	
-				}
-
-
 			}
-
 		});
 
 
@@ -474,31 +531,26 @@ public class TRCView extends ViewPart {
 		};
 		actionSetRequirementBoxes.setText("Set Requirement(s)");
 		actionSetRequirementBoxes.setToolTipText("Sets the currently checked Requirements in the Selection in the Editor");
-		actionSetRequirementBoxes.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
-				getImageDescriptor(ISharedImages.IMG_OBJ_FILE));
+		actionSetRequirementBoxes.setImageDescriptor(EditBox.getImageDescriptor(EditBox.IMG_SET_REQUIREMENTS));
 
 		actionMoveRequirementUp = new Action() {
 			public void run() {
-//				showMessage("Moved Requirement up");
 				moveRequirementOneUp();
 			}
 		};
 		actionMoveRequirementUp.setText("1 up");
 		actionMoveRequirementUp.setToolTipText("Move the selected Requirement 1 Layer up");
-		actionMoveRequirementUp.setImageDescriptor(workbench.getSharedImages().
-				getImageDescriptor(ISharedImages.IMG_TOOL_UNDO));
+		actionMoveRequirementUp.setImageDescriptor(EditBox.getImageDescriptor(EditBox.IMG_ARROW_UP));
 		
 		
 		actionMoveRequirementDown = new Action() {
 			public void run() {
-//				showMessage("Moved Requirement up");
 				moveRequirementOneDown();
 			}
 		};
 		actionMoveRequirementDown.setText("1 down");
 		actionMoveRequirementDown.setToolTipText("Move the selected Requirement 1 Layer down");
-		actionMoveRequirementDown.setImageDescriptor(workbench.getSharedImages().
-				getImageDescriptor(ISharedImages.IMG_TOOL_REDO));
+		actionMoveRequirementDown.setImageDescriptor(EditBox.getImageDescriptor(EditBox.IMG_ARROW_DOWN));
 
 		
 		
@@ -509,6 +561,9 @@ public class TRCView extends ViewPart {
 		};
 	}
 
+	/**
+	 * Move the current Requirement one up
+	 */
 	protected void moveRequirementOneUp() {
 		IStructuredSelection selected = viewer.getStructuredSelection();
 		if (selected != null) {
@@ -542,7 +597,6 @@ public class TRCView extends ViewPart {
 	}
 	
 	
-	//TODO: to TEST this.
 	/**
 	 * moves the currently selected Requirement one up.
 	 */
@@ -617,7 +671,9 @@ public class TRCView extends ViewPart {
 				if (trcRequirement.getId().equals(req.getId())) {
 					dlg.setRGB(trcRequirement.getColor().getRGB());
 					RGB rgb = dlg.open();
-					trcRequirement.setColor(new Color(null, rgb.red, rgb.green, rgb.blue));
+					if(rgb != null) {
+						trcRequirement.setColor(new Color(null, rgb.red, rgb.green, rgb.blue));						
+					}
 				}
 			}
 			TRCFileInteraction.WriteTRCsToFile(requirements, path);
