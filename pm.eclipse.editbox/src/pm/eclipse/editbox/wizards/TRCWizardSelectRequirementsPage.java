@@ -54,7 +54,7 @@ public class TRCWizardSelectRequirementsPage extends WizardPage {
 		requirementIDsText.setLayoutData(gd);
 		requirementIDsText.addModifyListener(e -> dialogChanged());
 		IPath path = new Path(newWisardPage.getNewFileName());
-		if (".trc".equals(path.getFileExtension())) {
+		if (path.toOSString().indexOf(".trc") != -1) {
 			reqs = TRCFileInteraction.ReadTRCsFromFile(path);			
 			Collections.reverse(reqs);
 		}
