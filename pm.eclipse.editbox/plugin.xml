@@ -52,7 +52,7 @@
        point="org.eclipse.ui.views">
     <view
           class="pm.eclipse.editbox.views.TRCView"
-          icon="icons/sample.png"
+          icon="icons/editbox.png" 
           id="pm.eclipse.editbox.views.TRCview2"
           name="TRC View">
     </view>
