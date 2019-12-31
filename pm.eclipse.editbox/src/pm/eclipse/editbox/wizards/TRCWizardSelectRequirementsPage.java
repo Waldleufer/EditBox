@@ -40,6 +40,7 @@ public class TRCWizardSelectRequirementsPage extends WizardPage {
 
 	@Override
 	public void createControl(Composite parent) {
+		reqs = null;
 		Composite container = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout();
 		container.setLayout(layout);
@@ -53,8 +54,10 @@ public class TRCWizardSelectRequirementsPage extends WizardPage {
 		requirementIDsText.setLayoutData(gd);
 		requirementIDsText.addModifyListener(e -> dialogChanged());
 		IPath path = new Path(newWisardPage.getNewFileName());
-		reqs = TRCFileInteraction.ReadTRCsFromFile(path);
-		Collections.reverse(reqs);
+		if (".trc".equals(path.getFileExtension())) {
+			reqs = TRCFileInteraction.ReadTRCsFromFile(path);			
+			Collections.reverse(reqs);
+		}
 		String reqIDs = "";
 		if(reqs != null) {
 			for (TRCRequirement r : reqs) {

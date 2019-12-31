@@ -6,7 +6,10 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardPage;
@@ -101,16 +104,22 @@ public class TRCNewWizardPage extends WizardPage {
 				return;
 			Object obj = ssel.getFirstElement();
 			if (obj instanceof IResource) {
-				IFile file;
-				//TODO: Look into, why this sometimes works and sometimes not.
-				if (((IResource) obj).getType() == IResource.FILE) {
-					file = (IFile) obj;
-					sourceFileText.setText(file.getFullPath().toOSString());
-					fileText.setText(TRCFileInteraction.exchangeEnding(file.getFullPath().toOSString()));
-				}
+				IResource file = (IResource) obj;
+				sourceFileText.setText(file.getFullPath().toOSString());
+				fileText.setText(TRCFileInteraction.exchangeEnding(file.getFullPath().toOSString()));
 			} 
+			else if (obj instanceof IJavaElement) {    
+				IPath p = ((IJavaElement)obj).getPath();   
+				sourceFileText.setText(p.toOSString());
+	            fileText.setText(TRCFileInteraction.exchangeEnding(p.toOSString()));
+			}
+	        else if (obj instanceof IPackageFragmentRoot) {    
+	            IPath p = ((IPackageFragmentRoot)obj).getPath(); 
+	            sourceFileText.setText(p.toOSString());
+	            fileText.setText(TRCFileInteraction.exchangeEnding(p.toOSString()));
+	        }
 			else {
-				System.out.println("Error:");
+				System.out.println("Initialiizer Error:");
 				System.out.println(obj.toString());
 			}
 		}
@@ -125,13 +134,13 @@ public class TRCNewWizardPage extends WizardPage {
 	private void handleBrowse() {
 		FileDialog dialog = new FileDialog(getShell(), SWT.OPEN);
 		dialog.setText("Select the already existing source file that shall be traced");
-		dialog.setFilterPath(ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString());
+		dialog.setFilterPath(getSourceFileName());
 		String path = dialog.open();
 		if (path != null) {
-			String localString = path.split(ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString())[1];
+//			String localString = path.split(ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString())[1];
 			System.out.println("BROWSE: " + path);
-			sourceFileText.setText(localString);
-			fileText.setText(TRCFileInteraction.exchangeEnding(localString));
+			sourceFileText.setText(path);
+			fileText.setText(TRCFileInteraction.exchangeEnding(path));
 		}
 	}
 
