@@ -293,7 +293,11 @@ public class TRCFileInteraction {
      * @return filePath of the corresponding .trc file
      */
 	public static String exchangeEnding(String filenameOrPath) {
-		String trcString = filenameOrPath.split("\\.")[0] + ".trc";
+		int lastDot = filenameOrPath.lastIndexOf(".");
+		if (lastDot == -1) {
+			return "";
+		}
+		String trcString = filenameOrPath.substring(0, lastDot) + ".trc";
 		return trcString;
 	}
 
