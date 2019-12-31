@@ -235,7 +235,9 @@ public class TRCView extends ViewPart {
 		column.setAlignment(SWT.LEFT);
 		LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
 		LinkedList<TRCRequirement> active = TRCFileInteraction.getActiveTRCRequirements(reqs);
-		if (active.size() <= 0) {
+		if (active == null) {
+			column.setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_CLEARED).createImage());
+		} else if (active.size() <= 0) {
 			column.setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_CLEARED).createImage());
 		} else if (active.size() > 0 && active.size() < reqs.size()) {
 			column.setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_UNSELECTED).createImage());
@@ -380,16 +382,18 @@ public class TRCView extends ViewPart {
 						} else {  // We reached End of Text
 							String endText = "";
 							if(event.gc.textExtent(currentBuildingTextLine).x < displaywidth ) {
-								endText += currentBuildingTextLine;								
+								endText = currentBuildingTextLine;								
 							} else {
-								endText += finalTextLine;
+								endText = finalTextLine;
 							}
 							
 							if(i <= 1) {
 								finalText = endText;
 								if(currentBuildingTextLine.length() > finalTextLine.length()) {
 									//We might have missed a word or two.
-									finalText += "\n" + currentBuildingTextLine.substring(finalTextLine.length());
+									if(finalText.indexOf("\n") == -1) {
+										finalText += "\n" + currentBuildingTextLine.substring(finalTextLine.length());										
+									} // Otherwise we already expanded
 								}
 							} else if (i < MAX_LINES){
 								finalText += "\n" + endText;
@@ -399,7 +403,9 @@ public class TRCView extends ViewPart {
 						}
 						
 						i++;
+						System.out.print(i + " ");
 					}
+					System.out.println();
 
 					item.setText(1, finalText);
 					//Setting the correct height and width for the SWT.PaintItem Job

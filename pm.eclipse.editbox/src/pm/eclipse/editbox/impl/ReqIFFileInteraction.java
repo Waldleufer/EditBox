@@ -36,6 +36,9 @@ public class ReqIFFileInteraction {
 		parser.setRemoveToolExtensions(true);
 		parser.setReqIFFilename("TRCOverlay.reqif");
 		ReqIF r = parser.parseReqIFContent();
+		if(r == null) {
+			return;
+		}
 		EList<Specification> list = r.getCoreContent().getSpecifications();
 
 		for(TRCRequirement req : trcList) {

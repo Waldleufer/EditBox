@@ -4,6 +4,7 @@
 package pm.eclipse.editbox.impl;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.ObjectInputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,10 +23,15 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPathEditorInput;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.activities.WorkbenchActivityHelper;
 
 import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
 import pm.eclipse.editbox.views.TRCView;
@@ -199,6 +205,19 @@ public class TRCFileInteraction {
 	}
     
 	/**
+	 * 
+	 * @param filePath - the file Path where to read the File.
+	 * @param alwaysReadFromFile - makes ReadFile read from File not from view if set to TRUE.
+	 * @return the linked List obtained from that file
+	 */
+	public static LinkedList<TRCRequirement> ReadTRCsFromFile(IPath filePath, boolean alwaysReadFromFile) {
+		if (alwaysReadFromFile) {
+			TRCView.setInitialized(false);
+		}
+		return ReadTRCsFromFile(filePath);
+	}
+	
+	/**
 	 * Opens the corresponding .trc file to the file at filePath and reads its contents.
 	 * 
 	 * @param filePath the absolute system path to the currently opened file.
@@ -221,56 +240,73 @@ public class TRCFileInteraction {
 			}
     	}
     	
-    	String stringPath = exchangeEnding(filePath.toOSString());
+    	if(filePath != null) {
+    		String stringPath = exchangeEnding(filePath.toOSString());
+    		
+    		//Localise:
+//    		String local = stringPath.split(ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString())[1];
+//    		System.out.println("LOCAL: "+ local);
+    		
+    		try {
+    			FileInputStream fis = new FileInputStream(stringPath);
+    			ObjectInputStream ois = new ObjectInputStream(fis);
+    			Object read = ois.readObject();	
+    			LinkedList<TRCRequirement> list = null;
+    			if (read == null) {
+    				new Throwable("read = null").printStackTrace();
+    			} else {
+    				if (read instanceof LinkedList<?>) {
+    					if (read != null) {
+    						list = (LinkedList<TRCRequirement>) read;						
+    					}
+    				}			
+    			}
+    			ois.close();
+    			fis.close();
+    			
+    			System.out.println("The Object was succesfully read from the file: " + stringPath);
+    			
+    			LinkedList<TRCRequirement> reqs = new LinkedList<TRCRequirement>();
+    			
+    			for (Iterator<TRCRequirement> descIterator = list.descendingIterator(); descIterator.hasNext();) {
+    				TRCRequirement r = (TRCRequirement) descIterator.next();
+    				reqs.add(r);
+    			}
+    			
+    			//TODO: Eventually launch a thread who gets the Info from the ReqIF File in Background
+    			ReqIFFileInteraction.setInfos(reqs);
+    			
+    			return reqs;
+    		} catch (Exception ex) {
+    			// No file found or file access error
+    			if(ex instanceof FileNotFoundException) {
+    				System.out.println("FileNotFound");
+    			} else {
+    				new Throwable("File access Error").printStackTrace();
+    				ex.printStackTrace();    				
+    			}
+    			return null;
+    		}
+    	} else {
+    		return null;
+    	}
     	
-    	//Localise:
-//    	String local = stringPath.split(ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString())[1];
-//    	System.out.println("LOCAL: "+ local);
-    	
-        try {
-            FileInputStream fis = new FileInputStream(stringPath);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            Object read = ois.readObject();	
-            LinkedList<TRCRequirement> list = null;
-            if (read == null) {
-				new Throwable("read = null").printStackTrace();
-			} else {
-				if (read instanceof LinkedList<?>) {
-					if (read != null) {
-						list = (LinkedList<TRCRequirement>) read;						
-					}
-				}			
-			}
-            ois.close();
-            fis.close();
-            
-            System.out.println("The Object was succesfully read from the file: " + stringPath);
-            
-            LinkedList<TRCRequirement> reqs = new LinkedList<TRCRequirement>();
-			
-			for (Iterator<TRCRequirement> descIterator = list.descendingIterator(); descIterator.hasNext();) {
-				TRCRequirement r = (TRCRequirement) descIterator.next();
-				reqs.add(r);
-			}
-            
-            //TODO: Eventually launch a thread who gets the Info from the ReqIF File in Background
-            ReqIFFileInteraction.setInfos(reqs);
-
-            return reqs;
-        } catch (Exception ex) {
-        	// No file found or file access error
-        	new Throwable("File access Error").printStackTrace();
-            ex.printStackTrace();
-            return null;
-        }
     }
     
     /**
-     * Checks whether the user eventually switched page
+     * Checks whether the user eventually switched editor (edited file) meanwhile
      */
     private static void checkWindowChanged() {
-		String currPage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getTitle();
-		if (page == null || !page.equals(currPage)) {
+    	IWorkbench workbench = PlatformUI.getWorkbench();
+		IWorkbenchWindow window = 
+				workbench == null ? null : workbench.getActiveWorkbenchWindow();
+		IWorkbenchPage activePage = 
+				window == null ? null : window.getActivePage();		
+		IEditorPart editor = 
+				activePage == null ? null : activePage.getActiveEditor();
+		String currPage = 
+				editor == null ? "" : editor.getTitle();
+		if (page == null || currPage == null || !page.equals(currPage)) {
 			TRCView.setInitialized(false);
 			page = currPage;
 		}
@@ -283,7 +319,6 @@ public class TRCFileInteraction {
 		if(reqs == null) {
 			return null;
 		}
-//		TRCView.updateViewer(reqs); //update Viewers context // is done in updateViewer();
 		return reqs;
 	}
 
@@ -307,6 +342,9 @@ public class TRCFileInteraction {
 	 * @return the List of all active Requirements if there are any or an empty list.
 	 */
 	public static LinkedList<TRCRequirement> getActiveTRCRequirements(LinkedList<TRCRequirement> reqs) {
+		if (reqs == null) {
+			return null;
+		}
 		LinkedList<TRCRequirement> active = new LinkedList<TRCRequirement>();
 		for (TRCRequirement trcRequirement : reqs) {
 			if (trcRequirement.isActive()) {

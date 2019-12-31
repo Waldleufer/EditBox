@@ -3,6 +3,8 @@ package pm.eclipse.editbox.wizards;
 import java.util.Collections;
 import java.util.LinkedList;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.ISelection;
@@ -54,9 +56,13 @@ public class TRCWizardSelectRequirementsPage extends WizardPage {
 		requirementIDsText.setLayoutData(gd);
 		requirementIDsText.addModifyListener(e -> dialogChanged());
 		IPath path = new Path(newWisardPage.getNewFileName());
+		IResource ressource = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
+		IPath absolutLocalized = ressource.getLocation();
 		if (path.toOSString().indexOf(".trc") != -1) {
-			reqs = TRCFileInteraction.ReadTRCsFromFile(path);			
-			Collections.reverse(reqs);
+			reqs = TRCFileInteraction.ReadTRCsFromFile(absolutLocalized, true);
+			if(reqs != null) {
+				Collections.reverse(reqs);				
+			}
 		}
 		String reqIDs = "";
 		if(reqs != null) {

@@ -166,6 +166,11 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		IEditorInput input = 
 				editor == null ? null : editor.getEditorInput();
 		IPath path = input instanceof IPathEditorInput ? ((IPathEditorInput)input).getPath() : null;
+		if (path != null) {
+			System.out.println("THIS CURRENT PATH:" + path.toOSString());			
+		} else {
+			System.out.println("THIS CURRENT PATH is NULL" );	
+		}
 		return path;
 	}
 

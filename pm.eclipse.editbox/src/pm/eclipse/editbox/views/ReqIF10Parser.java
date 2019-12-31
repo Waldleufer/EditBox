@@ -38,6 +38,10 @@ import org.eclipse.rmf.serialization.XMLPersistenceMappingResourceSetImpl;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IPathEditorInput;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 public final class ReqIF10Parser {
@@ -48,11 +52,22 @@ public final class ReqIF10Parser {
 
 	public ReqIF parseReqIFContent() {
 		String path = System.getProperty("User.dir") + "/reqif";
-		IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
-		IEditorInput input = editor.getEditorInput();
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		IWorkbenchWindow window = 
+				workbench == null ? null : workbench.getActiveWorkbenchWindow();
+		IWorkbenchPage activePage = 
+				window == null ? null : window.getActivePage();		
+		IEditorPart editor = 
+				activePage == null ? null : activePage.getActiveEditor();
+		IEditorInput input = 
+				editor == null ? null : editor.getEditorInput();
+		
 		IPath p = null;
 		if (input instanceof IFileEditorInput) {
 			p = ((IFileEditorInput)input).getFile().getProject().getLocation();
+		}
+		if (p == null) {
+			return null;
 		}
 		String wkFile = p.toOSString() + "/reqif/" + reqIFFilename;
 		System.out.println("PATH: " + wkFile);

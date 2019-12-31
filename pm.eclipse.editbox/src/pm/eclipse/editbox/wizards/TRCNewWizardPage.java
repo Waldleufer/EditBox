@@ -205,4 +205,8 @@ public class TRCNewWizardPage extends WizardPage {
 	public String getNewFileName() {
 		return fileText.getText();
 	}
+	
+	public Path newFilePath() {
+		return null;
+	}
 }
