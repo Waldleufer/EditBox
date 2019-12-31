@@ -93,8 +93,6 @@ public class TRCNewWizardPage extends WizardPage {
 
 	private void initialize() {
 		fileText.setText("new_file.trc");
-		// TODO: Line Below is countering a bug, that occured when selecting a file in a package ...
-		// TODO: ... Somehow the path was cleared if doing so.
 		sourceFileText.setText(ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString());
 		
 		if (selection != null && selection.isEmpty() == false
@@ -184,10 +182,6 @@ public class TRCNewWizardPage extends WizardPage {
 		if (target != null && ( target.exists())) {
 			return;
 		}
-//		if (fileName.replace('\\', '/').indexOf('/', 1) > 0) {
-//			updateStatus("File name must be valid");
-//			return;
-//		}
 		int dotLoc = fileName.lastIndexOf('.');
 		if (dotLoc != -1) {
 			String ext = fileName.substring(dotLoc + 1);
