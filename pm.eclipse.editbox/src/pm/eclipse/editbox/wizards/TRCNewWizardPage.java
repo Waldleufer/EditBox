@@ -1,9 +1,5 @@
 package pm.eclipse.editbox.wizards;
 
-import java.util.concurrent.Exchanger;
-
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
@@ -22,9 +18,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 
 import pm.eclipse.editbox.impl.TRCFileInteraction;
 
@@ -81,7 +75,7 @@ public class TRCNewWizardPage extends WizardPage {
 		fileText = new Text(container, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY );
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		fileText.setLayoutData(gd);
-//		fileText.addModifyListener(e -> dialogChanged());
+		// fileText.addModifyListener(e -> dialogChanged()); // not needed as File is never modified
 		initialize();
 		dialogChanged();
 		setControl(container);
@@ -135,8 +129,7 @@ public class TRCNewWizardPage extends WizardPage {
 		dialog.setFilterPath(getSourceFileName());
 		String path = dialog.open();
 		if (path != null) {
-//			String localString = path.split(ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString())[1];
-			System.out.println("BROWSE: " + path);
+			System.out.println("Browsed File: " + path);
 			sourceFileText.setText(path);
 			fileText.setText(TRCFileInteraction.exchangeEnding(path));
 		}
@@ -158,10 +151,6 @@ public class TRCNewWizardPage extends WizardPage {
 			updateStatus("Source File must be specified");
 			return;
 		}
-//		if (container == null || (container.getType() != IResource.FILE )) {
-//			updateStatus("Source File must exist");
-//			return;
-//		}
 		if (!container.isAccessible()) {
 			updateStatus("Source File must exist");
 			return;
