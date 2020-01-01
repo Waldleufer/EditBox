@@ -30,7 +30,7 @@ import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
  * in the provided container. If the container resource (a folder or a project
  * or a sourcecode file) is selected in the workspace when the wizard is opened,
  * it will accept it as the target source container. The file name for the file
- * which is to be created will be deriven by the wizard. The wizard creates one
+ * which is to be created will be derived by the wizard. The wizard creates one
  * file with the extension "trc".
  */
 public class TRCNewWizard extends Wizard implements INewWizard {
