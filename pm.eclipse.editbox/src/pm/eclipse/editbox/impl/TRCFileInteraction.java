@@ -238,7 +238,7 @@ public class TRCFileInteraction {
 		checkWindowChanged();
 
 		System.out.println("Initialised?: " + TRCView.isInitialized());
-		new Throwable("I Hate to do this printStackTrace thing").printStackTrace();
+//		new Throwable("I Hate to do this printStackTrace thing").printStackTrace();
 
 		// Try the shortcut. Don't read from file, take Requirements from View.
 		if (TRCView.isInitialized()) {
