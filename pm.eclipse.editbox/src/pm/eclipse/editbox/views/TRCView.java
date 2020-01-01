@@ -181,6 +181,13 @@ public class TRCView extends ViewPart {
 	 */
 	public static void updateViewer(LinkedList<TRCRequirement> requirements) {
 
+		if (requirements == null) {
+			System.out.println("Requirements == null");
+			viewer.setInput(new LinkedList<TRCRequirement>());
+			refreshed();
+			return;
+		}
+		
 		viewer.setInput(requirements);
 
 		table.layout();

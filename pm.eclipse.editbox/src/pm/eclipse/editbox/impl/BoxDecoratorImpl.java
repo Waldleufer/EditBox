@@ -904,6 +904,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		IPath path = getCurrentActivePath();
 		LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile(path);
 		if (reqs == null) {
+			change();
 			return;
 		}
 		int endOfChange = positionOfChange + amountOfChange;
