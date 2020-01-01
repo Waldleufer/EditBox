@@ -1,42 +1,45 @@
 package pm.eclipse.editbox.views;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyledText;
 
 import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
 
+/**
+ * The TRCViewArrayContentProvider works as a content provider for the
+ * TRCRequirements.
+ * 
+ * The layer system is configured to display things bottom up, but it is easier
+ * to understand if Information is provided top down. Thus the Content Provider
+ * usually provides information in reversed order.
+ * 
+ * @author Martin
+ *
+ */
 public class TRCViewArrayContentProvider implements ITreeContentProvider {
 
 	private static TRCViewArrayContentProvider instance;
-	private boolean reversedOrder = true;  //Default: true
+	private boolean reversedOrder = true; // Default: true
 
 	public boolean isReversedOrder() {
 		return this.reversedOrder;
 	}
 
-
 	public void setReversedOrder(boolean reversedOrder) {
 		this.reversedOrder = reversedOrder;
 	}
 
-
 	/**
 	 * Returns an instance of TRCViewArrayContentProvider. Since instances of this
-	 * class do not maintain any state, they can be shared between multiple
-	 * clients.
+	 * class do not maintain any state, they can be shared between multiple clients.
 	 *
 	 * @return an instance of TRCViewArrayContentProvider
 	 */
 	public static TRCViewArrayContentProvider getInstance() {
-		synchronized(TRCViewArrayContentProvider.class) {
+		synchronized (TRCViewArrayContentProvider.class) {
 			if (instance == null) {
 				instance = new TRCViewArrayContentProvider();
 				instance.setReversedOrder(true);
@@ -45,7 +48,6 @@ public class TRCViewArrayContentProvider implements ITreeContentProvider {
 		}
 	}
 
-	
 	/**
 	 * Returns the elements in the same Order as they lay in the .trc file.
 	 * 
@@ -61,7 +63,6 @@ public class TRCViewArrayContentProvider implements ITreeContentProvider {
 		}
 		return new Object[0];
 	}
-	
 
 	/**
 	 * Returns the elements in the input, which must be either an array or a
@@ -70,8 +71,8 @@ public class TRCViewArrayContentProvider implements ITreeContentProvider {
 	@Override
 	public Object[] getElements(final Object inputElement) {
 		reversedOrder = true;
-		if(reversedOrder) {
-			
+		if (reversedOrder) {
+
 			if (inputElement instanceof Object[]) {
 				return (Object[]) inputElement;
 			}
@@ -88,9 +89,9 @@ public class TRCViewArrayContentProvider implements ITreeContentProvider {
 				return ((Collection) inputElement).toArray();
 			}
 			return new Object[0];
-			
+
 		} else {
-			
+
 			if (inputElement instanceof Object[]) {
 				return (Object[]) inputElement;
 			}
@@ -102,22 +103,19 @@ public class TRCViewArrayContentProvider implements ITreeContentProvider {
 
 	}
 
-
 	@Override
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof TRCRequirement) {
-			String[] out = {((TRCRequirement) parentElement).getInfo()};
+			String[] out = { ((TRCRequirement) parentElement).getInfo() };
 			return out;
 		}
 		return null;
 	}
 
-
 	@Override
 	public Object getParent(Object element) {
 		return null;
 	}
-
 
 	@Override
 	public boolean hasChildren(Object element) {

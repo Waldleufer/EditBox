@@ -1,24 +1,16 @@
 package pm.eclipse.editbox.impl;
 
-import org.eclipse.swt.graphics.Color;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
-
-import com.sun.org.apache.xml.internal.resolver.readers.TR9401CatalogReader;
+import org.eclipse.swt.graphics.Color;
 
 import pm.eclipse.editbox.Box;
-import pm.eclipse.editbox.impl.TRCFileInteraction;
 import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
-import pm.eclipse.editbox.views.TRCView;
 
 /**
- * Is able to create and manage boxes This is the entry point for creating the
- * boxes
- *
+ * Is able to create and manage boxes.
  */
 public class BoxBuilderImpl extends AbstractBoxBuilder {
 
@@ -35,71 +27,6 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 	 * This method calculates the starting boundaries of the very first box and all
 	 * following currentBoxes
 	 */
-	public List<Box> buildOld() {
-		currentBoxes = new LinkedList<Box>();
-		int len = text.length() - 1;
-		currentbox = newbox(0, len, -1, null);
-		currentBoxes.clear(); // skip root box
-
-		emptyPrevLine = false;
-		int start = 0;
-		int offset = 0;
-		boolean startline = true;
-		lineHasStartTab = false;
-		boolean empty = true;
-
-		int line = 0;
-
-		checkCarret();
-
-		/**
-		 * This for loop traverses over the whole document (represented by a char
-		 * stream) and seeks the positions of the first and last occurring Symbol for
-		 * each line
-		 * 
-		 * It then calls addLine with parameter start that represents this position. i
-		 * is at that time the line length offset is the calculated offset from this
-		 * line empty evaluates to false at that point if the line did not contain only
-		 * whitespace
-		 * 
-		 * it also calculates the beginnings of the currentBoxes this way, as addLine
-		 * called with (empty = true) will set (emptyPrevLine = true);
-		 */
-		for (int i = 0; i <= len; i++) { // TODO: setze i zu Beginn, da boxxen ja gespeichert. und begrenze end.
-
-			char c = text.charAt(i);
-			boolean isWhitespace = Character.isWhitespace(c) && i != caretOffset;
-
-			empty = empty && isWhitespace;
-
-			if (c == '\n' || i == len) { // if end of line || EOF is reached
-				line++;
-				if (startline)
-					start = i;
-				addLine(start, i, offset, empty);
-				startline = true;
-				offset = 0;
-				start = i;
-				lineHasStartTab = false;
-				empty = true;
-			} else {
-				if (startline) {
-					if (isWhitespace) {
-						if (c == '\t') { // Heading Tab
-							offset += tabSize;
-							lineHasStartTab = true;
-						} else // Heading Space
-							offset++;
-					} else {
-						start = i;
-						startline = false;
-					}
-				}
-			}
-		}
-		return currentBoxes;
-	}
-
 	public List<List<Box>> build() {
 
 		currentBoxes = new LinkedList<Box>();
@@ -111,16 +38,9 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 		rootbox = currentbox;
 		currentBoxes.clear(); // skip root box
 
-		// ----------------------------------------------- //
-		// ----------------------------------------------- //
-		// TODO: delete line below:  Debug Starting Point / Debug Entry Point 
-//		TRCFileInteraction.debug(filePath);
-		// ----------------------------------------------- //
-		// ----------------------------------------------- //
-		
 		requirements = TRCFileInteraction.ReadTRCsFromFileAndUpdate(filePath);
-		if(requirements == null) {
-			//return the empty Linked List
+		if (requirements == null) {
+			// return the empty Linked List
 			return boxes;
 		}
 
@@ -134,19 +54,22 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 
 		checkCarret();
 
+		/**
+		 * This for loop traverses over the all requirements
+		 */
 		for (TRCRequirement req : requirements) {
 			currentBoxes = new LinkedList<Box>();
-			//int[] rgb = req.getColor();
 			currentColor = req.getColor();
-			//TODO: remove debug outputs below 2 lines
-//			System.out.println("Requirement Color: " + currentColor.toString());
-//			new Throwable("TRC Requirement: " + req.toString()).printStackTrace()
 			List<int[]> pairs = req.getPositions();
 
+			/**
+			 * this loop reads the begin and end position in the char stream of the file or
+			 * every box.
+			 */
 			for (int[] pair : pairs) {
 				currentbox = rootbox;
 				currentbox.setColor(currentColor);
-				
+
 				emptyPrevLine = true;
 				start = pair[0];
 				end = pair[1];
@@ -155,17 +78,18 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 				 * stream) and seeks the positions of the first and last occurring Symbol for
 				 * each line
 				 * 
-				 * It then calls addLine with parameter start that represents this position. i
-				 * is at that time the line length offset is the calculated offset from this
-				 * line empty evaluates to false at that point if the line did not contain only
+				 * It then calls addLine with parameter start that represents this position.
+				 * <code>i</code> is at that time the index of the current character from the
+				 * stream. <code>offset</code> is the calculated offset from this line.
+				 * <code>empty</code> is false at that point if the line did NOT only contain
 				 * whitespace
 				 * 
 				 * it also calculates the beginnings of the currentBoxes this way, as addLine
 				 * called with (empty = true) will set (emptyPrevLine = true);
 				 */
 				for (int i = start; i <= end; i++) { // setze i zu beginn, da boxen ja gespeichert. und begrenze end.
-					if (i >= text.length()) {
-						// Do not attempt to draw after EOF.
+					if (i >= text.length() || i < 0) {
+						// Do not attempt to draw after EOF. Or before file start
 						break;
 					}
 					char c = text.charAt(i);
@@ -199,7 +123,7 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 					}
 				}
 			}
-			for(Box b : currentBoxes) {
+			for (Box b : currentBoxes) {
 				b.setRequirement(req); // Make every box aware of the ReqID it represents
 				System.err.println(b.toString() + " " + b.getRequirement().toString());
 			}
@@ -248,36 +172,12 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 
 	/**
 	 * This little code snippet creates all the Boxes for every opened file in the
-	 * Project window - highly recursive! - magically reactive!
+	 * Project window - recursive!
 	 * 
 	 * @param start
 	 * @param end
 	 * @param offset
 	 */
-	// TODO: Old addbox0 - Remove @martin
-	protected void addbox1(int start, int end, int offset) {
-
-		if (offset == currentbox.offset) {
-			if ((emptyPrevLine && currentbox.parent != null)) {
-				currentbox = newbox(start, end, offset, currentbox.parent);
-				updateParentEnds(currentbox);
-			} else if (end > currentbox.end) {
-				currentbox.end = end;
-				if (currentbox.tabsStart < 0 && lineHasStartTab)
-					currentbox.tabsStart = start;
-				updateMaxEndOffset(start, currentbox);
-				updateParentEnds(currentbox);
-			}
-		} else if (offset > currentbox.offset) {
-			currentbox = newbox(start, end, offset, currentbox);
-			updateParentEnds(currentbox);
-		} else if (currentbox.parent != null) {
-			currentbox = currentbox.parent;
-			addbox0(start, end, offset);
-		}
-
-	}
-
 	protected void addbox0(int start, int end, int offset) {
 		// TODO: remove this and the line below. Box Boundery Debug entrance
 //		System.err.println("BOX: " + currentbox.toString());
@@ -285,7 +185,8 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 		if (offset == currentbox.offset) { // Same indentation level
 			if ((emptyPrevLine && currentbox.parent != null)) { // handles empty lines on same indentation level
 				if (offset < 4) {
-					// offset <= 4 would create multiple inner boxes for any box. we only want 1 Box Layer per Requirement.
+					// offset <= 4 would create multiple inner boxes for any box. we only want 1 Box
+					// Layer per Requirement.
 					currentbox = newbox(start, end, offset, currentbox.parent);
 					updateParentEnds(currentbox);
 				} else {
@@ -307,8 +208,6 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 				currentbox = invisibleNewbox(start, end, offset, currentbox);
 				updateParentEnds(currentbox);
 			}
-//			currentbox = newbox(start, end, offset, currentbox);
-//			updateParentEnds(currentbox);
 		} else if (currentbox.parent != null) { // running from inside out, biggest indent to lowest.
 			currentbox = currentbox.parent;
 			addbox0(start, end, offset);
@@ -372,7 +271,6 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 			box.tabsStart = start;
 		if (parent != null)
 			parent.hasChildren = true;
-		// TODO: Remove Debug
 		currentBoxes.add(box);
 		return box;
 	}
@@ -399,7 +297,6 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 			box.tabsStart = start;
 		if (parent != null)
 			parent.hasChildren = true;
-		// TODO: Remove Debug
 		// currentBoxes.add(box); // Don't add it - makes it invisible
 		return box;
 	}

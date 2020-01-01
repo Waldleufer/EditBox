@@ -1,67 +1,69 @@
 package pm.eclipse.editbox.views;
 
-import org.eclipse.swt.widgets.ColorDialog;
-
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.ui.part.*;
-
-import pm.eclipse.editbox.EditBox;
-import pm.eclipse.editbox.impl.BoxDecoratorImpl;
-import pm.eclipse.editbox.impl.TRCFileInteraction;
-import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
-import org.eclipse.jface.viewers.*;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.jface.text.*;
-import org.eclipse.jface.action.*;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.layout.TableColumnLayout;
-import org.eclipse.ui.*;
+import org.eclipse.jface.text.TextSelection;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.TableLayout;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.ColorDialog;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.swt.widgets.Widget;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.DragDetectEvent;
-import org.eclipse.swt.events.DragDetectListener;
+import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.ViewPart;
+
+import pm.eclipse.editbox.EditBox;
+import pm.eclipse.editbox.impl.BoxDecoratorImpl;
+import pm.eclipse.editbox.impl.TRCFileInteraction;
+import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
 
 /**
- * This sample class demonstrates how to plug-in a new
- * workbench view. The view shows data obtained from the
- * model. The sample creates a dummy model on the fly,
- * but a real implementation would connect to the model
- * available either in this or another plug-in (e.g. the workspace).
- * The view is connected to the model using a content provider.
+ * This TRCView class plugs-in a new workbench view. The view shows
+ * {@link TRCRequirement}s obtained via {@link TRCFileInteraction}. The view is
+ * connected to the model using a {@link TRCViewArrayContentProvider}
  * <p>
- * The view uses a label provider to define how model
- * objects should be presented in the view. Each
- * view can present the same model objects using
- * different labels and icons, if needed. Alternatively,
- * a single label provider can be shared between views
- * in order to ensure that objects of the same type are
- * presented in the same way everywhere.
- * <p>
+ * The view uses a {@link TRCViewLabelProvider} to define how TRCRequirements
+ * should be presented in the view.
  */
 
 public class TRCView extends ViewPart {
@@ -85,7 +87,7 @@ public class TRCView extends ViewPart {
 	private Action actionMoveRequirementUp;
 	private Action actionMoveRequirementDown;
 	private Action doubleClickAction;
-	
+
 	public Table getTable() {
 		return table;
 	}
@@ -97,22 +99,28 @@ public class TRCView extends ViewPart {
 	public static boolean isInitialized() {
 		return initialized;
 	}
-	
+
 	public static void setInitialized(boolean state) {
 		initialized = state;
 	}
 
-	class ViewLabelProvider extends ColumnLabelProvider implements ITableLabelProvider {
+	/**
+	 * The TRCViewLabelProvider is the custom {@link ColumnLabelProvider} for the
+	 * TRC View. It defines how the list of {@link TRCRequirement}s should be
+	 * displayed, including Text, Background Color and ToolTipText.
+	 * 
+	 * @author Martin Wagner
+	 */
+	class TRCViewLabelProvider extends ColumnLabelProvider implements ITableLabelProvider {
 
 		@Override
-		//Displaying only the useful things
 		public String getColumnText(Object obj, int index) {
 			if (obj instanceof TRCRequirement) {
 				if (index == 0) {
 					return ((TRCRequirement) obj).getId();
 				} else if (index == 1) {
 					return ((TRCRequirement) obj).getInfo();
-				}	
+				}
 			}
 			if (obj instanceof String) {
 				if (index == 1) {
@@ -124,7 +132,7 @@ public class TRCView extends ViewPart {
 			}
 			return getText(obj);
 		}
-		
+
 		@Override
 		public String getText(Object obj) {
 			return super.getText(obj);
@@ -132,17 +140,18 @@ public class TRCView extends ViewPart {
 
 		@Override
 		public Image getImage(Object obj) {
-			//			return workbench.getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
+			// return workbench.getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
 			return super.getImage(obj);
 		}
-		@Override	
+
+		@Override
 		public Color getBackground(final Object element) {
 			if (element instanceof TRCRequirement) {
 				return ((TRCRequirement) element).getColor();
 			}
 			return super.getBackground(element);
 		}
-		
+
 		@Override
 		public String getToolTipText(Object element) {
 			if (element instanceof TRCRequirement) {
@@ -150,7 +159,7 @@ public class TRCView extends ViewPart {
 			}
 			return super.getToolTipText(element);
 		}
-		
+
 		@Override
 		public boolean useNativeToolTip(Object object) {
 			if (object instanceof TRCRequirement) {
@@ -161,37 +170,37 @@ public class TRCView extends ViewPart {
 
 		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Updates TRC View without reading
+	 * 
 	 * @param requirements
 	 */
 	public static void updateViewer(LinkedList<TRCRequirement> requirements) {
 
 		viewer.setInput(requirements);
-		
+
 		table.layout();
 
 		for (TRCRequirement trcRequirement : requirements) {
 			viewer.setChecked(trcRequirement, trcRequirement.isActive());
 		}
-		
+
 		refreshed();
 
 		TRCView.setInitialized(true);
 	}
 
-
 	/**
 	 * reads the TRCRequirements and updates the TRC View
 	 */
 	public static LinkedList<TRCRequirement> updateViewer() {
-		LinkedList<TRCRequirement> requirements = TRCFileInteraction.ReadTRCsFromFile(BoxDecoratorImpl.getCurrentActivePath());
-		if(requirements == null) {
+		LinkedList<TRCRequirement> requirements = TRCFileInteraction
+				.ReadTRCsFromFile(BoxDecoratorImpl.getCurrentActivePath());
+		if (requirements == null) {
 			System.out.println("Requirements == null");
 			viewer.setInput(new LinkedList<TRCRequirement>());
 			refreshed();
@@ -201,35 +210,30 @@ public class TRCView extends ViewPart {
 		return requirements;
 	}
 
-
 	@Override
 	public void createPartControl(Composite parent) {
-		
+
 		FillLayout layer = new FillLayout(SWT.VERTICAL);
 		parent.setLayout(layer);
-		
-		//viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-		table = new Table(parent, SWT.MULTI
-				| SWT.CHECK
-				| SWT.V_SCROLL
-				| SWT.FULL_SELECTION );
-		
+
+		// viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		table = new Table(parent, SWT.MULTI | SWT.CHECK | SWT.V_SCROLL | SWT.FULL_SELECTION);
+
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
-		
-		
-		//TODO: Layout might be improvable: Size of Columns should automatically adapt to Size of first column
-		//TODO: Cells content in Info column should be wrapped or extended or else.
+
+		// TODO: Layout might be improvable: Size of Columns should automatically adapt
+		// to Size of first column
+		// TODO: Cells content in Info column should be wrapped or extended or else.
 		/**
 		 * Set the Table Layout
 		 */
 //		table.getColumn(0).pack();
 		int tablewidth = table.getParent().getClientArea().width;
 		TableLayout tableLayout = new TableLayout(true);
-		
+
 //		TableColumn column0 = new TableColumn(table, SWT.CHECK, 0);
-		
-		
+
 		TableColumn column = new TableColumn(table, SWT.BORDER | SWT.WRAP, 0);
 		column.setText("Requirement ID");
 		column.setAlignment(SWT.LEFT);
@@ -246,102 +250,101 @@ public class TRCView extends ViewPart {
 		}
 
 		column.addListener(SWT.Selection, new Listener() {
-		    @Override
-		    public void handleEvent(Event event) {
-		    	
-		        int checkBoxFlag = TRCView.CHECKBOX_UNSELECTED;
-		        LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
-		        LinkedList<TRCRequirement> active = TRCFileInteraction.getActiveTRCRequirements(reqs);
-		        
-		        if (active.size() <= 0) {
-		        	checkBoxFlag = TRCView.CHECKBOX_CLEARED;
-		        } else if (active.size() > 0 && active.size() < reqs.size()) {
-		        	checkBoxFlag = TRCView.CHECKBOX_UNSELECTED;
-		        } else {
-		        	checkBoxFlag = TRCView.CHECKBOX_SELECTED;
-		        }
+			@Override
+			public void handleEvent(Event event) {
 
-		        if (checkBoxFlag == TRCView.CHECKBOX_CLEARED) {
-		        	//select all
-		        	for (TRCRequirement r : reqs) {
+				int checkBoxFlag = TRCView.CHECKBOX_UNSELECTED;
+				LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
+				LinkedList<TRCRequirement> active = TRCFileInteraction.getActiveTRCRequirements(reqs);
+
+				if (active.size() <= 0) {
+					checkBoxFlag = TRCView.CHECKBOX_CLEARED;
+				} else if (active.size() > 0 && active.size() < reqs.size()) {
+					checkBoxFlag = TRCView.CHECKBOX_UNSELECTED;
+				} else {
+					checkBoxFlag = TRCView.CHECKBOX_SELECTED;
+				}
+
+				if (checkBoxFlag == TRCView.CHECKBOX_CLEARED) {
+					// select all
+					for (TRCRequirement r : reqs) {
 						r.setActive(true);
 					}
-		        	viewer.setAllChecked(true);
-		        	column.setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_SELECTED).createImage());
-		        } else if (checkBoxFlag == TRCView.CHECKBOX_SELECTED || checkBoxFlag == TRCView.CHECKBOX_UNSELECTED){
-		        	//deselect all
-		        	for (TRCRequirement r : reqs) {
+					viewer.setAllChecked(true);
+					column.setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_SELECTED).createImage());
+				} else if (checkBoxFlag == TRCView.CHECKBOX_SELECTED || checkBoxFlag == TRCView.CHECKBOX_UNSELECTED) {
+					// deselect all
+					for (TRCRequirement r : reqs) {
 						r.setActive(false);
 					}
-		        	viewer.setAllChecked(false);
-		        	column.setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_CLEARED).createImage());
-		        }
-		        
-		        TRCFileInteraction.WriteReversedTRCsToFile(reqs);
+					viewer.setAllChecked(false);
+					column.setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_CLEARED).createImage());
+				}
 
-		    }
+				TRCFileInteraction.WriteReversedTRCsToFile(reqs);
+
+			}
 		});
-		
+
 		TableColumn column2 = new TableColumn(table, SWT.BORDER | SWT.WRAP, 1);
 		column2.setText("Info");
 		column2.setAlignment(SWT.LEFT);
-		
-		tableLayout.addColumnData(new ColumnWeightData(15, (int)(tablewidth/10)));
-		tableLayout.addColumnData(new ColumnWeightData(85, (int)(tablewidth*7/10)));
+
+		tableLayout.addColumnData(new ColumnWeightData(15, (int) (tablewidth / 10)));
+		tableLayout.addColumnData(new ColumnWeightData(85, (int) (tablewidth * 7 / 10)));
 		table.setLayout(tableLayout);
-		
+
 //		TableLayout tableLayout = new TableLayout(true);
 //		tableLayout.addColumnData(new ColumnWeightData(15));
 ////		tableLayout.addColumnData(new ColumnWeightData(85));
 //		table.setLayout(tableLayout);
-		
-		
+
 		viewer = new CheckboxTableViewer(table);
 
 		viewer.setContentProvider(TRCViewArrayContentProvider.getInstance());
 //		updateViewer();  // Do not update here as Build Boxes will set the content in a second
-		//Reverting Display Order
-		//		TRCViewArrayContentProvider t = (TRCViewArrayContentProvider) viewer.getContentProvider();
-		//		t.setReversedOrder(true);
-		viewer.setLabelProvider(new ViewLabelProvider());
-		//viewer.setCellModifier(new TableCellModifier(viewer));
+		// Reverting Display Order
+		// TRCViewArrayContentProvider t = (TRCViewArrayContentProvider)
+		// viewer.getContentProvider();
+		// t.setReversedOrder(true);
+		viewer.setLabelProvider(new TRCViewLabelProvider());
+		// viewer.setCellModifier(new TableCellModifier(viewer));
 
 		// Create the help context id for the viewer's control
 		workbench.getHelpSystem().setHelp(viewer.getControl(), "pm.eclipse.editbox.viewer");
 		getSite().setSelectionProvider(viewer);
-		hookListeners();	// TODO: eventually redesign all listeners?
+		hookListeners(); // TODO: eventually redesign all listeners?
 		makeActions();
 		hookContextMenu();
 		hookDoubleClickAction();
 		contributeToActionBars();
 	}
 
-
 	private void hookListeners() {
-		
+
 		int TEXT_MARGIN = 10;
-		
+
 		/**
 		 * adding Text wrapping / 2 Line Info
 		 */
 		table.addListener(SWT.MeasureItem, event -> {
 			/**
-			 * Check The Column of the Event. Format Info Column in two lines
-			 * TODO: Format only the second lines ... somehow
+			 * Check The Column of the Event. Format Info Column in two lines TODO: Format
+			 * only the second lines ... somehow
 			 */
 			final int MAX_LINES = 2;
-			if(event.index == 1) {
+			if (event.index == 1) {
 
 				TableItem item = (TableItem) event.item;
 				final String text = item.getText(event.index);
 
-				item.getParent().setToolTipText(((TRCRequirement) item.getData()).getInfo());		
-				
+				item.getParent().setToolTipText(((TRCRequirement) item.getData()).getInfo());
+
 				String finalText = "";
 				int displaywidth = item.getTextBounds(1).width;
 				int textwidth = event.width;
-				
-				if( textwidth > displaywidth ) {
+
+				if (textwidth > displaywidth) {
 					int i = 1; // first Line, 2nd line, ...
 					int spaceFoundAtIndex = 0;
 					int lineProgressionIndex = 0;
@@ -349,69 +352,68 @@ public class TRCView extends ViewPart {
 					String currentBuildingTextLine = "";
 					String more = " ...";
 					boolean reachedEnd = false;
-					
-					while(!reachedEnd) {
-						
+
+					while (!reachedEnd) {
+
 						do {
 							finalTextLine = currentBuildingTextLine;
-							spaceFoundAtIndex = text.indexOf(" ", spaceFoundAtIndex + 1); //+1 to avoid  finding same space over and over again
-							if(spaceFoundAtIndex == -1 || spaceFoundAtIndex > text.length()) {
+							spaceFoundAtIndex = text.indexOf(" ", spaceFoundAtIndex + 1); // +1 to avoid finding same
+																							// space over and over again
+							if (spaceFoundAtIndex == -1 || spaceFoundAtIndex > text.length()) {
 								reachedEnd = true;
 								currentBuildingTextLine = text.substring(lineProgressionIndex);
 								break;
-								//We found the end of the text
+								// We found the end of the text
 							}
 							currentBuildingTextLine = text.substring(lineProgressionIndex, spaceFoundAtIndex);
 						} while (!reachedEnd && event.gc.textExtent(currentBuildingTextLine).x < displaywidth);
-						
-						//the line was to long; finalTextLine is a line that fits
-						if (! reachedEnd ) {
+
+						// the line was to long; finalTextLine is a line that fits
+						if (!reachedEnd) {
 							lineProgressionIndex += finalTextLine.length();
-							if(i <= 1) {
+							if (i <= 1) {
 								finalText = finalTextLine;
-							} else if (i < MAX_LINES){
+							} else if (i < MAX_LINES) {
 								finalText += "\n" + finalTextLine;
 							} else if (i == MAX_LINES) {
-								if(event.gc.textExtent(finalTextLine+more+more).x < displaywidth) {
-									finalText += "\n" + finalTextLine + more;	
+								if (event.gc.textExtent(finalTextLine + more + more).x < displaywidth) {
+									finalText += "\n" + finalTextLine + more;
 								} else {
 									finalText += "\n" + finalTextLine;
 								}
 							}
-							
-						} else {  // We reached End of Text
+
+						} else { // We reached End of Text
 							String endText = "";
-							if(event.gc.textExtent(currentBuildingTextLine).x < displaywidth ) {
-								endText = currentBuildingTextLine;								
+							if (event.gc.textExtent(currentBuildingTextLine).x < displaywidth) {
+								endText = currentBuildingTextLine;
 							} else {
 								endText = finalTextLine;
 							}
-							
-							if(i <= 1) {
+
+							if (i <= 1) {
 								finalText = endText;
-								if(currentBuildingTextLine.length() > finalTextLine.length()) {
-									//We might have missed a word or two.
-									if(finalText.indexOf("\n") == -1) {
-										finalText += "\n" + currentBuildingTextLine.substring(finalTextLine.length());										
+								if (currentBuildingTextLine.length() > finalTextLine.length()) {
+									// We might have missed a word or two.
+									if (finalText.indexOf("\n") == -1) {
+										finalText += "\n" + currentBuildingTextLine.substring(finalTextLine.length());
 									} // Otherwise we already expanded
 								}
-							} else if (i < MAX_LINES){
+							} else if (i < MAX_LINES) {
 								finalText += "\n" + endText;
 							} else if (i == MAX_LINES) {
 								finalText += "\n" + endText;
-							}	
+							}
 						}
-						
+
 						i++;
-						System.out.print(i + " ");
 					}
-					System.out.println();
 
 					item.setText(1, finalText);
-					//Setting the correct height and width for the SWT.PaintItem Job
+					// Setting the correct height and width for the SWT.PaintItem Job
 					Point size = event.gc.textExtent(finalText);
 					event.width = size.x;
-					event.height = size.y;	
+					event.height = size.y;
 				}
 			}
 		});
@@ -420,21 +422,22 @@ public class TRCView extends ViewPart {
 			String text = item.getText(event.index);
 			/* center all columns vertically */
 			int yOffset = 0;
-				Point size = event.gc.textExtent(text);
-				yOffset = Math.max(0, (event.height - size.y) / 2);
-				event.gc.drawText(text, event.x, event.y + yOffset, true);
+			Point size = event.gc.textExtent(text);
+			yOffset = Math.max(0, (event.height - size.y) / 2);
+			event.gc.drawText(text, event.x, event.y + yOffset, true);
 		});
-		
+
 		/**
-		 * Adds a Listener that creates a custom selection Highlighting
-		 * As the Colour is specified by the Requirements, we only change the Foreground Colour 
-		 * By Setting SWT.HOT
+		 * Adds a Listener that creates a custom selection Highlighting As the Colour is
+		 * specified by the Requirements, we only change the Foreground Colour By
+		 * Setting SWT.HOT
 		 */
 		table.addListener(SWT.EraseItem, new Listener() {
 			public void handleEvent(Event event) {
 				event.detail &= ~SWT.HOT;
 				event.detail &= ~SWT.FOREGROUND;
-				if ((event.detail & SWT.SELECTED) == 0) return; /* item not selected */
+				if ((event.detail & SWT.SELECTED) == 0)
+					return; /* item not selected */
 				event.detail &= ~SWT.SELECTED;
 			}
 		});
@@ -450,22 +453,23 @@ public class TRCView extends ViewPart {
 					LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
 					LinkedList<TRCRequirement> active = TRCFileInteraction.getActiveTRCRequirements(reqs);
 					if (active.size() <= 0) {
-						table.getColumn(0).setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_CLEARED).createImage());
+						table.getColumn(0)
+								.setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_CLEARED).createImage());
 					} else if (active.size() > 0 && active.size() < reqs.size()) {
-						table.getColumn(0).setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_UNSELECTED).createImage());
+						table.getColumn(0)
+								.setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_UNSELECTED).createImage());
 					} else {
-						table.getColumn(0).setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_SELECTED).createImage());
+						table.getColumn(0)
+								.setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_SELECTED).createImage());
 					}
 					if (reqs != null && reqs instanceof List) {
-						TRCFileInteraction.WriteTRCsToFile(reqs, BoxDecoratorImpl.getCurrentActivePath());	
+						TRCFileInteraction.WriteReversedTRCsToFile(reqs, BoxDecoratorImpl.getCurrentActivePath());
 					}
 				}
 			}
 		});
 
-
 	}
-
 
 	private void hookContextMenu() {
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
@@ -508,7 +512,8 @@ public class TRCView extends ViewPart {
 	}
 
 	/**
-	 * Defines all the Actions that are meant to be executed when interacting with this viewer
+	 * Defines all the Actions that are meant to be executed when interacting with
+	 * this viewer
 	 */
 	private void makeActions() {
 		actionSetRequirementBoxes = new Action() {
@@ -517,7 +522,8 @@ public class TRCView extends ViewPart {
 			}
 
 			private void setRequirementBoxes() {
-				IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+				IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+						.getActiveEditor();
 				ISelection selected = editor.getSite().getSelectionProvider().getSelection();
 				if (selected != null) {
 					if (selected instanceof TextSelection) {
@@ -525,8 +531,8 @@ public class TRCView extends ViewPart {
 						int start = sel.getOffset();
 						int length = sel.getLength();
 						int end = start + length;
-						int[] out = {start, end};
-						if(end > start) {
+						int[] out = { start, end };
+						if (end > start) {
 							System.out.println("setRequirementBoxes: " + Arrays.toString(out));
 							BoxDecoratorImpl.changeBoxes(start, length);
 							editor.setFocus();
@@ -536,7 +542,8 @@ public class TRCView extends ViewPart {
 			}
 		};
 		actionSetRequirementBoxes.setText("Set Requirement(s)");
-		actionSetRequirementBoxes.setToolTipText("Sets the currently checked Requirements in the Selection in the Editor");
+		actionSetRequirementBoxes
+				.setToolTipText("Sets the currently checked Requirements in the Selection in the Editor");
 		actionSetRequirementBoxes.setImageDescriptor(EditBox.getImageDescriptor(EditBox.IMG_SET_REQUIREMENTS));
 
 		actionMoveRequirementUp = new Action() {
@@ -547,8 +554,7 @@ public class TRCView extends ViewPart {
 		actionMoveRequirementUp.setText("1 up");
 		actionMoveRequirementUp.setToolTipText("Move the selected Requirement 1 Layer up");
 		actionMoveRequirementUp.setImageDescriptor(EditBox.getImageDescriptor(EditBox.IMG_ARROW_UP));
-		
-		
+
 		actionMoveRequirementDown = new Action() {
 			public void run() {
 				moveRequirementOneDown();
@@ -558,8 +564,6 @@ public class TRCView extends ViewPart {
 		actionMoveRequirementDown.setToolTipText("Move the selected Requirement 1 Layer down");
 		actionMoveRequirementDown.setImageDescriptor(EditBox.getImageDescriptor(EditBox.IMG_ARROW_DOWN));
 
-		
-		
 		doubleClickAction = new Action() {
 			public void run() {
 				showColorDialoge();
@@ -580,8 +584,8 @@ public class TRCView extends ViewPart {
 				LinkedList<TRCRequirement> out = new LinkedList<TRCRequirement>();
 				for (Iterator<TRCRequirement> iterator = reqs.iterator(); iterator.hasNext();) {
 					TRCRequirement trcRequirement = (TRCRequirement) iterator.next();
-					if(trcRequirement.getId().equals(r.getId())) {
-						if(iterator.hasNext()) {
+					if (trcRequirement.getId().equals(r.getId())) {
+						if (iterator.hasNext()) {
 							TRCRequirement after = (TRCRequirement) iterator.next();
 							out.add(after);
 							out.add(r);
@@ -592,17 +596,16 @@ public class TRCView extends ViewPart {
 						out.add(trcRequirement);
 					}
 				}
-				
+
 				TRCFileInteraction.WriteReversedTRCsToFile(out);
 				BoxDecoratorImpl.change();
 				updateViewer(out);
-				
+
 			}
 		}
-		
+
 	}
-	
-	
+
 	/**
 	 * moves the currently selected Requirement one up.
 	 */
@@ -616,28 +619,28 @@ public class TRCView extends ViewPart {
 				LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
 				LinkedList<TRCRequirement> out = new LinkedList<TRCRequirement>();
 				Iterator<TRCRequirement> iterator = reqs.iterator();
-				do  {
+				do {
 					TRCRequirement trcRequirement = (TRCRequirement) iterator.next();
-					if(trcRequirement.getId().equals(r.getId())) {
-						if(last != null) {
+					if (trcRequirement.getId().equals(r.getId())) {
+						if (last != null) {
 							out.add(trcRequirement);
 							continue;
 						}
 					} else {
-						if(last != null) {
-							out.add(last);							
+						if (last != null) {
+							out.add(last);
 						}
 					}
 					last = trcRequirement;
 				} while (iterator.hasNext());
-				
+
 				TRCFileInteraction.WriteReversedTRCsToFile(out);
 				BoxDecoratorImpl.change();
 				updateViewer(out);
-				
+
 			}
 		}
-		
+
 	}
 
 	private void hookDoubleClickAction() {
@@ -647,29 +650,27 @@ public class TRCView extends ViewPart {
 			}
 		});
 	}
+
 	private void showMessage(String message) {
-		MessageDialog.openInformation(
-				viewer.getControl().getShell(),
-				"TRC View",
-				message);
+		MessageDialog.openInformation(viewer.getControl().getShell(), "TRC View", message);
 	}
 
 	/**
-	 * Opens a ColorDialoge Window where the user can change the color of the Requirement.
+	 * Opens a ColorDialoge Window where the user can change the color of the
+	 * Requirement.
 	 * 
-	 * After the change: 
-	 *   - enforces Redraw of boxes
-	 *   - enforces Redraw of the View's table
+	 * After the change: - enforces Redraw of boxes - enforces Redraw of the View's
+	 * table
 	 */
 	private void showColorDialoge() {
 		IPath path = BoxDecoratorImpl.getCurrentActivePath();
 		LinkedList<TRCRequirement> requirements = TRCFileInteraction.ReadTRCsFromFile(path);
-		if(requirements == null) {
+		if (requirements == null) {
 			return;
 		}
 		IStructuredSelection selection = viewer.getStructuredSelection();
 		Object obj = selection.getFirstElement();
-		if(obj instanceof TRCRequirement) {
+		if (obj instanceof TRCRequirement) {
 			TRCRequirement req = (TRCRequirement) obj;
 			Shell shell = new Shell();
 			ColorDialog dlg = new ColorDialog(shell);
@@ -677,47 +678,43 @@ public class TRCView extends ViewPart {
 				if (trcRequirement.getId().equals(req.getId())) {
 					dlg.setRGB(trcRequirement.getColor().getRGB());
 					RGB rgb = dlg.open();
-					if(rgb != null) {
-						trcRequirement.setColor(new Color(null, rgb.red, rgb.green, rgb.blue));						
+					if (rgb != null) {
+						trcRequirement.setColor(new Color(null, rgb.red, rgb.green, rgb.blue));
 					}
 				}
 			}
-			TRCFileInteraction.WriteTRCsToFile(requirements, path);
+			TRCFileInteraction.WriteReversedTRCsToFile(requirements, path);
 			BoxDecoratorImpl.change();
-			
+
 			refreshed();
-		}
-		else {
-			showMessage("Object is no instance of TRCRequirment: Double-click detected on "+obj.toString());	
+		} else {
+			showMessage("Object is no instance of TRCRequirment: Double-click detected on " + obj.toString());
 		}
 	}
 
 	@Override
 	public void setFocus() {
-		//TODO: This does not work properly.
+		// TODO: This does not work properly.
 		viewer.getControl().setFocus();
 	}
-	
+
 	public static void refreshed() {
 		System.out.println("Refreshed");
 //		viewer.getTable().pack();
 		viewer.getTable().setFocus();
-		IWorkbenchWindow window = 
-				workbench == null ? null : workbench.getActiveWorkbenchWindow();
-		IWorkbenchPage activePage = 
-				window == null ? null : window.getActivePage();		
-		IEditorPart editor = 
-				activePage == null ? null : activePage.getActiveEditor();
+		IWorkbenchWindow window = workbench == null ? null : workbench.getActiveWorkbenchWindow();
+		IWorkbenchPage activePage = window == null ? null : window.getActivePage();
+		IEditorPart editor = activePage == null ? null : activePage.getActiveEditor();
 		if (editor != null) {
 			editor.setFocus();
 		}
 		IViewReference[] references = activePage.getViewReferences();
-		for ( IViewReference v : references) {
-			if(v.getPartName().equals("TRC View")) {
+		for (IViewReference v : references) {
+			if (v.getPartName().equals("TRC View")) {
 				IViewPart p = v.getView(true);
 				if (p instanceof TRCView) {
 				}
-				p.setFocus();		
+				p.setFocus();
 			}
 		}
 		if (editor != null) {

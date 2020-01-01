@@ -876,7 +876,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 				}		
 			}
 
-			TRCFileInteraction.WriteTRCsToFile(reqs, path);
+			TRCFileInteraction.WriteReversedTRCsToFile(reqs, path);
 
 		}
 
