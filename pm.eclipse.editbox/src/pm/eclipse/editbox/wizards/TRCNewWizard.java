@@ -26,12 +26,13 @@ import org.eclipse.ui.IWorkbenchWizard;
 import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
 
 /**
- * This is a sample new wizard. Its role is to create a new file resource in the
- * provided container. If the container resource (a folder or a project) is
- * selected in the workspace when the wizard is opened, it will accept it as the
- * target container. The wizard creates one file with the extension "trc".
+ * This is a TRCNewWizard wizard. Its role is to create a new .trc file resource
+ * in the provided container. If the container resource (a folder or a project
+ * or a sourcecode file) is selected in the workspace when the wizard is opened,
+ * it will accept it as the target source container. The file name for the file
+ * which is to be created will be deriven by the wizard. The wizard creates one
+ * file with the extension "trc".
  */
-
 public class TRCNewWizard extends Wizard implements INewWizard {
 	private TRCNewWizardPage newWisardPage;
 	private TRCWizardSelectRequirementsPage selectRequirementsPage;
@@ -46,7 +47,7 @@ public class TRCNewWizard extends Wizard implements INewWizard {
 	}
 
 	/**
-	 * Adding the newWisardPage to the wizard.
+	 * Adding the newWisardPage and selectRequirementsPage to the wizard.
 	 */
 	@Override
 	public void addPages() {
@@ -91,6 +92,17 @@ public class TRCNewWizard extends Wizard implements INewWizard {
 	 * or just replace its contents
 	 */
 
+	/**
+	 * 
+	 * @param sourceFileName Project relative path of the File whose content shall
+	 *                       be traced
+	 * @param fileName       Project relative path of the .trc file that shall be
+	 *                       edited / created
+	 * @param requirementIDs the IDs from the
+	 *                       {@link TRCWizardSelectRequirementsPage}
+	 * @param monitor        the progress monitor
+	 * @throws CoreException
+	 */
 	private void doFinish(final String sourceFileName, final String fileName, final String[] requirementIDs,
 			IProgressMonitor monitor) throws CoreException {
 		// create a sample file
@@ -125,7 +137,6 @@ public class TRCNewWizard extends Wizard implements INewWizard {
 	 * @param oldRequirements - the Requirements found in the already existing .trc
 	 *                        file, or null if there are none.
 	 */
-
 	private LinkedList<TRCRequirement> getTRCReqs(String[] ids, LinkedList<TRCRequirement> oldRequirements) {
 		LinkedList<TRCRequirement> trcReqs = new LinkedList<TRCRequirement>();
 		for (String id : ids) {

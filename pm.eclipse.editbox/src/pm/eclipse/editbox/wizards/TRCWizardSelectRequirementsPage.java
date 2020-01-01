@@ -19,11 +19,10 @@ import pm.eclipse.editbox.impl.TRCFileInteraction;
 import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
 
 /**
- * The "New" wizard page allows setting the container for the new file as well
- * as the file name. The page will only accept file name without the extension
- * OR with the extension that matches the expected one (.trc).
+ * The TRCWizardSelectRequirementsPage allows setting / editing the Requirement
+ * ID's for the in {@link TRCNewWizardPage} specified file. One has to specify
+ * at least one Requirement
  */
-
 public class TRCWizardSelectRequirementsPage extends WizardPage {
 	private Text requirementIDsText;
 	private TRCNewWizardPage newWisardPage;
@@ -31,6 +30,9 @@ public class TRCWizardSelectRequirementsPage extends WizardPage {
 
 	/**
 	 * Constructor for TRCWizardSelectRequirementsPage.
+	 * 
+	 * @param newWisardPage - requires the newWisardPage to check the contents of a
+	 *                      possibly already existing .trc file.
 	 */
 	public TRCWizardSelectRequirementsPage(TRCNewWizardPage newWisardPage) {
 		super("wizardPage");
@@ -76,7 +78,6 @@ public class TRCWizardSelectRequirementsPage extends WizardPage {
 	/**
 	 * Ensures that the ID text field is set.
 	 */
-
 	private void dialogChanged() {
 		if (requirementIDsText.getText() == null || requirementIDsText.getText().length() <= 0) {
 			updateStatus("Please Specify at least one Requirement");
@@ -92,6 +93,11 @@ public class TRCWizardSelectRequirementsPage extends WizardPage {
 		setPageComplete(message == null);
 	}
 
+	/**
+	 * returns the Requirement IDs in a fitting format for the TextBox
+	 * 
+	 * @return the Requirement IDs seperated by '\n'
+	 */
 	public String[] getSpecifiedIDs() {
 		String[] out;
 		out = requirementIDsText.getText().split("\n|;");
