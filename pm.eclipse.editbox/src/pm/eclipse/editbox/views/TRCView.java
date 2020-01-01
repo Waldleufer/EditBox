@@ -125,7 +125,7 @@ public class TRCView extends ViewPart {
 			if (obj instanceof String) {
 				if (index == 1) {
 					int width = TRCView.getViewer().getTable().getColumn(1).getWidth();
-					return "width: " + width + " " + (String) obj;
+					return (String) obj;
 				} else {
 					return "";
 				}
@@ -185,6 +185,7 @@ public class TRCView extends ViewPart {
 			System.out.println("Requirements == null");
 			viewer.setInput(new LinkedList<TRCRequirement>());
 			refreshed();
+			TRCView.setInitialized(false);
 			return;
 		}
 		
