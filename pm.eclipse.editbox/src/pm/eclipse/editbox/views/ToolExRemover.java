@@ -56,8 +56,7 @@ class ToolExRemover {
 		}
 	}
 
-	private Document parse(final String reqifFile)
-			throws ParserConfigurationException, SAXException, IOException {
+	private Document parse(final String reqifFile) throws ParserConfigurationException, SAXException, IOException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		Document document = builder.parse(new File(reqifFile));
@@ -103,8 +102,7 @@ class ToolExRemover {
 		return wkFile;
 	}
 
-	private void output(final Document document, final File tmp)
-			throws IOException {
+	private void output(final Document document, final File tmp) throws IOException {
 		DOMBuilder domBuilder = new DOMBuilder();
 		org.jdom2.Document doc = domBuilder.build(document);
 		XMLOutputter out = new XMLOutputter();

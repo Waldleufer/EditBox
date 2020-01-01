@@ -43,7 +43,8 @@ public class TRCNewWizardPage extends WizardPage {
 	public TRCNewWizardPage(ISelection selection) {
 		super("wizardPage");
 		setTitle("Traceability Data File");
-		setDescription("This wizard creates a new file with *.trc extension that maintains the Traceability Data for the corresponding File");
+		setDescription(
+				"This wizard creates a new file with *.trc extension that maintains the Traceability Data for the corresponding File");
 		this.selection = selection;
 	}
 
@@ -72,10 +73,11 @@ public class TRCNewWizardPage extends WizardPage {
 		label = new Label(container, SWT.NULL);
 		label.setText("&TRC File:");
 
-		fileText = new Text(container, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY );
+		fileText = new Text(container, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		fileText.setLayoutData(gd);
-		// fileText.addModifyListener(e -> dialogChanged()); // not needed as File is never modified
+		// fileText.addModifyListener(e -> dialogChanged()); // not needed as File is
+		// never modified
 		initialize();
 		dialogChanged();
 		setControl(container);
@@ -88,9 +90,8 @@ public class TRCNewWizardPage extends WizardPage {
 	private void initialize() {
 		fileText.setText("new_file.trc");
 		sourceFileText.setText(ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString());
-		
-		if (selection != null && selection.isEmpty() == false
-				&& selection instanceof IStructuredSelection) {
+
+		if (selection != null && selection.isEmpty() == false && selection instanceof IStructuredSelection) {
 			IStructuredSelection ssel = (IStructuredSelection) selection;
 			if (ssel.size() > 1)
 				return;
@@ -99,18 +100,15 @@ public class TRCNewWizardPage extends WizardPage {
 				IResource file = (IResource) obj;
 				sourceFileText.setText(file.getFullPath().toOSString());
 				fileText.setText(TRCFileInteraction.exchangeEnding(file.getFullPath().toOSString()));
-			} 
-			else if (obj instanceof IJavaElement) {    
-				IPath p = ((IJavaElement)obj).getPath();   
+			} else if (obj instanceof IJavaElement) {
+				IPath p = ((IJavaElement) obj).getPath();
 				sourceFileText.setText(p.toOSString());
-	            fileText.setText(TRCFileInteraction.exchangeEnding(p.toOSString()));
-			}
-	        else if (obj instanceof IPackageFragmentRoot) {    
-	            IPath p = ((IPackageFragmentRoot)obj).getPath(); 
-	            sourceFileText.setText(p.toOSString());
-	            fileText.setText(TRCFileInteraction.exchangeEnding(p.toOSString()));
-	        }
-			else {
+				fileText.setText(TRCFileInteraction.exchangeEnding(p.toOSString()));
+			} else if (obj instanceof IPackageFragmentRoot) {
+				IPath p = ((IPackageFragmentRoot) obj).getPath();
+				sourceFileText.setText(p.toOSString());
+				fileText.setText(TRCFileInteraction.exchangeEnding(p.toOSString()));
+			} else {
 				System.out.println("Initialiizer Error:");
 				System.out.println(obj.toString());
 			}
@@ -119,8 +117,8 @@ public class TRCNewWizardPage extends WizardPage {
 	}
 
 	/**
-	 * Uses the standard container selection dialog to choose the new value for
-	 * the container field.
+	 * Uses the standard container selection dialog to choose the new value for the
+	 * container field.
 	 */
 
 	private void handleBrowse() {
@@ -141,11 +139,11 @@ public class TRCNewWizardPage extends WizardPage {
 
 	private void dialogChanged() {
 		Path p = new Path(getSourceFileName());
-		System.out.println("Path Dialog Changed: "+ p.toOSString());
+		System.out.println("Path Dialog Changed: " + p.toOSString());
 		IResource container = ResourcesPlugin.getWorkspace().getRoot().getFile(p);
 		String fileName = getNewFileName();
 		System.out.println("Dialoge Changed Container: " + container.toString());
-		System.out.println("File Name "+ fileName);
+		System.out.println("File Name " + fileName);
 
 		if (getSourceFileName().length() == 0) {
 			updateStatus("Source File must be specified");
@@ -168,7 +166,7 @@ public class TRCNewWizardPage extends WizardPage {
 			}
 		}
 		IResource target = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(getNewFileName()));
-		if (target != null && ( target.exists())) {
+		if (target != null && (target.exists())) {
 			return;
 		}
 		int dotLoc = fileName.lastIndexOf('.');
@@ -194,7 +192,7 @@ public class TRCNewWizardPage extends WizardPage {
 	public String getNewFileName() {
 		return fileText.getText();
 	}
-	
+
 	public Path newFilePath() {
 		return null;
 	}

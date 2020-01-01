@@ -549,7 +549,7 @@ public class TRCView extends ViewPart {
 		actionMoveRequirementUp.setText("1 up");
 		actionMoveRequirementUp.setToolTipText("Move the selected Requirement 1 Layer up");
 		actionMoveRequirementUp.setImageDescriptor(EditBox.getImageDescriptor(EditBox.IMG_ARROW_UP));
-		
+
 		actionMoveRequirementUpTop = new Action() {
 			public void run() {
 				moveToTop();
@@ -567,7 +567,7 @@ public class TRCView extends ViewPart {
 		actionMoveRequirementDown.setText("1 down");
 		actionMoveRequirementDown.setToolTipText("Move the selected Requirement 1 Layer down");
 		actionMoveRequirementDown.setImageDescriptor(EditBox.getImageDescriptor(EditBox.IMG_ARROW_DOWN));
-		
+
 		actionMoveRequirementDownBottom = new Action() {
 			public void run() {
 				moveToBottom();
@@ -596,9 +596,9 @@ public class TRCView extends ViewPart {
 				TRCRequirement tmp = null;
 				LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
 				int i = reqs.indexOf(r);
-				if (i >= 0 && i < reqs.size()-1) {
-					tmp = reqs.get(i+1);
-					reqs.set(i+1, r);
+				if (i >= 0 && i < reqs.size() - 1) {
+					tmp = reqs.get(i + 1);
+					reqs.set(i + 1, r);
 					reqs.set(i, tmp);
 				}
 
@@ -610,7 +610,7 @@ public class TRCView extends ViewPart {
 			viewer.setSelection(selected);
 		}
 	}
-	
+
 	/**
 	 * Move the current Requirement to the top
 	 */
@@ -622,7 +622,7 @@ public class TRCView extends ViewPart {
 				TRCRequirement r = (TRCRequirement) obj;
 				LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
 				int i = reqs.indexOf(r);
-				if (i >= 0 && i < reqs.size()-1) {
+				if (i >= 0 && i < reqs.size() - 1) {
 					reqs.remove(i);
 					reqs.add(r);
 				}
@@ -647,8 +647,8 @@ public class TRCView extends ViewPart {
 				LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
 				int i = reqs.indexOf(r);
 				if (i > 0 && i < reqs.size()) {
-					tmp = reqs.get(i-1);
-					reqs.set(i-1, r);
+					tmp = reqs.get(i - 1);
+					reqs.set(i - 1, r);
 					reqs.set(i, tmp);
 				}
 				TRCFileInteraction.WriteReversedTRCsToFile(reqs);
@@ -658,7 +658,7 @@ public class TRCView extends ViewPart {
 			viewer.setSelection(selected);
 		}
 	}
-	
+
 	/**
 	 * moves the currently selected Requirement to the bottom.
 	 */

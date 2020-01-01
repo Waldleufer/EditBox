@@ -12,13 +12,9 @@
 package pm.eclipse.editbox.views;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
@@ -38,7 +34,6 @@ import org.eclipse.rmf.serialization.XMLPersistenceMappingResourceSetImpl;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -51,34 +46,22 @@ public final class ReqIF10Parser {
 	private boolean removeTemporaries = true;
 
 	public ReqIF parseReqIFContent() {
-		String path = System.getProperty("User.dir") + "/reqif";
 		IWorkbench workbench = PlatformUI.getWorkbench();
-		IWorkbenchWindow window = 
-				workbench == null ? null : workbench.getActiveWorkbenchWindow();
-		IWorkbenchPage activePage = 
-				window == null ? null : window.getActivePage();		
-		IEditorPart editor = 
-				activePage == null ? null : activePage.getActiveEditor();
-		IEditorInput input = 
-				editor == null ? null : editor.getEditorInput();
-		
+		IWorkbenchWindow window = workbench == null ? null : workbench.getActiveWorkbenchWindow();
+		IWorkbenchPage activePage = window == null ? null : window.getActivePage();
+		IEditorPart editor = activePage == null ? null : activePage.getActiveEditor();
+		IEditorInput input = editor == null ? null : editor.getEditorInput();
+
 		IPath p = null;
 		if (input instanceof IFileEditorInput) {
-			p = ((IFileEditorInput)input).getFile().getProject().getLocation();
+			p = ((IFileEditorInput) input).getFile().getProject().getLocation();
 		}
 		if (p == null) {
 			return null;
 		}
 		String wkFile = p.toOSString() + "/reqif/" + reqIFFilename;
 		System.out.println("PATH: " + wkFile);
-//		String wkFile = this.getReqIFFilename();  // Could be used to set the ReqIF File name programmatically
-		// ***** Config start ****** //
-		
-//		String wkFile = "/Users/Martin/Uni/Bachelorarbeit/runtime-EclipseApplication/TestTest1/reqif/chapter3.reqif";
-//		wkFile = "/Users/Martin/Uni/Bachelorarbeit/runtime-EclipseApplication/TestTest1/reqif/TestTest1.reqif";
-//		this.setReqIFFilename(wkFile);
-		// ***** Config  end  ****** //
-		 
+
 		if (isRemoveToolExtensions()) {
 			ToolExRemover remover = new ToolExRemover();
 			remover.setDeleteOnExit(this.isRemoveTemporaries());
@@ -118,22 +101,19 @@ public final class ReqIF10Parser {
 
 	private ReqIF parse(final String fileName) {
 		try {
-			
+
 			URI uri = URI.createFileURI(fileName);
 			ResourceFactoryImpl resourceFactory = new XMLPersistenceMappingResourceFactoryImpl();
-			XMLResource resource = (XMLResource) resourceFactory
-					.createResource(uri);
+			XMLResource resource = (XMLResource) resourceFactory.createResource(uri);
 			Map<?, ?> options = null;
 			resource.load(options);
-			
+
 			this.getDiagnostics().clear();
 			for (Diagnostic d : resource.getErrors()) {
-				this.getDiagnostics().add("ERROR " + d.getLocation() + " "
-						+ d.getLine() + " " + d.getMessage());
+				this.getDiagnostics().add("ERROR " + d.getLocation() + " " + d.getLine() + " " + d.getMessage());
 			}
 			for (Diagnostic d : resource.getWarnings()) {
-				this.getDiagnostics().add("WARNING " + d.getLocation() + " "
-						+ d.getLine() + " " + d.getMessage());
+				this.getDiagnostics().add("WARNING " + d.getLocation() + " " + d.getLine() + " " + d.getMessage());
 			}
 
 			ResourceSet resourceSet = new XMLPersistenceMappingResourceSetImpl();
@@ -141,16 +121,14 @@ public final class ReqIF10Parser {
 
 			EList<EObject> rootObjects = resource.getContents();
 			if (rootObjects.isEmpty()) {
-				throw new RuntimeException("The resource parsed from '"
-						+ uri.toString() + "' seems to be empty.");
+				throw new RuntimeException("The resource parsed from '" + uri.toString() + "' seems to be empty.");
 			}
 			ReqIF reqif = (ReqIF) rootObjects.get(0);
-			
+
 			return reqif;
 
 		} catch (Exception e) {
-			throw new RuntimeException("Parsing '" + fileName + "' failed.",
-					e.getCause());
+			throw new RuntimeException("Parsing '" + fileName + "' failed.", e.getCause());
 		}
 	}
 
@@ -162,22 +140,21 @@ public final class ReqIF10Parser {
 //		DatatypesPackage.eINSTANCE.getName();
 //		XMLNamespacePackage.eINSTANCE.getName();
 		// Workaround //
-		
+
 		/*
-		 * As Clearing would destroy some inner Plugin stuff I commented the .clear() line out.
+		 * As Clearing would destroy some inner Plugin stuff I commented the .clear()
+		 * line out.
 		 */
 //		EPackage.Registry.INSTANCE.clear();  
 //		EPackage.Registry.INSTANCE.put("http://www.w3.org/1999/02/22-rdf-syntax-ns",
 //				this);
-		System.out.println("ReqIF10Package URI: " + ReqIF10Package.eNS_URI + " + eInstance: " + ReqIF10Package.eINSTANCE.toString());
+		System.out.println("ReqIF10Package URI: " + ReqIF10Package.eNS_URI + " + eInstance: "
+				+ ReqIF10Package.eINSTANCE.toString());
 //		EPackage.Registry.INSTANCE.put("https://www.omg.org/spec/ReqIF/20110401/reqif.xsd", ReqIF10Package.eINSTANCE);		
 		EPackage.Registry.INSTANCE.put(ReqIF10Package.eNS_URI, ReqIF10Package.eINSTANCE);
-		EPackage.Registry.INSTANCE.put(XhtmlPackage.eNS_URI,
-				XhtmlPackage.eINSTANCE);
-		EPackage.Registry.INSTANCE.put(DatatypesPackage.eNS_URI,
-				DatatypesPackage.eINSTANCE);
-		EPackage.Registry.INSTANCE.put(XMLNamespacePackage.eNS_URI,
-				XMLNamespacePackage.eINSTANCE);
+		EPackage.Registry.INSTANCE.put(XhtmlPackage.eNS_URI, XhtmlPackage.eINSTANCE);
+		EPackage.Registry.INSTANCE.put(DatatypesPackage.eNS_URI, DatatypesPackage.eINSTANCE);
+		EPackage.Registry.INSTANCE.put(XMLNamespacePackage.eNS_URI, XMLNamespacePackage.eINSTANCE);
 	}
 
 	public List<String> getDiagnostics() {

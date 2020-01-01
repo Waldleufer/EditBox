@@ -48,8 +48,7 @@ public class TRCWizardSelectRequirementsPage extends WizardPage {
 		layout.numColumns = 2;
 		layout.verticalSpacing = 9;
 		Label label = new Label(container, SWT.SINGLE);
-		label.setText("&Requirement IDs: " + "\n" + 
-				"seperate with \"\\n\" or \";\"");
+		label.setText("&Requirement IDs: " + "\n" + "seperate with \"\\n\" or \";\"");
 		requirementIDsText = new Text(container, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
 		requirementIDsText.setLayoutData(gd);
@@ -59,21 +58,20 @@ public class TRCWizardSelectRequirementsPage extends WizardPage {
 		IPath absolutLocalized = ressource.getLocation();
 		if (path.toOSString().indexOf(".trc") != -1) {
 			reqs = TRCFileInteraction.ReadTRCsFromFile(absolutLocalized, true);
-			if(reqs != null) {
-				Collections.reverse(reqs);				
+			if (reqs != null) {
+				Collections.reverse(reqs);
 			}
 		}
 		String reqIDs = "";
-		if(reqs != null) {
+		if (reqs != null) {
 			for (TRCRequirement r : reqs) {
 				reqIDs += r.getId() + "\n";
-			}			
+			}
 		}
 		requirementIDsText.setText(reqIDs);
 		dialogChanged();
 		setControl(container);
 	}
-
 
 	/**
 	 * Ensures that the ID text field is set.
@@ -84,8 +82,8 @@ public class TRCWizardSelectRequirementsPage extends WizardPage {
 			updateStatus("Please Specify at least one Requirement");
 			return;
 		}
-		//TODO: Validation
-		//TODO: Select from ReqIF File
+		// TODO: Validation
+		// TODO: Select from ReqIF File
 		updateStatus(null);
 	}
 
@@ -93,7 +91,7 @@ public class TRCWizardSelectRequirementsPage extends WizardPage {
 		setErrorMessage(message);
 		setPageComplete(message == null);
 	}
-	
+
 	public String[] getSpecifiedIDs() {
 		String[] out;
 		out = requirementIDsText.getText().split("\n|;");
@@ -102,7 +100,7 @@ public class TRCWizardSelectRequirementsPage extends WizardPage {
 		}
 		return out;
 	}
-	
+
 	public LinkedList<TRCRequirement> getOldRequirements() {
 		return reqs;
 	}
