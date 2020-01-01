@@ -85,7 +85,9 @@ public class TRCView extends ViewPart {
 
 	private Action actionSetRequirementBoxes;
 	private Action actionMoveRequirementUp;
+	private Action actionMoveRequirementUpTop;
 	private Action actionMoveRequirementDown;
+	private Action actionMoveRequirementDownBottom;
 	private Action doubleClickAction;
 
 	public Table getTable() {
@@ -216,23 +218,16 @@ public class TRCView extends ViewPart {
 		FillLayout layer = new FillLayout(SWT.VERTICAL);
 		parent.setLayout(layer);
 
-		// viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		table = new Table(parent, SWT.MULTI | SWT.CHECK | SWT.V_SCROLL | SWT.FULL_SELECTION);
 
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 
-		// TODO: Layout might be improvable: Size of Columns should automatically adapt
-		// to Size of first column
-		// TODO: Cells content in Info column should be wrapped or extended or else.
 		/**
 		 * Set the Table Layout
 		 */
-//		table.getColumn(0).pack();
 		int tablewidth = table.getParent().getClientArea().width;
 		TableLayout tableLayout = new TableLayout(true);
-
-//		TableColumn column0 = new TableColumn(table, SWT.CHECK, 0);
 
 		TableColumn column = new TableColumn(table, SWT.BORDER | SWT.WRAP, 0);
 		column.setText("Requirement ID");
@@ -280,9 +275,7 @@ public class TRCView extends ViewPart {
 					viewer.setAllChecked(false);
 					column.setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_CLEARED).createImage());
 				}
-
 				TRCFileInteraction.WriteReversedTRCsToFile(reqs);
-
 			}
 		});
 
@@ -294,43 +287,32 @@ public class TRCView extends ViewPart {
 		tableLayout.addColumnData(new ColumnWeightData(85, (int) (tablewidth * 7 / 10)));
 		table.setLayout(tableLayout);
 
-//		TableLayout tableLayout = new TableLayout(true);
-//		tableLayout.addColumnData(new ColumnWeightData(15));
-////		tableLayout.addColumnData(new ColumnWeightData(85));
-//		table.setLayout(tableLayout);
-
 		viewer = new CheckboxTableViewer(table);
 
 		viewer.setContentProvider(TRCViewArrayContentProvider.getInstance());
-//		updateViewer();  // Do not update here as Build Boxes will set the content in a second
-		// Reverting Display Order
-		// TRCViewArrayContentProvider t = (TRCViewArrayContentProvider)
-		// viewer.getContentProvider();
-		// t.setReversedOrder(true);
 		viewer.setLabelProvider(new TRCViewLabelProvider());
-		// viewer.setCellModifier(new TableCellModifier(viewer));
 
 		// Create the help context id for the viewer's control
 		workbench.getHelpSystem().setHelp(viewer.getControl(), "pm.eclipse.editbox.viewer");
 		getSite().setSelectionProvider(viewer);
-		hookListeners(); // TODO: eventually redesign all listeners?
+		hookListeners();
 		makeActions();
 		hookContextMenu();
 		hookDoubleClickAction();
 		contributeToActionBars();
 	}
 
+	/**
+	 * Adds Listeners to the table and the viewer.
+	 */
 	private void hookListeners() {
-
-		int TEXT_MARGIN = 10;
-
 		/**
 		 * adding Text wrapping / 2 Line Info
 		 */
 		table.addListener(SWT.MeasureItem, event -> {
 			/**
-			 * Check The Column of the Event. Format Info Column in two lines TODO: Format
-			 * only the second lines ... somehow
+			 * Check The Column of the Event. Format Info Column in two lines Allow
+			 * <code>MAX_LINES</code> at max.
 			 */
 			final int MAX_LINES = 2;
 			if (event.index == 1) {
@@ -442,6 +424,10 @@ public class TRCView extends ViewPart {
 			}
 		});
 
+		/**
+		 * Adds a CheckStateListener for the Checkbox events of the {@link TRCView} and
+		 * adjusts the column checkbox
+		 */
 		viewer.addCheckStateListener(new ICheckStateListener() {
 
 			@Override
@@ -493,22 +479,33 @@ public class TRCView extends ViewPart {
 	private void fillLocalPullDown(IMenuManager manager) {
 		manager.add(actionSetRequirementBoxes);
 		manager.add(new Separator());
+		manager.add(actionMoveRequirementUpTop);
 		manager.add(actionMoveRequirementUp);
 		manager.add(actionMoveRequirementDown);
+		manager.add(actionMoveRequirementDownBottom);
+		manager.add(new Separator());
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
 		manager.add(actionSetRequirementBoxes);
+		manager.add(new Separator());
+		manager.add(actionMoveRequirementUpTop);
 		manager.add(actionMoveRequirementUp);
 		manager.add(actionMoveRequirementDown);
+		manager.add(actionMoveRequirementDownBottom);
+		manager.add(new Separator());
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
 		manager.add(actionSetRequirementBoxes);
+		manager.add(new Separator());
+		manager.add(actionMoveRequirementUpTop);
 		manager.add(actionMoveRequirementUp);
 		manager.add(actionMoveRequirementDown);
+		manager.add(actionMoveRequirementDownBottom);
+		manager.add(new Separator());
 	}
 
 	/**
@@ -554,6 +551,15 @@ public class TRCView extends ViewPart {
 		actionMoveRequirementUp.setText("1 up");
 		actionMoveRequirementUp.setToolTipText("Move the selected Requirement 1 Layer up");
 		actionMoveRequirementUp.setImageDescriptor(EditBox.getImageDescriptor(EditBox.IMG_ARROW_UP));
+		
+		actionMoveRequirementUpTop = new Action() {
+			public void run() {
+				moveToTop();
+			}
+		};
+		actionMoveRequirementUpTop.setText("up to top");
+		actionMoveRequirementUpTop.setToolTipText("Move the selected Requirement to the uppermost Layer");
+		actionMoveRequirementUpTop.setImageDescriptor(EditBox.getImageDescriptor(EditBox.IMG_ARROW_UP_TOP));
 
 		actionMoveRequirementDown = new Action() {
 			public void run() {
@@ -563,6 +569,15 @@ public class TRCView extends ViewPart {
 		actionMoveRequirementDown.setText("1 down");
 		actionMoveRequirementDown.setToolTipText("Move the selected Requirement 1 Layer down");
 		actionMoveRequirementDown.setImageDescriptor(EditBox.getImageDescriptor(EditBox.IMG_ARROW_DOWN));
+		
+		actionMoveRequirementDownBottom = new Action() {
+			public void run() {
+				moveToBottom();
+			}
+		};
+		actionMoveRequirementDownBottom.setText("down to bottom");
+		actionMoveRequirementDownBottom.setToolTipText("Move the selected Requirement to the lowermost Layer");
+		actionMoveRequirementDownBottom.setImageDescriptor(EditBox.getImageDescriptor(EditBox.IMG_ARROW_DOWN_END));
 
 		doubleClickAction = new Action() {
 			public void run() {
@@ -580,34 +595,49 @@ public class TRCView extends ViewPart {
 			Object obj = selected.getFirstElement();
 			if (obj instanceof TRCRequirement) {
 				TRCRequirement r = (TRCRequirement) obj;
+				TRCRequirement tmp = null;
 				LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
-				LinkedList<TRCRequirement> out = new LinkedList<TRCRequirement>();
-				for (Iterator<TRCRequirement> iterator = reqs.iterator(); iterator.hasNext();) {
-					TRCRequirement trcRequirement = (TRCRequirement) iterator.next();
-					if (trcRequirement.getId().equals(r.getId())) {
-						if (iterator.hasNext()) {
-							TRCRequirement after = (TRCRequirement) iterator.next();
-							out.add(after);
-							out.add(r);
-						} else {
-							out.add(r);
-						}
-					} else {
-						out.add(trcRequirement);
-					}
+				int i = reqs.indexOf(r);
+				if (i >= 0 && i < reqs.size()-1) {
+					tmp = reqs.get(i+1);
+					reqs.set(i+1, r);
+					reqs.set(i, tmp);
 				}
 
-				TRCFileInteraction.WriteReversedTRCsToFile(out);
+				TRCFileInteraction.WriteReversedTRCsToFile(reqs);
 				BoxDecoratorImpl.change();
-				updateViewer(out);
+				updateViewer(reqs);
 
 			}
+			viewer.setSelection(selected);
 		}
-
+	}
+	
+	/**
+	 * Move the current Requirement to the top
+	 */
+	protected void moveToTop() {
+		IStructuredSelection selected = viewer.getStructuredSelection();
+		if (selected != null) {
+			Object obj = selected.getFirstElement();
+			if (obj instanceof TRCRequirement) {
+				TRCRequirement r = (TRCRequirement) obj;
+				LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
+				int i = reqs.indexOf(r);
+				if (i >= 0 && i < reqs.size()-1) {
+					reqs.remove(i);
+					reqs.add(r);
+				}
+				TRCFileInteraction.WriteReversedTRCsToFile(reqs);
+				BoxDecoratorImpl.change();
+				updateViewer(reqs);
+			}
+			viewer.setSelection(selected);
+		}
 	}
 
 	/**
-	 * moves the currently selected Requirement one up.
+	 * moves the currently selected Requirement one down.
 	 */
 	protected void moveRequirementOneDown() {
 		IStructuredSelection selected = viewer.getStructuredSelection();
@@ -615,32 +645,43 @@ public class TRCView extends ViewPart {
 			Object obj = selected.getFirstElement();
 			if (obj instanceof TRCRequirement) {
 				TRCRequirement r = (TRCRequirement) obj;
-				TRCRequirement last = null;
+				TRCRequirement tmp = null;
 				LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
-				LinkedList<TRCRequirement> out = new LinkedList<TRCRequirement>();
-				Iterator<TRCRequirement> iterator = reqs.iterator();
-				do {
-					TRCRequirement trcRequirement = (TRCRequirement) iterator.next();
-					if (trcRequirement.getId().equals(r.getId())) {
-						if (last != null) {
-							out.add(trcRequirement);
-							continue;
-						}
-					} else {
-						if (last != null) {
-							out.add(last);
-						}
-					}
-					last = trcRequirement;
-				} while (iterator.hasNext());
-
-				TRCFileInteraction.WriteReversedTRCsToFile(out);
+				int i = reqs.indexOf(r);
+				if (i > 0 && i < reqs.size()) {
+					tmp = reqs.get(i-1);
+					reqs.set(i-1, r);
+					reqs.set(i, tmp);
+				}
+				TRCFileInteraction.WriteReversedTRCsToFile(reqs);
 				BoxDecoratorImpl.change();
-				updateViewer(out);
-
+				updateViewer(reqs);
 			}
+			viewer.setSelection(selected);
 		}
-
+	}
+	
+	/**
+	 * moves the currently selected Requirement to the bottom.
+	 */
+	protected void moveToBottom() {
+		IStructuredSelection selected = viewer.getStructuredSelection();
+		if (selected != null) {
+			Object obj = selected.getFirstElement();
+			if (obj instanceof TRCRequirement) {
+				TRCRequirement r = (TRCRequirement) obj;
+				LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
+				int i = reqs.indexOf(r);
+				if (i > 0 && i < reqs.size()) {
+					reqs.remove(i);
+					reqs.addFirst(r);
+				}
+				TRCFileInteraction.WriteReversedTRCsToFile(reqs);
+				BoxDecoratorImpl.change();
+				updateViewer(reqs);
+			}
+			viewer.setSelection(selected);
+		}
 	}
 
 	private void hookDoubleClickAction() {
@@ -694,13 +735,11 @@ public class TRCView extends ViewPart {
 
 	@Override
 	public void setFocus() {
-		// TODO: This does not work properly.
 		viewer.getControl().setFocus();
 	}
 
 	public static void refreshed() {
 		System.out.println("Refreshed");
-//		viewer.getTable().pack();
 		viewer.getTable().setFocus();
 		IWorkbenchWindow window = workbench == null ? null : workbench.getActiveWorkbenchWindow();
 		IWorkbenchPage activePage = window == null ? null : window.getActivePage();
