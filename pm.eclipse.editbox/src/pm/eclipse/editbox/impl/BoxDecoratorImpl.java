@@ -127,8 +127,6 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 
 		if (path != null)
 		{
-			//TODO: MAGIC PATH LOCATION remove
-//			new Throwable("MAGIC here is the path: " + path).printStackTrace();
 			builder.setFilePath(path);
 			this.path = path;
 		}
@@ -151,11 +149,11 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 	}
 
 	/**
-	 * Calculates the path to the currently opened File.
-	 * @return the IPath of the currently opened File
+	 * Calculates the path to the currently opened File in the editor, if any.
+	 * @return the IPath of the currently opened File or null
 	 */
 	public static IPath getCurrentActivePath() {
-		// from here on: get the path of the file that is inspected TODO: remove MAGIC
+		// from here on: get the path of the file that is currently inspected
 		IWorkbench workbench = PlatformUI.getWorkbench();
 		IWorkbenchWindow window = 
 				workbench == null ? null : workbench.getActiveWorkbenchWindow();
@@ -166,11 +164,6 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		IEditorInput input = 
 				editor == null ? null : editor.getEditorInput();
 		IPath path = input instanceof IPathEditorInput ? ((IPathEditorInput)input).getPath() : null;
-		if (path != null) {
-			System.out.println("THIS CURRENT PATH:" + path.toOSString());			
-		} else {
-			System.out.println("THIS CURRENT PATH is NULL" );	
-		}
 		return path;
 	}
 
@@ -233,6 +226,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 			fillRectangle(bc, gc, rec.x, rec.y, rec.width, rec.height);
 		}
 
+		// TODO: It might be possible do a implementation of opacity additional to the Layer system
 		if (settings.getAlpha()>0)
 			gc.setAlpha(settings.getAlpha());
 
@@ -880,7 +874,9 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 
 		}
 
-		//TODO: Change Text Changed Text Text has changed event listener
+		/**
+		 * This method is being called every time after a Text Change has occured
+		 */
 		public void textChanged(TextChangedEvent event) {
 			change();
 		}
