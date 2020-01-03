@@ -186,19 +186,20 @@ public class TRCView extends ViewPart {
 			viewer.setInput(new LinkedList<TRCRequirement>());
 			refreshed();
 			return;
+		} else {
+			viewer.setInput(requirements);
+			
+			table.layout();
+			
+			for (TRCRequirement trcRequirement : requirements) {
+				viewer.setChecked(trcRequirement, trcRequirement.isActive());
+			}
+			
+			refreshed();
+			
+			TRCView.setInitialized(true);
 		}
 		
-		viewer.setInput(requirements);
-
-		table.layout();
-
-		for (TRCRequirement trcRequirement : requirements) {
-			viewer.setChecked(trcRequirement, trcRequirement.isActive());
-		}
-
-		refreshed();
-
-		TRCView.setInitialized(true);
 	}
 
 	/**
@@ -209,12 +210,15 @@ public class TRCView extends ViewPart {
 				.ReadTRCsFromFile(BoxDecoratorImpl.getCurrentActivePath());
 		if (requirements == null) {
 			System.out.println("Requirements == null");
-			viewer.setInput(new LinkedList<TRCRequirement>());
-			refreshed();
+			if(viewer != null) {
+				viewer.setInput(new LinkedList<TRCRequirement>());				
+				refreshed();
+			}
 			return null;
+		} else {
+			updateViewer(requirements);
+			return requirements;			
 		}
-		updateViewer(requirements);
-		return requirements;
 	}
 
 	@Override
