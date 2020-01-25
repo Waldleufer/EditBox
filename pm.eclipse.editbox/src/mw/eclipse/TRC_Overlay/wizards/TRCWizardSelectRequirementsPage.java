@@ -1,4 +1,4 @@
-package pm.eclipse.editbox.wizards;
+package mw.eclipse.TRC_Overlay.wizards;
 
 import java.util.Collections;
 import java.util.LinkedList;

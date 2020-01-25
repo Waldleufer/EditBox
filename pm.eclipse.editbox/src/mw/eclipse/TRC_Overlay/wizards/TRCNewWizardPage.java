@@ -1,4 +1,4 @@
-package pm.eclipse.editbox.wizards;
+package mw.eclipse.TRC_Overlay.wizards;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;

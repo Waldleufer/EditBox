@@ -1,4 +1,4 @@
-package pm.eclipse.editbox.impl;
+package mw.eclipse.editbox.impl;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -7,6 +7,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.swt.graphics.Color;
 
 import pm.eclipse.editbox.Box;
+import pm.eclipse.editbox.impl.AbstractBoxBuilder;
+import pm.eclipse.editbox.impl.TRCFileInteraction;
 import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
 
 /**

@@ -1,4 +1,4 @@
-package pm.eclipse.editbox.wizards;
+package mw.eclipse.TRC_Overlay.wizards;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
