@@ -1,3 +1,15 @@
+/**
+ * Copyright (c) 2020 Martin Wagner.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.spdx.org/licenses/EPL-1.0
+ * 
+ * Contributors
+ * @author Piotr Metel
+ * @author Paul Verest 
+ * @author Martin Wagner : Modified the Builder to Support the TRCOverlay
+ */
 package mw.eclipse.TRC_Overlay.impl;
 
 import java.util.ArrayList;
