@@ -1,4 +1,4 @@
-package pm.eclipse.editbox.views;
+package mw.eclipse.TRC_Overlay.views;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -69,7 +69,7 @@ public class TRCView extends ViewPart {
 	/**
 	 * The ID of the view as specified by the extension.
 	 */
-	public static final String ID = "pm.eclipse.editbox.views.TRCView";
+	public static final String ID = "mw.eclipse.TRC_Overlay.views.TRCView";
 
 	protected static final int CHECKBOX_CLEARED = -1;
 	protected static final int CHECKBOX_UNSELECTED = 0;

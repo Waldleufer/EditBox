@@ -33,8 +33,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.activities.WorkbenchActivityHelper;
 
+import mw.eclipse.TRC_Overlay.views.TRCView;
 import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
-import pm.eclipse.editbox.views.TRCView;
 
 /**
  * @author Martin

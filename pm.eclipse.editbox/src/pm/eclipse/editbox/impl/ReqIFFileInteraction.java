@@ -9,10 +9,12 @@ import org.eclipse.rmf.reqif10.SpecElementWithAttributes;
 import org.eclipse.rmf.reqif10.SpecHierarchy;
 import org.eclipse.rmf.reqif10.Specification;
 import org.eclipse.rmf.reqif10.impl.AttributeValueStringImpl;
+
+import mw.eclipse.TRC_Overlay.views.ReqIF10Parser;
+
 import org.eclipse.rmf.reqif10.common.util.ReqIF10Util;
 
 import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
-import pm.eclipse.editbox.views.ReqIF10Parser;
 
 public class ReqIFFileInteraction {
 

@@ -9,7 +9,7 @@
  *     Kay Erik Münch - initial API and implementation
  * 
  */
-package pm.eclipse.editbox.views;
+package mw.eclipse.TRC_Overlay.views;
 
 import java.util.ArrayList;
 import java.util.List;

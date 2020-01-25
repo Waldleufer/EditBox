@@ -42,6 +42,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
+import mw.eclipse.TRC_Overlay.views.TRCView;
 import pm.eclipse.editbox.Box;
 import pm.eclipse.editbox.EditBox;
 import pm.eclipse.editbox.IBoxBuilder;
@@ -49,7 +50,6 @@ import pm.eclipse.editbox.IBoxDecorator;
 import pm.eclipse.editbox.IBoxProvider;
 import pm.eclipse.editbox.IBoxSettings;
 import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
-import pm.eclipse.editbox.views.TRCView;
 
 public class BoxDecoratorImpl implements IBoxDecorator {
 
