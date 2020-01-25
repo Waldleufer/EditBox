@@ -87,7 +87,6 @@ public class TRCFileInteraction {
 			// Debug:
 			// Color randomColor = new Color(null, 100, 150, 0);
 			setColor(randomColor);
-			System.out.println("COLOR IS: " + randomColor.toString());
 		}
 
 		/**
