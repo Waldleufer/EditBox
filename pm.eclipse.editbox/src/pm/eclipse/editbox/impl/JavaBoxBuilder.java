@@ -1,6 +1,6 @@
 package pm.eclipse.editbox.impl;
 
-import mw.eclipse.editbox.impl.BoxBuilderImpl;
+import mw.eclipse.TRC_Overlay.impl.BoxBuilderImpl;
 import pm.eclipse.editbox.Box;
 
 

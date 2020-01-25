@@ -2,7 +2,7 @@ package pm.eclipse.editbox.impl;
 
 import java.util.LinkedList;
 
-import mw.eclipse.editbox.impl.BoxBuilderImpl;
+import mw.eclipse.TRC_Overlay.impl.BoxBuilderImpl;
 
 public class MarkupBoxBuilder extends BoxBuilderImpl {
 
