@@ -50,8 +50,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
+import mw.eclipse.editbox.impl.BoxDecoratorImpl;
 import pm.eclipse.editbox.EditBox;
-import pm.eclipse.editbox.impl.BoxDecoratorImpl;
 import pm.eclipse.editbox.impl.TRCFileInteraction;
 import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
 

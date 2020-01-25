@@ -1,4 +1,4 @@
-package pm.eclipse.editbox.impl;
+package mw.eclipse.editbox.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,6 +49,7 @@ import pm.eclipse.editbox.IBoxBuilder;
 import pm.eclipse.editbox.IBoxDecorator;
 import pm.eclipse.editbox.IBoxProvider;
 import pm.eclipse.editbox.IBoxSettings;
+import pm.eclipse.editbox.impl.TRCFileInteraction;
 import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
 
 public class BoxDecoratorImpl implements IBoxDecorator {

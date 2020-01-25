@@ -13,6 +13,7 @@ import org.eclipse.ui.IWorkbenchPart;
 //import org.eclipse.ui.texteditor.AbstractTextEditor;
 
 import mw.eclipse.editbox.impl.BoxBuilderImpl;
+import mw.eclipse.editbox.impl.BoxDecoratorImpl;
 import pm.eclipse.editbox.EditBox;
 import pm.eclipse.editbox.IBoxBuilder;
 import pm.eclipse.editbox.IBoxDecorator;
