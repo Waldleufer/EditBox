@@ -1,4 +1,4 @@
-package pm.eclipse.editbox.impl;
+package mw.eclipse.TRC_Overlay.impl;
 
 import java.util.LinkedList;
 
@@ -14,6 +14,7 @@ import mw.eclipse.TRC_Overlay.views.ReqIF10Parser;
 
 import org.eclipse.rmf.reqif10.common.util.ReqIF10Util;
 
+import pm.eclipse.editbox.impl.TRCFileInteraction;
 import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
 
 public class ReqIFFileInteraction {
