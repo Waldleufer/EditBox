@@ -226,7 +226,10 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 			fillRectangle(bc, gc, rec.x, rec.y, rec.width, rec.height);
 		}
 
-		// TODO: It might be possible do a implementation of opacity additional to the Layer system
+		// TODO: It might be possible do a implementation of opacity instead of the
+		// Layer system
+		// But that would mess up the clear identification as the user can not easily
+		// say what colours are mixed
 		if (settings.getAlpha()>0)
 			gc.setAlpha(settings.getAlpha());
 
@@ -243,7 +246,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		for (Box b : visibleBoxes) {
 			if (checkFillbox && b.level == fillBoxLevel && b.start <= fillBoxStart && b.end >=fillBoxEnd)
 				fillBox = b;
-			//			TODO: Remove Sysout
+
 			//Old version:
 			//fillRectangle(settings.getColor(b.level + 1), gc, b.rec.x - xOffset, b.rec.y - yOffset, ex?r0.width:b.rec.width, b.rec.height);
 			//			System.out.println("FARBEN: " + b.getColor().toString());
