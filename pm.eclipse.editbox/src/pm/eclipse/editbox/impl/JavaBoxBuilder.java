@@ -17,33 +17,34 @@ public class JavaBoxBuilder extends BoxBuilderImpl {
 	protected void addLine(int start, int end, int offset, boolean empty) {
 		//if (!empty && !startLineComment(start,end,offset,empty)) {
 		if(!empty){
-			if (startLineComment(start,end,offset,empty)){
-				int n = 2;
-				char c = 0;
-				int newOffset = 0;
-				while (start + n < end && Character.isWhitespace(c = text.charAt(start+n))){
-					newOffset += (c == '\t' ? tabSize : 1);
-					n++;
-				}
-				updateEnds(start,end,newOffset+2);
-				return;
-			}
-			if (text.charAt(start) == '*'){
-				emptyPrevLine = !commentStarts(currentbox.start, currentbox.end);
-				if (!emptyPrevLine){
-					if (currentbox.offset < offset) {
-						offset = currentbox.offset;
-						start-= offset - currentbox.offset;
-					}
-				} else {
-				 start--;
-				 offset--;
-				}
-			}else if (emptyPrevLine && isClosingToken(start, end)) {
-				emptyPrevLine = false;  //block closing expands block
-			}else if (!emptyPrevLine && commentStarts(start, end)){
-				emptyPrevLine = true;  // block comment start
-			}
+			// For the TRC Overlay, no special Comment Handling is required
+//			if (startLineComment(start,end,offset,empty)){
+//				int n = 2;
+//				char c = 0;
+//				int newOffset = 0;
+//				while (start + n < end && Character.isWhitespace(c = text.charAt(start+n))){
+//					newOffset += (c == '\t' ? tabSize : 1);
+//					n++;
+//				}
+//				updateEnds(start,end,newOffset+2);
+//				return;
+//			}
+//			if (text.charAt(start) == '*'){
+//				emptyPrevLine = !commentStarts(currentbox.start, currentbox.end);
+//				if (!emptyPrevLine){
+//					if (currentbox.offset < offset) {
+//						offset = currentbox.offset;
+//						start-= offset - currentbox.offset;
+//					}
+//				} else {
+//				 start--;
+//				 offset--;
+//				}
+//			}else if (emptyPrevLine && isClosingToken(start, end)) {
+//				emptyPrevLine = false;  //block closing expands block
+//			}else if (!emptyPrevLine && commentStarts(start, end)){
+//				emptyPrevLine = true;  // block comment start
+//			}
 			addbox0(start, end, offset);
 			emptyPrevLine = commentEnds(start, end);
 		} else {
