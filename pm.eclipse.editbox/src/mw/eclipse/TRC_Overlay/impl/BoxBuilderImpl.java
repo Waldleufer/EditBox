@@ -195,20 +195,12 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 	 * @param offset
 	 */
 	protected void addbox0(int start, int end, int offset) {
-		// TODO: remove this and the line below. Box Boundery Debug entrance
-//		System.err.println("BOX: " + currentbox.toString());
+		System.err.println("BOX: " + currentbox.toString());
 
 		if (offset == currentbox.offset) { // Same indentation level
 			if ((emptyPrevLine && currentbox.parent != null)) { // handles empty lines on same indentation level
-				if (offset < 4) {
-					// offset <= 4 would create multiple inner boxes for any box. we only want 1 Box
-					// Layer per Requirement.
-					currentbox = newbox(start, end, offset, currentbox.parent);
-					updateParentEnds(currentbox);
-				} else {
 					currentbox = invisibleNewbox(start, end, offset, currentbox.parent);
 					updateParentEnds(currentbox);
-				}
 			} else if (end > currentbox.end) { // increases width of boxes and extends boxes line numbers
 				currentbox.end = end;
 				if (currentbox.tabsStart < 0 && lineHasStartTab)

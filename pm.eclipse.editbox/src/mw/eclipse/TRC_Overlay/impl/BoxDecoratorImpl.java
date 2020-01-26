@@ -99,6 +99,13 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 	public boolean keyPressed;
 	protected int charCount;
 	protected IPath path; //The absolute path of the file that is active in the Editor
+	
+	// Boundaries of Boxes can be customised here 0 makes the box cling exactly to
+	// the text. higher values widen the box about the specified number of pixels.
+	final private int RIGHT_SIDE_BOUNDARY = 1;
+	final private int LEFT_SIDE_BOUNDARY = 1; 
+	final private int TOP_SIDE_BOUNDARY = 1;
+	final private int BOTTOM_SIDE_BOUNDARY = 0;
 
 
 	public void enableUpdates(boolean flag) {
@@ -345,15 +352,6 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		if (c == null)
 			return;
 
-		//TODO : Think about a smarter way of merging the colors:
-		//TODO IDEA: Create Extra "Requirements" that conist of merged ones e.g. R01+R02
-		// and then the Boxes where they shall be. Or Just use Patterns.
-		//Color a = gc.getBackground();
-		//System.out.println("Color before: " + a.toString() + "; Color afterwards: " + c.toString());
-		//Color merge = new Color(null, (a.getRed() + c.getRed()) / 2,(a.getGreen() + c.getGreen()) / 2, (a.getBlue() + c.getBlue()) / 2, 100);
-		//gc.setBackground(merge);
-		//Pattern z = gc.getBackgroundPattern();
-
 		gc.setBackground(c);
 
 		if (settings.getRoundBox()){
@@ -447,6 +445,11 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		return result;
 	}
 
+	/**
+	 * Adds a boundary to the Collection of Boxes.
+	 * 
+	 * @param boxes0 - The Collection of Boxes that shall be inflicted with boundaries
+	 */
 	protected void calcBounds(Collection<Box> boxes0) {
 		int yOffset = boxText.getTopPixel();
 		int xOffset = boxText.getHorizontalPixel();
@@ -463,7 +466,12 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 					Point e1 = boxText.getLocationAtOffset(b.maxEndOffset);
 					e.x = e1.x;
 				}
-				Rectangle rec2 = new Rectangle(s.x + xOffset -2, s.y + yOffset-1, e.x - s.x + 6, e.y - s.y + boxText.getLineHeight(b.end));
+				
+				Rectangle rec2 = new Rectangle(
+						s.x + xOffset - LEFT_SIDE_BOUNDARY, 
+						s.y + yOffset - TOP_SIDE_BOUNDARY,
+						e.x - s.x + RIGHT_SIDE_BOUNDARY,
+						e.y - s.y + boxText.getLineHeight(b.end) + BOTTOM_SIDE_BOUNDARY);
 				b.rec = rec2;
 				updateWidth(b);
 				updateWidth3(b);
@@ -761,133 +769,9 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 			change();
 			return;
 		}
-		int endOfChange = positionOfChange + amountOfChange;
-
-		for (Iterator<TRCRequirement> iterator = reqs.iterator(); iterator.hasNext();) {
-			TRCRequirement r = (TRCRequirement) iterator.next();
-			
-			boolean active = r.isActive();
-			boolean changeHandled = false;
-			LinkedList<int[]> pairs = r.getPositions();
-			LinkedList<int[]> newPairs = new LinkedList<int[]>();
-
-			// No occurrence of this requirement yet -> Create new pair if active
-			if(pairs.size() <= 0) {
-				System.out.println("pairs.size() == 0");
-				if (active) {
-					int[] changed = {positionOfChange, positionOfChange+amountOfChange};
-					newPairs.add(changed);
-					r.setPositions(newPairs);	
-					changeHandled = true;
-				}
-
-			} else { // Requirement does already have at least one occurrence
-
-				for(int[] pair : pairs) {
-					if (changeHandled) {
-						int[] lastPair = newPairs.getLast();
-						if (lastPair[1] >= pair[0]) {
-							System.out.println("Fusion!");
-							if (pair[1] > lastPair[1]) {
-								lastPair[1] = pair[1];								
-							}
-						} else {
-							newPairs.add(pair);							
-						}
-					} else {
-						if(positionOfChange < pair[0]) {
-							if (endOfChange > pair[0]) {
-								// the selections right side overlaps with this box' left side
-								if (endOfChange >= pair[1]) {
-									//The selection overlaps the box completely
-									if (active) {
-										pair[0] = positionOfChange;
-										pair[1] = endOfChange;
-										newPairs.add(pair);
-										changeHandled = true;
-									} else {
-										// do NOT add the box to the new list
-									}
-								}
-								else if(active) {
-									//Add start to box
-									pair[0] = positionOfChange;	
-									newPairs.add(pair);	
-									changeHandled = true;
-								} else {
-									//Remove everything from start to end from selection 
-									//TODO: Check if the end has to be in or excluded
-									pair[0] = endOfChange;
-									newPairs.add(pair);	
-									changeHandled = true;
-								}
-							} else {
-								// No overlapp
-								if(active && !changeHandled) {
-									// New Box has to be created
-									int[] insert = {positionOfChange, endOfChange};
-									newPairs.add(insert); //add the new box
-									changeHandled = true;
-								}
-								newPairs.add(pair); // append this box
-							}
-						} else if(positionOfChange <= pair[1]) {
-							//Change occurs inside of the current box.
-							if (active && !changeHandled) {
-								System.out.println("Active + Inside Box Change!");
-								//box end needs to be altered. 
-								if(endOfChange >= pair[1]) {
-									pair[1] = endOfChange;
-								}
-								// else no change needed
-								newPairs.add(pair);	
-								changeHandled = true;
-							} else {
-								// Not active: Deletion of trc info of selection requested
-								System.out.println("Delete!");
-								if(positionOfChange > pair[0]) {
-									//handle remainder on left side
-									int[] insert = {pair[0], positionOfChange};
-									newPairs.add(insert);
-									changeHandled = true;
-								}
-								if (endOfChange < pair[1]) {
-									//handle remainder on right side
-									int[] insert = {endOfChange, pair[1]};
-									newPairs.add(insert);
-									changeHandled = true;
-								}
-							}
-						} else {
-							// the change is happening after the current box -> no action required, successor will handle.
-							newPairs.add(pair);
-						}
-					}
-
-
-				}
-				if (active && !changeHandled) {
-					// handle insertion after last boxes
-					int[] insert = {positionOfChange, positionOfChange+amountOfChange};
-					newPairs.add(insert);
-					changeHandled = true;
-				} 
-
-				System.out.print("    Pairs:");
-				for(int[] p : pairs) {
-					System.out.print(" " + Arrays.toString(p));
-				}
-				System.out.println();
-				System.out.print("New Pairs:");
-				for(int[] p : newPairs) {
-					System.out.print(" " + Arrays.toString(p));
-				}
-				System.out.println();
-				r.setPositions(newPairs);
-			}
-		}
+		LinkedList<TRCRequirement> result = BoxActualizerHelper.changeBoxes(positionOfChange, amountOfChange, reqs);
 		
-		TRCFileInteraction.WriteReversedTRCsToFile(reqs, path);
+		TRCFileInteraction.WriteReversedTRCsToFile(result, path);
 		change();
 	}
 

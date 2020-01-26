@@ -6,6 +6,6 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses(
 
-{ BoxActualizerHelperTest.class })
+{ BoxActualizerHelperTestchangeBoxes.class, BoxActualizerHelperTestactualizeBoxes.class })
 public class TestSuite { // nothing
 }

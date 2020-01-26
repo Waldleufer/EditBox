@@ -236,7 +236,7 @@ public class TRCFileInteraction {
 	public static LinkedList<TRCRequirement> ReadTRCsFromFile(IPath filePath) {
 		checkWindowChanged();
 
-		System.out.println("Initialised?: " + TRCView.isInitialized());
+//		System.out.println("Initialised?: " + TRCView.isInitialized());
 //		new Throwable("I Hate to do this printStackTrace thing").printStackTrace();
 
 		// Try the shortcut. Don't read from file, take Requirements from View.
@@ -309,11 +309,11 @@ public class TRCFileInteraction {
 		IWorkbenchPage activePage = window == null ? null : window.getActivePage();
 		IEditorPart editor = activePage == null ? null : activePage.getActiveEditor();
 		String currPage = editor == null ? null : editor.getTitle();
-		System.out.println("CHECK!");
-		System.out.println("page: " + page);
-		System.out.println("curp: " + currPage);
+//		System.out.println("CHECK!");
+//		System.out.println("        page: " + page);
+//		System.out.println("current page: " + currPage);
 		if (page == null || currPage == null || !page.equals(currPage)) {
-			System.out.println("Current page: " + currPage);
+//			System.out.println("Current page: " + currPage);
 			TRCView.setInitialized(false);
 			page = currPage;
 		}
