@@ -237,7 +237,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 		Image newImage = new Image(null, r0.width, r0.height);
 		GC gc = new GC(newImage);
 
-		// fill background
+		// fill background //TODO: Evtl. remove this. The TRCOverlay does not use the settings page yet.
 		Color bc = settings.getColor(0);
 		if (settings.getNoBackground() && oldBackground != null) 
 			bc = new Color(null,oldBackground);
