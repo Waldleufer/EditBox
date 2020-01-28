@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="jdom2-2.0.6.jar"/>
+	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="var" path="ECLIPSE_HOME"/>
-	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/org.eclipse.jface.text_3.15.200.v20190519-2344.jar" sourcepath="/ECLIPSE_HOME/plugins/org.eclipse.jface.text.source_3.15.200.v20190519-2344.jar"/>
-	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/org.eclipse.jface_3.16.0.v20190528-0922.jar" sourcepath="/ECLIPSE_HOME/plugins/org.eclipse.jface.source_3.16.0.v20190528-0922.jar"/>
-	<classpathentry kind="lib" path="/Users/Martin/Google Drive/Bachelorarbeit 2019/Files needed for BA/jdom2-2.0.6.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry exported="true" kind="lib" path="jdom2-2.0.6.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="/Users/Martin/Google Drive/Bachelorarbeit 2019/Files needed for BA/junit-tools-libraries/jmockit.jar"/>
+	<classpathentry kind="lib" path="/Users/Martin/Google Drive/Bachelorarbeit 2019/Files needed for BA/junit-tools-libraries/junit-tools.jar"/>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>
