@@ -141,7 +141,7 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 			}
 			for (Box b : currentBoxes) {
 				b.setRequirement(req); // Make every box aware of the ReqID it represents
-				System.err.println(b.toString() + " " + b.getRequirement().toString());
+//				System.err.println(b.toString() + " " + b.getRequirement().toString());
 			}
 			boxes.add(currentBoxes);
 		}
@@ -212,7 +212,7 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 			if (currentbox.level < 0) { // we only want one level of boxes to be visible
 				currentbox = newbox(start, end, offset, currentbox);
 				updateParentEnds(currentbox);
-			} else {
+			} else {  // To not destroy the recursive algorithm create invisibleBoxes and never use them.
 				currentbox = invisibleNewbox(start, end, offset, currentbox);
 				updateParentEnds(currentbox);
 			}
@@ -253,7 +253,6 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 			}
 			b = b.parent;
 		}
-
 	}
 
 	/**
@@ -314,4 +313,5 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 
 	}
 
-}
+} 
+
