@@ -312,6 +312,6 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 		this.filePath = filePath;
 
 	}
-
-} 
+	
+}
 
