@@ -129,8 +129,10 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 								if (c == '\t') { // Heading Tab
 									offset += tabSize;
 									lineHasStartTab = true;
-								} else // Heading Space
+								} else {
+									// Heading Space
 									offset++;
+								}
 							} else {
 								start = i;
 								startline = false;
