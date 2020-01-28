@@ -51,7 +51,7 @@
  <extension
        point="org.eclipse.ui.views">
     <view
-          class="pm.eclipse.editbox.views.TRCView"
+          class="mw.eclipse.TRC_Overlay.views.TRCView"
           icon="icons/editbox.png" 
           id="pm.eclipse.editbox.views.TRCview2"
           name="TRC View">
@@ -106,7 +106,7 @@
     </category>
     <wizard
           category="pm.eclipse.editbox"
-          class="pm.eclipse.editbox.wizards.TRCNewWizard"
+          class="mw.eclipse.TRC_Overlay.wizards.TRCNewWizard"
           icon="icons/sample.png"
           id="pm.eclipse.editbox.wizards.TRCNewWizard"
           name="Traceability Data file">
