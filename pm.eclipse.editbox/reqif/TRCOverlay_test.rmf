@@ -3,7 +3,7 @@
   <specViewConfigurations>
     <specification href="TRCOverlay.reqif#_specificationDocument"/>
     <columns label="requirementID" width="100"/>
-    <columns label="PlainText" width="377"/>
+    <columns label="PlainText" width="100"/>
     <columns label="WordTraceId" width="100"/>
     <columns label="atomic" width="100"/>
     <columns label="RichText" width="100"/>
