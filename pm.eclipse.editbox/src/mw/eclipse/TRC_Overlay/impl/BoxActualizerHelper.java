@@ -44,9 +44,9 @@ public class BoxActualizerHelper {
 		}
 
 		for (TRCRequirement r : reqs) {
-//			TODO: remove DEBUGs many Sysouts below:
-			System.out.println("Requirement from Table: " + r.toString());		
-			System.out.println("Corresponding Action: " + positionOfChange + "; amount: " + amountOfChange);
+//			DEBUGs Sysouts:
+//			System.out.println("Requirement from Table: " + r.toString());		
+//			System.out.println("Corresponding Action: " + positionOfChange + "; amount: " + amountOfChange);
 			
 			boolean active = r.isActive();
 			boolean changeHandled = false;
@@ -404,12 +404,12 @@ public class BoxActualizerHelper {
 				r.setPositions(newPairs);
 			}
 			// Debug Sysout
-			for (TRCRequirement trcRequirement : reqs) {
-				for(int[] p : trcRequirement.getPositions()) {
-					System.out.print(" " + Arrays.toString(p));
-				}
-				System.out.println();
-			}
+//			for (TRCRequirement trcRequirement : reqs) {
+//				for(int[] p : trcRequirement.getPositions()) {
+//					System.out.print(" " + Arrays.toString(p));
+//				}
+//				System.out.println();
+//			}
 		}
 		return reqs;
 	}
