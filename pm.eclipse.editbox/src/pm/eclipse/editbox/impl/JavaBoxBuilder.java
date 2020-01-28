@@ -30,20 +30,20 @@ public class JavaBoxBuilder extends BoxBuilderImpl {
 				return;
 			}
 			if (text.charAt(start) == '*'){
-				emptyPrevLine = !commentStarts(currentbox.start, currentbox.end);
-				if (!emptyPrevLine){
-					if (currentbox.offset < offset) {
-						offset = currentbox.offset;
-						start-= offset - currentbox.offset;
-					}
-				} else {
-				 start--;
-				 offset--;
-				}
+//				emptyPrevLine = !commentStarts(currentbox.start, currentbox.end);
+//				if (!emptyPrevLine){
+//					if (currentbox.offset < offset) {
+//						offset = currentbox.offset;
+//						start-= offset - currentbox.offset;
+//					}
+//				} else {
+//				 start--;
+//				 offset--;
+//				}
 			}else if (emptyPrevLine && isClosingToken(start, end)) {
 				emptyPrevLine = false;  //block closing expands block
 			}else if (!emptyPrevLine && commentStarts(start, end)){
-				emptyPrevLine = true;  // block comment start
+//				emptyPrevLine = true;  // block comment start
 			}
 			addbox0(start, end, offset);
 			emptyPrevLine = commentEnds(start, end);
