@@ -45,7 +45,7 @@ public class boxShapeTest {
 		 * Adds the given Requirement ID to the List
 		 */
 		public void setRequirement(TRCRequirement requirement) {
-			this.requirement = requirement; //123456789012345678901234567
+			this.requirement = requirement; //1234567890
 		}
 		
 		public TRCRequirement getRequirement() {
