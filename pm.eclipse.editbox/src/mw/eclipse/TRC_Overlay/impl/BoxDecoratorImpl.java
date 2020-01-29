@@ -61,7 +61,6 @@ import pm.eclipse.editbox.IBoxBuilder;
 import pm.eclipse.editbox.IBoxDecorator;
 import pm.eclipse.editbox.IBoxProvider;
 import pm.eclipse.editbox.IBoxSettings;
-import pm.eclipse.editbox.impl.TRCFileInteraction;
 import mw.eclipse.TRC_Overlay.impl.TRCRequirement;               
 
 public class BoxDecoratorImpl implements IBoxDecorator {

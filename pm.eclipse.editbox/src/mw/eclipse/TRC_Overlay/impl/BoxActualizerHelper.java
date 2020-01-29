@@ -17,7 +17,6 @@ import java.util.LinkedList;
 
 import org.eclipse.core.runtime.IPath;
 
-import pm.eclipse.editbox.impl.TRCFileInteraction;
 import mw.eclipse.TRC_Overlay.impl.TRCRequirement;               
 
 /**

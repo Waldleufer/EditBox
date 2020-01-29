@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import pm.eclipse.editbox.impl.TRCFileInteraction;
+import mw.eclipse.TRC_Overlay.impl.TRCFileInteraction;
 
 /**
  * The "New" wizard page allows setting the container for the new file as well

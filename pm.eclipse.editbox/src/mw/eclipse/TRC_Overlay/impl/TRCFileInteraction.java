@@ -9,7 +9,7 @@
  * @author Martin Wagner
  * 
  */
-package pm.eclipse.editbox.impl;
+package mw.eclipse.TRC_Overlay.impl;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -29,9 +29,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
-import mw.eclipse.TRC_Overlay.impl.BoxDecoratorImpl;
-import mw.eclipse.TRC_Overlay.impl.ReqIFFileInteraction;
-import mw.eclipse.TRC_Overlay.impl.TRCRequirement;
 import mw.eclipse.TRC_Overlay.views.TRCView;
 
 

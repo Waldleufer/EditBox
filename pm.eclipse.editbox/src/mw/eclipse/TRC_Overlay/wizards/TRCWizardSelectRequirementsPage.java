@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import pm.eclipse.editbox.impl.TRCFileInteraction;
+import mw.eclipse.TRC_Overlay.impl.TRCFileInteraction;
 import mw.eclipse.TRC_Overlay.impl.TRCRequirement;               
 
 /**

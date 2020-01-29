@@ -22,7 +22,6 @@ import org.eclipse.swt.graphics.Color;
 
 import pm.eclipse.editbox.Box;
 import pm.eclipse.editbox.impl.AbstractBoxBuilder;
-import pm.eclipse.editbox.impl.TRCFileInteraction;
 import mw.eclipse.TRC_Overlay.impl.TRCRequirement;               
 
 /**

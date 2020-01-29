@@ -62,8 +62,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
 import mw.eclipse.TRC_Overlay.impl.BoxDecoratorImpl;
+import mw.eclipse.TRC_Overlay.impl.TRCFileInteraction;
 import pm.eclipse.editbox.EditBox;
-import pm.eclipse.editbox.impl.TRCFileInteraction;
 import mw.eclipse.TRC_Overlay.impl.TRCRequirement;               
 
 /**
