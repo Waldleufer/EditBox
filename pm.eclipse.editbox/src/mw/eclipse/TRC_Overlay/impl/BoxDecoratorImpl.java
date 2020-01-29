@@ -62,7 +62,7 @@ import pm.eclipse.editbox.IBoxDecorator;
 import pm.eclipse.editbox.IBoxProvider;
 import pm.eclipse.editbox.IBoxSettings;
 import pm.eclipse.editbox.impl.TRCFileInteraction;
-import mw.eclipse.TRC_Overlay.impl.TRCRequirement2;               
+import mw.eclipse.TRC_Overlay.impl.TRCRequirement;               
 
 public class BoxDecoratorImpl implements IBoxDecorator {
 
@@ -513,7 +513,7 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 
 		Box newCurrent = null;
 		
-		LinkedList<TRCRequirement2> newSelection = new LinkedList<TRCRequirement2>();
+		LinkedList<TRCRequirement> newSelection = new LinkedList<TRCRequirement>();
 		
 		for (Box b : visibleBoxes()) {
 			if (contains(b.rec,x, y)) {
@@ -728,13 +728,13 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 			//TODO: remove DEBUG: 
 			//System.err.println("Änderung bei: " + positionOfChange + "; Änderungsmenge: " + amountOfChange);
 			
-			LinkedList<TRCRequirement2> reqs = TRCFileInteraction.ReadTRCsFromFile(path);
+			LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile(path);
 			
 			if (reqs == null) {
 				return;
 			}
 
-			LinkedList<TRCRequirement2> afterChange = BoxActualizerHelper.actualizeBoxes(positionOfChange, amountOfChange, reqs);
+			LinkedList<TRCRequirement> afterChange = BoxActualizerHelper.actualizeBoxes(positionOfChange, amountOfChange, reqs);
 			
 			TRCFileInteraction.WriteReversedTRCsToFile(afterChange, path);
 
@@ -764,12 +764,12 @@ public class BoxDecoratorImpl implements IBoxDecorator {
 	 */
 	public static void changeBoxes(int positionOfChange, int amountOfChange) {
 		IPath path = getCurrentActivePath();
-		LinkedList<TRCRequirement2> reqs = TRCFileInteraction.ReadTRCsFromFile(path);
+		LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile(path);
 		if (reqs == null) {
 			change();
 			return;
 		}
-		LinkedList<TRCRequirement2> result = BoxActualizerHelper.changeBoxes(positionOfChange, amountOfChange, reqs);
+		LinkedList<TRCRequirement> result = BoxActualizerHelper.changeBoxes(positionOfChange, amountOfChange, reqs);
 		
 		TRCFileInteraction.WriteReversedTRCsToFile(result, path);
 		change();

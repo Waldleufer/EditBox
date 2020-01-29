@@ -21,7 +21,7 @@ import java.util.List;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 
-import mw.eclipse.TRC_Overlay.impl.TRCRequirement2;               
+import mw.eclipse.TRC_Overlay.impl.TRCRequirement;               
 
 public class Box {
 	/**
@@ -48,7 +48,7 @@ public class Box {
 	private List<Box> children;
 	public Object data;
 	
-	private TRCRequirement2 requirement;  // Requirement represented in this box
+	private TRCRequirement requirement;  // Requirement represented in this box
 	
 	@Override
 	public String toString() {
@@ -58,11 +58,11 @@ public class Box {
 	/**
 	 * Adds the given Requirement ID to the List
 	 */
-	public void setRequirement(TRCRequirement2 requirement) {
+	public void setRequirement(TRCRequirement requirement) {
 		this.requirement = requirement;
 	}
 	
-	public TRCRequirement2 getRequirement() {
+	public TRCRequirement getRequirement() {
 		return requirement;
 	}
 

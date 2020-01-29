@@ -25,7 +25,7 @@ import mw.eclipse.TRC_Overlay.views.ReqIF10Parser;
 import org.eclipse.rmf.reqif10.common.util.ReqIF10Util;
 
 import pm.eclipse.editbox.impl.TRCFileInteraction;
-import mw.eclipse.TRC_Overlay.impl.TRCRequirement2;               
+import mw.eclipse.TRC_Overlay.impl.TRCRequirement;               
 
 public class ReqIFFileInteraction {
 
@@ -53,7 +53,7 @@ public class ReqIFFileInteraction {
 	 * 
 	 * @param trcList the List of the Requirements whose Info needs to be set.
 	 */
-	public static void setInfos(LinkedList<TRCRequirement2> trcList) {
+	public static void setInfos(LinkedList<TRCRequirement> trcList) {
 
 		// TODO: Change Indication. The Requirements are only read once this way, and
 		// for further clarification after a change to the ReqIF File, Requirements
@@ -69,7 +69,7 @@ public class ReqIFFileInteraction {
 		}
 		EList<Specification> list = r.getCoreContent().getSpecifications();
 
-		for(TRCRequirement2 req : trcList) {
+		for(TRCRequirement req : trcList) {
 			String info = req.getInfo();
 			if (info == null || info.isEmpty()) {
 

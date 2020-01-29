@@ -64,11 +64,11 @@ import org.eclipse.ui.part.ViewPart;
 import mw.eclipse.TRC_Overlay.impl.BoxDecoratorImpl;
 import pm.eclipse.editbox.EditBox;
 import pm.eclipse.editbox.impl.TRCFileInteraction;
-import mw.eclipse.TRC_Overlay.impl.TRCRequirement2;               
+import mw.eclipse.TRC_Overlay.impl.TRCRequirement;               
 
 /**
  * This TRCView class plugs-in a new workbench view. The view shows
- * {@link TRCRequirement2}s obtained via {@link TRCFileInteraction}. The view is
+ * {@link TRCRequirement}s obtained via {@link TRCFileInteraction}. The view is
  * connected to the model using a {@link TRCViewArrayContentProvider}
  * <p>
  * The view uses a {@link TRCViewLabelProvider} to define how TRCRequirements
@@ -116,7 +116,7 @@ public class TRCView extends ViewPart {
 
 	/**
 	 * The TRCViewLabelProvider is the custom {@link ColumnLabelProvider} for the
-	 * TRC View. It defines how the list of {@link TRCRequirement2}s should be
+	 * TRC View. It defines how the list of {@link TRCRequirement}s should be
 	 * displayed, including Text, Background Color and ToolTipText.
 	 * 
 	 * @author Martin Wagner
@@ -125,11 +125,11 @@ public class TRCView extends ViewPart {
 
 		@Override
 		public String getColumnText(Object obj, int index) {
-			if (obj instanceof TRCRequirement2) {
+			if (obj instanceof TRCRequirement) {
 				if (index == 0) {
-					return ((TRCRequirement2) obj).getId();
+					return ((TRCRequirement) obj).getId();
 				} else if (index == 1) {
-					return ((TRCRequirement2) obj).getInfo();
+					return ((TRCRequirement) obj).getInfo();
 				}
 			}
 			if (obj instanceof String) {
@@ -156,23 +156,23 @@ public class TRCView extends ViewPart {
 
 		@Override
 		public Color getBackground(final Object element) {
-			if (element instanceof TRCRequirement2) {
-				return ((TRCRequirement2) element).getColor();
+			if (element instanceof TRCRequirement) {
+				return ((TRCRequirement) element).getColor();
 			}
 			return super.getBackground(element);
 		}
 
 		@Override
 		public String getToolTipText(Object element) {
-			if (element instanceof TRCRequirement2) {
-				return ((TRCRequirement2) element).getId();
+			if (element instanceof TRCRequirement) {
+				return ((TRCRequirement) element).getId();
 			}
 			return super.getToolTipText(element);
 		}
 
 		@Override
 		public boolean useNativeToolTip(Object object) {
-			if (object instanceof TRCRequirement2) {
+			if (object instanceof TRCRequirement) {
 				return true;
 			}
 			return super.useNativeToolTip(object);
@@ -189,11 +189,11 @@ public class TRCView extends ViewPart {
 	 * 
 	 * @param requirements
 	 */
-	public static void updateViewer(LinkedList<TRCRequirement2> requirements) {
+	public static void updateViewer(LinkedList<TRCRequirement> requirements) {
 
 		if (requirements == null) {
 			System.out.println("Requirements == null");
-			viewer.setInput(new LinkedList<TRCRequirement2>());
+			viewer.setInput(new LinkedList<TRCRequirement>());
 			refreshed();
 			TRCView.setInitialized(false);
 			return;
@@ -202,7 +202,7 @@ public class TRCView extends ViewPart {
 			
 			table.layout();
 			
-			for (TRCRequirement2 trcRequirement : requirements) {
+			for (TRCRequirement trcRequirement : requirements) {
 				viewer.setChecked(trcRequirement, trcRequirement.isActive());
 			}
 			
@@ -216,13 +216,13 @@ public class TRCView extends ViewPart {
 	/**
 	 * reads the TRCRequirements and updates the TRC View
 	 */
-	public static LinkedList<TRCRequirement2> updateViewer() {
-		LinkedList<TRCRequirement2> requirements = TRCFileInteraction
+	public static LinkedList<TRCRequirement> updateViewer() {
+		LinkedList<TRCRequirement> requirements = TRCFileInteraction
 				.ReadTRCsFromFile(BoxDecoratorImpl.getCurrentActivePath());
 		if (requirements == null) {
 			System.out.println("Requirements == null");
 			if(viewer != null) {
-				viewer.setInput(new LinkedList<TRCRequirement2>());				
+				viewer.setInput(new LinkedList<TRCRequirement>());				
 				refreshed();
 			}
 			return null;
@@ -252,8 +252,8 @@ public class TRCView extends ViewPart {
 		TableColumn column = new TableColumn(table, SWT.BORDER | SWT.WRAP, 0);
 		column.setText("Requirement ID");
 		column.setAlignment(SWT.LEFT);
-		LinkedList<TRCRequirement2> reqs = TRCFileInteraction.ReadTRCsFromFile();
-		LinkedList<TRCRequirement2> active = TRCFileInteraction.getActiveTRCRequirements(reqs);
+		LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
+		LinkedList<TRCRequirement> active = TRCFileInteraction.getActiveTRCRequirements(reqs);
 		if (active == null) {
 			column.setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_CLEARED).createImage());
 		} else if (active.size() <= 0) {
@@ -269,8 +269,8 @@ public class TRCView extends ViewPart {
 			public void handleEvent(Event event) {
 
 				int checkBoxFlag = TRCView.CHECKBOX_UNSELECTED;
-				LinkedList<TRCRequirement2> reqs = TRCFileInteraction.ReadTRCsFromFile();
-				LinkedList<TRCRequirement2> active = TRCFileInteraction.getActiveTRCRequirements(reqs);
+				LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
+				LinkedList<TRCRequirement> active = TRCFileInteraction.getActiveTRCRequirements(reqs);
 
 				if (active.size() <= 0) {
 					checkBoxFlag = TRCView.CHECKBOX_CLEARED;
@@ -282,14 +282,14 @@ public class TRCView extends ViewPart {
 
 				if (checkBoxFlag == TRCView.CHECKBOX_CLEARED) {
 					// select all
-					for (TRCRequirement2 r : reqs) {
+					for (TRCRequirement r : reqs) {
 						r.setActive(true);
 					}
 					viewer.setAllChecked(true);
 					column.setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_SELECTED).createImage());
 				} else if (checkBoxFlag == TRCView.CHECKBOX_SELECTED || checkBoxFlag == TRCView.CHECKBOX_UNSELECTED) {
 					// deselect all
-					for (TRCRequirement2 r : reqs) {
+					for (TRCRequirement r : reqs) {
 						r.setActive(false);
 					}
 					viewer.setAllChecked(false);
@@ -340,7 +340,7 @@ public class TRCView extends ViewPart {
 				TableItem item = (TableItem) event.item;
 				final String text = item.getText(event.index);
 
-				item.getParent().setToolTipText(((TRCRequirement2) item.getData()).getInfo());
+				item.getParent().setToolTipText(((TRCRequirement) item.getData()).getInfo());
 
 				String finalText = "";
 				int displaywidth = item.getTextBounds(1).width;
@@ -453,11 +453,11 @@ public class TRCView extends ViewPart {
 			@Override
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				Object checkChanged = event.getElement();
-				if (checkChanged instanceof TRCRequirement2) {
-					TRCRequirement2 req = (TRCRequirement2) checkChanged;
+				if (checkChanged instanceof TRCRequirement) {
+					TRCRequirement req = (TRCRequirement) checkChanged;
 					req.setActive(event.getChecked());
-					LinkedList<TRCRequirement2> reqs = TRCFileInteraction.ReadTRCsFromFile();
-					LinkedList<TRCRequirement2> active = TRCFileInteraction.getActiveTRCRequirements(reqs);
+					LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
+					LinkedList<TRCRequirement> active = TRCFileInteraction.getActiveTRCRequirements(reqs);
 					if (active.size() <= 0) {
 						table.getColumn(0)
 								.setImage(EditBox.getImageDescriptor(EditBox.IMG_CHECKBOX_CLEARED).createImage());
@@ -613,10 +613,10 @@ public class TRCView extends ViewPart {
 		IStructuredSelection selected = viewer.getStructuredSelection();
 		if (selected != null) {
 			Object obj = selected.getFirstElement();
-			if (obj instanceof TRCRequirement2) {
-				TRCRequirement2 r = (TRCRequirement2) obj;
-				TRCRequirement2 tmp = null;
-				LinkedList<TRCRequirement2> reqs = TRCFileInteraction.ReadTRCsFromFile();
+			if (obj instanceof TRCRequirement) {
+				TRCRequirement r = (TRCRequirement) obj;
+				TRCRequirement tmp = null;
+				LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
 				int i = reqs.indexOf(r);
 				if (i >= 0 && i < reqs.size() - 1) {
 					tmp = reqs.get(i + 1);
@@ -640,9 +640,9 @@ public class TRCView extends ViewPart {
 		IStructuredSelection selected = viewer.getStructuredSelection();
 		if (selected != null) {
 			Object obj = selected.getFirstElement();
-			if (obj instanceof TRCRequirement2) {
-				TRCRequirement2 r = (TRCRequirement2) obj;
-				LinkedList<TRCRequirement2> reqs = TRCFileInteraction.ReadTRCsFromFile();
+			if (obj instanceof TRCRequirement) {
+				TRCRequirement r = (TRCRequirement) obj;
+				LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
 				int i = reqs.indexOf(r);
 				if (i >= 0 && i < reqs.size() - 1) {
 					reqs.remove(i);
@@ -663,10 +663,10 @@ public class TRCView extends ViewPart {
 		IStructuredSelection selected = viewer.getStructuredSelection();
 		if (selected != null) {
 			Object obj = selected.getFirstElement();
-			if (obj instanceof TRCRequirement2) {
-				TRCRequirement2 r = (TRCRequirement2) obj;
-				TRCRequirement2 tmp = null;
-				LinkedList<TRCRequirement2> reqs = TRCFileInteraction.ReadTRCsFromFile();
+			if (obj instanceof TRCRequirement) {
+				TRCRequirement r = (TRCRequirement) obj;
+				TRCRequirement tmp = null;
+				LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
 				int i = reqs.indexOf(r);
 				if (i > 0 && i < reqs.size()) {
 					tmp = reqs.get(i - 1);
@@ -688,9 +688,9 @@ public class TRCView extends ViewPart {
 		IStructuredSelection selected = viewer.getStructuredSelection();
 		if (selected != null) {
 			Object obj = selected.getFirstElement();
-			if (obj instanceof TRCRequirement2) {
-				TRCRequirement2 r = (TRCRequirement2) obj;
-				LinkedList<TRCRequirement2> reqs = TRCFileInteraction.ReadTRCsFromFile();
+			if (obj instanceof TRCRequirement) {
+				TRCRequirement r = (TRCRequirement) obj;
+				LinkedList<TRCRequirement> reqs = TRCFileInteraction.ReadTRCsFromFile();
 				int i = reqs.indexOf(r);
 				if (i > 0 && i < reqs.size()) {
 					reqs.remove(i);
@@ -725,17 +725,17 @@ public class TRCView extends ViewPart {
 	 */
 	private void showColorDialoge() {
 		IPath path = BoxDecoratorImpl.getCurrentActivePath();
-		LinkedList<TRCRequirement2> requirements = TRCFileInteraction.ReadTRCsFromFile(path);
+		LinkedList<TRCRequirement> requirements = TRCFileInteraction.ReadTRCsFromFile(path);
 		if (requirements == null) {
 			return;
 		}
 		IStructuredSelection selection = viewer.getStructuredSelection();
 		Object obj = selection.getFirstElement();
-		if (obj instanceof TRCRequirement2) {
-			TRCRequirement2 req = (TRCRequirement2) obj;
+		if (obj instanceof TRCRequirement) {
+			TRCRequirement req = (TRCRequirement) obj;
 			Shell shell = new Shell();
 			ColorDialog dlg = new ColorDialog(shell);
-			for (TRCRequirement2 trcRequirement : requirements) {
+			for (TRCRequirement trcRequirement : requirements) {
 				if (trcRequirement.getId().equals(req.getId())) {
 					dlg.setRGB(trcRequirement.getColor().getRGB());
 					RGB rgb = dlg.open();

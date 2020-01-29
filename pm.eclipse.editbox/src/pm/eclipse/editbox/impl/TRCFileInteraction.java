@@ -16,16 +16,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -34,8 +31,8 @@ import org.eclipse.ui.PlatformUI;
 
 import mw.eclipse.TRC_Overlay.impl.BoxDecoratorImpl;
 import mw.eclipse.TRC_Overlay.impl.ReqIFFileInteraction;
+import mw.eclipse.TRC_Overlay.impl.TRCRequirement;
 import mw.eclipse.TRC_Overlay.views.TRCView;
-import mw.eclipse.TRC_Overlay.impl.TRCRequirement2;
 
 
 /**
@@ -46,7 +43,7 @@ public class TRCFileInteraction {
 
 	private static String page;
 
-	public static void WriteReversedTRCsToFile(LinkedList<TRCRequirement2> trcReqs) {
+	public static void WriteReversedTRCsToFile(LinkedList<TRCRequirement> trcReqs) {
 		WriteReversedTRCsToFile(trcReqs, BoxDecoratorImpl.getCurrentActivePath());
 	}
 
@@ -58,10 +55,10 @@ public class TRCFileInteraction {
 	 *                order
 	 * @param path    - the Absolute system Path of the corresponding Code file
 	 */
-	public static void WriteReversedTRCsToFile(LinkedList<TRCRequirement2> trcReqs, IPath path) {
+	public static void WriteReversedTRCsToFile(LinkedList<TRCRequirement> trcReqs, IPath path) {
 
-		LinkedList<TRCRequirement2> reversed = new LinkedList<TRCRequirement2>(
-				Arrays.asList(new TRCRequirement2[trcReqs.size()]));
+		LinkedList<TRCRequirement> reversed = new LinkedList<TRCRequirement>(
+				Arrays.asList(new TRCRequirement[trcReqs.size()]));
 		Collections.copy(reversed, trcReqs);
 		Collections.reverse(reversed);
 
@@ -80,7 +77,7 @@ public class TRCFileInteraction {
 		}
 	}
 
-	public static void WriteTRCsToFile(LinkedList<TRCRequirement2> trcReqs) {
+	public static void WriteTRCsToFile(LinkedList<TRCRequirement> trcReqs) {
 		WriteTRCsToFile(trcReqs, BoxDecoratorImpl.getCurrentActivePath());
 	}
 
@@ -89,7 +86,7 @@ public class TRCFileInteraction {
 	 * @param trcReqs the TRCRequirementOld Array that needs to be saved
 	 * @param path    - the Absolute system Path of the corresponding Code file
 	 */
-	public static void WriteTRCsToFile(LinkedList<TRCRequirement2> trcReqs, IPath path) {
+	public static void WriteTRCsToFile(LinkedList<TRCRequirement> trcReqs, IPath path) {
 		try {
 			String stringPath = exchangeEnding(path.toOSString());
 
@@ -105,16 +102,8 @@ public class TRCFileInteraction {
 		}
 	}
 
-	public static LinkedList<TRCRequirement2> ReadTRCsFromFile() {
+	public static LinkedList<TRCRequirement> ReadTRCsFromFile() {
 		return ReadTRCsFromFile(BoxDecoratorImpl.getCurrentActivePath());
-	}
-	
-	public static TRCRequirement2 trcRequirementTotrcRequirement2 (TRCRequirement2 toChange) {
-		TRCRequirement2 n = new TRCRequirement2(toChange.getId(), toChange.getPositions());
-		n.setColor(toChange.getColor());
-		n.setActive(toChange.isActive());
-		
-		return n;
 	}
 
 	/**
@@ -124,7 +113,7 @@ public class TRCFileInteraction {
 	 *                           set to TRUE.
 	 * @return the linked List obtained from that file
 	 */
-	public static LinkedList<TRCRequirement2> ReadTRCsFromFile(IPath filePath, boolean alwaysReadFromFile) {
+	public static LinkedList<TRCRequirement> ReadTRCsFromFile(IPath filePath, boolean alwaysReadFromFile) {
 		if (alwaysReadFromFile) {
 			TRCView.setInitialized(false);
 		}
@@ -140,7 +129,7 @@ public class TRCFileInteraction {
 	 *         displayed. Which means reversed order corsesponding to as it is saved
 	 *         in the file.
 	 */
-	public static LinkedList<TRCRequirement2> ReadTRCsFromFile(IPath filePath) {
+	public static LinkedList<TRCRequirement> ReadTRCsFromFile(IPath filePath) {
 		checkWindowChanged();
 
 //		System.out.println("Initialised?: " + TRCView.isInitialized());
@@ -148,9 +137,9 @@ public class TRCFileInteraction {
 
 		// Try the shortcut. Don't read from file, take Requirements from View.
 		if (TRCView.isInitialized()) {
-			LinkedList<TRCRequirement2> reqs;
+			LinkedList<TRCRequirement> reqs;
 			try {
-				reqs = (LinkedList<TRCRequirement2>) TRCView.getViewer().getInput();
+				reqs = (LinkedList<TRCRequirement>) TRCView.getViewer().getInput();
 				return reqs;
 			} catch (Exception e) {
 				System.err.println("Not Initialised, due to: " + e.getMessage());
@@ -164,13 +153,13 @@ public class TRCFileInteraction {
 				FileInputStream fis = new FileInputStream(stringPath);
 				ObjectInputStream ois = new ObjectInputStream(fis);
 				Object read = ois.readObject();
-				LinkedList<TRCRequirement2> list = null;
+				LinkedList<TRCRequirement> list = null;
 				if (read == null) {
 					new Throwable("read = null").printStackTrace();
 				} else {
 					if (read instanceof LinkedList<?>) {
 						if (read != null) {
-							list = (LinkedList<TRCRequirement2>) read;
+							list = (LinkedList<TRCRequirement>) read;
 						}
 					}
 				}
@@ -179,11 +168,10 @@ public class TRCFileInteraction {
 
 				System.out.println("The Object was succesfully read from the file: " + stringPath);
 
-				LinkedList<TRCRequirement2> reqs = new LinkedList<TRCRequirement2>();
+				LinkedList<TRCRequirement> reqs = new LinkedList<TRCRequirement>();
 
-				for (Iterator<TRCRequirement2> descIterator = list.descendingIterator(); descIterator.hasNext();) {
-					TRCRequirement2 r = (TRCRequirement2) descIterator.next();
-//					TRCRequirement2 n = trcRequirementTotrcRequirement2(r);
+				for (Iterator<TRCRequirement> descIterator = list.descendingIterator(); descIterator.hasNext();) {
+					TRCRequirement r = (TRCRequirement) descIterator.next();
 					reqs.add(r);
 				}
 
@@ -228,9 +216,9 @@ public class TRCFileInteraction {
 
 	}
 
-	public static List<TRCRequirement2> ReadTRCsFromFileAndUpdate(IPath filePath) {
+	public static List<TRCRequirement> ReadTRCsFromFileAndUpdate(IPath filePath) {
 
-		LinkedList<TRCRequirement2> reqs = TRCView.updateViewer();
+		LinkedList<TRCRequirement> reqs = TRCView.updateViewer();
 		if (reqs == null) {
 			return null;
 		}
@@ -257,12 +245,12 @@ public class TRCFileInteraction {
 	 * @return the List of all active Requirements if there are any or an empty
 	 *         list.
 	 */
-	public static LinkedList<TRCRequirement2> getActiveTRCRequirements(LinkedList<TRCRequirement2> reqs) {
+	public static LinkedList<TRCRequirement> getActiveTRCRequirements(LinkedList<TRCRequirement> reqs) {
 		if (reqs == null) {
 			return null;
 		}
-		LinkedList<TRCRequirement2> active = new LinkedList<TRCRequirement2>();
-		for (TRCRequirement2 trcRequirement : reqs) {
+		LinkedList<TRCRequirement> active = new LinkedList<TRCRequirement>();
+		for (TRCRequirement trcRequirement : reqs) {
 			if (trcRequirement.isActive()) {
 				active.add(trcRequirement);
 			}

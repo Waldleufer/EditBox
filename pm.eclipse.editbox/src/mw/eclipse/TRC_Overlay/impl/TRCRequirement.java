@@ -1,3 +1,14 @@
+/**
+ * Copyright (c) 2020 Martin Wagner.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.spdx.org/licenses/EPL-1.0
+ * 
+ * Contributors
+ * @author Martin Wagner
+ * 
+ */
 package mw.eclipse.TRC_Overlay.impl;
 
 import java.io.Serializable;
@@ -10,14 +21,14 @@ import org.eclipse.swt.graphics.Color;
 import mw.eclipse.TRC_Overlay.views.TRCView;
 
 /**
- * The TRCRequirement2 class defines how TRCRequirements shall be stored
+ * The TRCRequirement class defines how TRCRequirements shall be stored
  * internally. In Order to enable simple Read and Write operations this class
  * has to implement {@link Serializable}.
  * 
  * @author Martin
  *
  */
-public final class TRCRequirement2 implements Serializable {
+public final class TRCRequirement implements Serializable {
 	/**
 	 * The generated serialVersionUID of this Object
 	 */
@@ -31,15 +42,15 @@ public final class TRCRequirement2 implements Serializable {
 	private String info;
 
 	/**
-	 * Constructor for a new {@link TRCRequirement2}
+	 * Constructor for a new {@link TRCRequirement}
 	 * 
-	 * Creates a new TRCRequirement2 with the id, and initial boxes. Picks a random
+	 * Creates a new TRCRequirement with the id, and initial boxes. Picks a random
 	 * pastel color that can be changed later via {@link TRCView}
 	 * 
 	 * @param id        - the unique ID of the requirement
 	 * @param positions - a list of (start, end) tuples.
 	 */
-	public TRCRequirement2(String id, LinkedList<int[]> positions) {
+	public TRCRequirement(String id, LinkedList<int[]> positions) {
 		this.id = id;
 		this.positions = positions;
 		this.info = null;

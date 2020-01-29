@@ -17,7 +17,7 @@ import java.util.LinkedList;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 
-import mw.eclipse.TRC_Overlay.impl.TRCRequirement2;               
+import mw.eclipse.TRC_Overlay.impl.TRCRequirement;               
 
 /**
  * The TRCViewArrayContentProvider works as a content provider for the
@@ -89,10 +89,10 @@ public class TRCViewArrayContentProvider implements ITreeContentProvider {
 			}
 			if (inputElement instanceof Collection) {
 				if (inputElement instanceof LinkedList<?>) {
-					final LinkedList<TRCRequirement2> list = (LinkedList<TRCRequirement2>) inputElement;
-					LinkedList<TRCRequirement2> out = new LinkedList<TRCRequirement2>();
-					for (Iterator<TRCRequirement2> iterator = list.descendingIterator(); iterator.hasNext();) {
-						TRCRequirement2 r = (TRCRequirement2) iterator.next();
+					final LinkedList<TRCRequirement> list = (LinkedList<TRCRequirement>) inputElement;
+					LinkedList<TRCRequirement> out = new LinkedList<TRCRequirement>();
+					for (Iterator<TRCRequirement> iterator = list.descendingIterator(); iterator.hasNext();) {
+						TRCRequirement r = (TRCRequirement) iterator.next();
 						out.add(r);
 					}
 					return out.toArray();
@@ -116,8 +116,8 @@ public class TRCViewArrayContentProvider implements ITreeContentProvider {
 
 	@Override
 	public Object[] getChildren(Object parentElement) {
-		if (parentElement instanceof TRCRequirement2) {
-			String[] out = { ((TRCRequirement2) parentElement).getInfo() };
+		if (parentElement instanceof TRCRequirement) {
+			String[] out = { ((TRCRequirement) parentElement).getInfo() };
 			return out;
 		}
 		return null;
@@ -130,7 +130,7 @@ public class TRCViewArrayContentProvider implements ITreeContentProvider {
 
 	@Override
 	public boolean hasChildren(Object element) {
-		if (element instanceof TRCRequirement2) {
+		if (element instanceof TRCRequirement) {
 			return true;
 		}
 		return false;

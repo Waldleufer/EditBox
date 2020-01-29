@@ -23,7 +23,7 @@ import org.eclipse.swt.graphics.Color;
 import pm.eclipse.editbox.Box;
 import pm.eclipse.editbox.impl.AbstractBoxBuilder;
 import pm.eclipse.editbox.impl.TRCFileInteraction;
-import mw.eclipse.TRC_Overlay.impl.TRCRequirement2;               
+import mw.eclipse.TRC_Overlay.impl.TRCRequirement;               
 
 /**
  * Is able to create and manage boxes.
@@ -47,7 +47,7 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 
 		currentBoxes = new LinkedList<Box>();
 		boxes = new LinkedList<List<Box>>();
-		List<TRCRequirement2> requirements = null;
+		List<TRCRequirement> requirements = null;
 		int len = text.length() - 1;
 		currentColor = new Color(null, 0, 0, 0);
 		currentbox = newbox(0, len, -1, null);
@@ -73,7 +73,7 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 		/**
 		 * This for loop traverses over the all requirements
 		 */
-		for (TRCRequirement2 req : requirements) {
+		for (TRCRequirement req : requirements) {
 			currentBoxes = new LinkedList<Box>();
 			currentColor = req.getColor();
 			List<int[]> pairs = req.getPositions();
