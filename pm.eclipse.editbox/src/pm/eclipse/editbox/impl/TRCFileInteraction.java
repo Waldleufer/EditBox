@@ -47,14 +47,14 @@ public class TRCFileInteraction {
 	private static String page;
 
 //	/**
-//	 * The TRCRequirement class defines how TRCRequirements shall be stored
+//	 * The TRCRequirementOld class defines how TRCRequirements shall be stored
 //	 * internally. In Order to enable simple Read and Write operations this class
 //	 * has to implement {@link Serializable}.
 //	 * 
 //	 * @author Martin
 //	 *
 //	 */
-//	public class TRCRequirement implements Serializable {
+//	public class TRCRequirementOld implements Serializable {
 //		/**
 //		 * The generated serialVersionUID of this Object
 //		 */
@@ -68,15 +68,15 @@ public class TRCFileInteraction {
 //		private String info;
 //
 //		/**
-//		 * Constructor for a new {@link TRCRequirement}
+//		 * Constructor for a new {@link TRCRequirementOld}
 //		 * 
-//		 * Creates a new TRCRequirement with the id, and initial boxes. Picks a random
+//		 * Creates a new TRCRequirementOld with the id, and initial boxes. Picks a random
 //		 * pastel color that can be changed later via {@link TRCView}
 //		 * 
 //		 * @param id        - the unique ID of the requirement
 //		 * @param positions - a list of (start, end) tuples.
 //		 */
-//		public TRCRequirement(String id, LinkedList<int[]> positions) {
+//		public TRCRequirementOld(String id, LinkedList<int[]> positions) {
 //			this.id = id;
 //			this.positions = positions;
 //			this.info = null;
@@ -157,7 +157,7 @@ public class TRCFileInteraction {
 	 * The TRCView handles the Requirements in the reversed order. In order to save
 	 * these correctly, the list has to be reversed.
 	 * 
-	 * @param trcReqs the TRCRequirement Array that needs to be saved in reversed
+	 * @param trcReqs the TRCRequirementOld Array that needs to be saved in reversed
 	 *                order
 	 * @param path    - the Absolute system Path of the corresponding Code file
 	 */
@@ -189,7 +189,7 @@ public class TRCFileInteraction {
 
 	/**
 	 * 
-	 * @param trcReqs the TRCRequirement Array that needs to be saved
+	 * @param trcReqs the TRCRequirementOld Array that needs to be saved
 	 * @param path    - the Absolute system Path of the corresponding Code file
 	 */
 	public static void WriteTRCsToFile(LinkedList<TRCRequirement2> trcReqs, IPath path) {
@@ -239,7 +239,7 @@ public class TRCFileInteraction {
 	 * contents.
 	 * 
 	 * @param filePath the absolute system path to the currently opened file.
-	 * @return the TRCRequirement[] read from file in the same order, as it is
+	 * @return the TRCRequirementOld[] read from file in the same order, as it is
 	 *         displayed. Which means reversed order corsesponding to as it is saved
 	 *         in the file.
 	 */
