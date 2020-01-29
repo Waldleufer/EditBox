@@ -759,7 +759,7 @@ public class TRCView extends ViewPart {
 	}
 
 	public static void refreshed() {
-		System.out.println("Refreshed");
+//		System.out.println("Refreshed");
 		viewer.getTable().setFocus();
 		IWorkbenchWindow window = workbench == null ? null : workbench.getActiveWorkbenchWindow();
 		IWorkbenchPage activePage = window == null ? null : window.getActivePage();
