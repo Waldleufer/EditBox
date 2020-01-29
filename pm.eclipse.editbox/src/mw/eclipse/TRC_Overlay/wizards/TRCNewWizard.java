@@ -23,7 +23,7 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
 
-import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
+import mw.eclipse.TRC_Overlay.impl.TRCRequirement2;               
 
 /**
  * This is a TRCNewWizard wizard. Its role is to create a new .trc file resource
@@ -117,7 +117,7 @@ public class TRCNewWizard extends Wizard implements INewWizard {
 		final String absolut = file.getLocation().toOSString();
 		System.out.println("ABSOLUT: " + absolut);
 		try {
-			LinkedList<TRCRequirement> trcReqs = getTRCReqs(requirementIDs,
+			LinkedList<TRCRequirement2> trcReqs = getTRCReqs(requirementIDs,
 					selectRequirementsPage.getOldRequirements());
 			FileOutputStream fileOut = new FileOutputStream(absolut);
 			ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
@@ -137,23 +137,23 @@ public class TRCNewWizard extends Wizard implements INewWizard {
 	 * @param oldRequirements - the Requirements found in the already existing .trc
 	 *                        file, or null if there are none.
 	 */
-	private LinkedList<TRCRequirement> getTRCReqs(String[] ids, LinkedList<TRCRequirement> oldRequirements) {
-		LinkedList<TRCRequirement> trcReqs = new LinkedList<TRCRequirement>();
+	private LinkedList<TRCRequirement2> getTRCReqs(String[] ids, LinkedList<TRCRequirement2> oldRequirements) {
+		LinkedList<TRCRequirement2> trcReqs = new LinkedList<TRCRequirement2>();
 		for (String id : ids) {
 			if (oldRequirements != null) {
 				boolean added = false;
-				for (TRCRequirement r : oldRequirements) {
+				for (TRCRequirement2 r : oldRequirements) {
 					if (r.getId().equals(id)) {
 						trcReqs.add(r);
 						added = true;
 					}
 				}
 				if (!added) {
-					TRCRequirement trcReq = new TRCRequirement(id, new LinkedList<int[]>());
+					TRCRequirement2 trcReq = new TRCRequirement2(id, new LinkedList<int[]>());
 					trcReqs.add(trcReq);
 				}
 			} else {
-				TRCRequirement trcReq = new TRCRequirement(id, new LinkedList<int[]>());
+				TRCRequirement2 trcReq = new TRCRequirement2(id, new LinkedList<int[]>());
 				trcReqs.add(trcReq);
 			}
 		}

@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.junit.tools.configuration.base.MethodRef;
 
 import mw.eclipse.TRC_Overlay.impl.BoxActualizerHelper;
-import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
+import mw.eclipse.TRC_Overlay.impl.TRCRequirement2;
 
 @Generated(value = "org.junit-tools-1.1.0")
 public class BoxActualizerHelperTestactualizeBoxes {
@@ -30,16 +30,16 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	 * 
 	 * @return one Req with two Boxes: {{0, 20}, {21, 40}}
 	 */
-	public static LinkedList<TRCRequirement> oneRequirementOneBox() {
+	public static LinkedList<TRCRequirement2> oneRequirementOneBox() {
 		
 		int[] box0 = {250, 309};
 		
 		LinkedList<int[]> positions = new LinkedList<int[]>();
 		positions.add(box0);
 		
-		TRCRequirement testReq = new TRCRequirement("TEST-01", positions);
+		TRCRequirement2 testReq = new TRCRequirement2("TEST-01", positions);
 		
-		LinkedList<TRCRequirement> out = new LinkedList<TRCRequirement>();
+		LinkedList<TRCRequirement2> out = new LinkedList<TRCRequirement2>();
 		out.add(testReq);
 		
 		return out;
@@ -50,7 +50,7 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	 * 
 	 * @return one Req with two Boxes: {{0, 20}, {21, 40}}
 	 */
-	public static LinkedList<TRCRequirement> oneRequirementTwoBoxesSeparatedByOneSpace() {
+	public static LinkedList<TRCRequirement2> oneRequirementTwoBoxesSeparatedByOneSpace() {
 		
 		int[] box0 = {0, 20};
 		int[] box1 = {21, 40};
@@ -59,9 +59,9 @@ public class BoxActualizerHelperTestactualizeBoxes {
 		positions.add(box0);
 		positions.add(box1);
 		
-		TRCRequirement testReq = new TRCRequirement("TEST-01", positions);
+		TRCRequirement2 testReq = new TRCRequirement2("TEST-01", positions);
 		
-		LinkedList<TRCRequirement> out = new LinkedList<TRCRequirement>();
+		LinkedList<TRCRequirement2> out = new LinkedList<TRCRequirement2>();
 		out.add(testReq);
 		
 		return out;
@@ -72,8 +72,8 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	public void noChange_testActualizeBoxes() throws Exception {
 		int positionOfChange = 11;
 		int amountOfChange = 0;
-		LinkedList<TRCRequirement> reqs = null;
-		LinkedList<TRCRequirement> result;
+		LinkedList<TRCRequirement2> reqs = null;
+		LinkedList<TRCRequirement2> result;
 		LinkedList<int[]> positions = new LinkedList<int[]>();
 		
 		// Solution:
@@ -105,9 +105,9 @@ public class BoxActualizerHelperTestactualizeBoxes {
 			
 			int positionOfChange = rand.nextInt(128);
 			int amountOfChange = rand.nextInt(128);
-			LinkedList<TRCRequirement> reqs = new LinkedList<TRCRequirement>();
-			LinkedList<TRCRequirement> result;
-			TRCRequirement testReq = null;
+			LinkedList<TRCRequirement2> reqs = new LinkedList<TRCRequirement2>();
+			LinkedList<TRCRequirement2> result;
+			TRCRequirement2 testReq = null;
 			LinkedList<int[]> positions = new LinkedList<int[]>();
 			
 			// Solution:
@@ -116,7 +116,7 @@ public class BoxActualizerHelperTestactualizeBoxes {
 			positions.add(box0);
 			
 			// Test
-			testReq = new TRCRequirement("TEST-02", new LinkedList<int[]>());
+			testReq = new TRCRequirement2("TEST-02", new LinkedList<int[]>());
 			testReq.setActive(true);
 			reqs.add(testReq);
 			
@@ -130,8 +130,8 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	public void deleteBehindSingleBox_testActualizeBoxes() throws Exception {
 		int positionOfChange = 309;
 		int amountOfChange = -100;
-		LinkedList<TRCRequirement> reqs = null;
-		LinkedList<TRCRequirement> result;
+		LinkedList<TRCRequirement2> reqs = null;
+		LinkedList<TRCRequirement2> result;
 		LinkedList<int[]> positions = new LinkedList<int[]>();
 		
 		// Solution:
@@ -156,8 +156,8 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	public void deleteBeforeSingleBox_testActualizeBoxes() throws Exception {
 		int positionOfChange = 200;
 		int amountOfChange = -50;
-		LinkedList<TRCRequirement> reqs = null;
-		LinkedList<TRCRequirement> result;
+		LinkedList<TRCRequirement2> reqs = null;
+		LinkedList<TRCRequirement2> result;
 		LinkedList<int[]> positions = new LinkedList<int[]>();
 		
 		// Solution:
@@ -182,8 +182,8 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	public void deleteLeftEdgeSingleBox_testActualizeBoxes() throws Exception {
 		int positionOfChange = 250;
 		int amountOfChange = -2;
-		LinkedList<TRCRequirement> reqs = null;
-		LinkedList<TRCRequirement> result;
+		LinkedList<TRCRequirement2> reqs = null;
+		LinkedList<TRCRequirement2> result;
 		LinkedList<int[]> positions = new LinkedList<int[]>();
 		
 		// Solution:
@@ -208,8 +208,8 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	public void deleteRightEdgeSingleBox_testActualizeBoxes() throws Exception {
 		int positionOfChange = 307;
 		int amountOfChange = -2;
-		LinkedList<TRCRequirement> reqs = null;
-		LinkedList<TRCRequirement> result;
+		LinkedList<TRCRequirement2> reqs = null;
+		LinkedList<TRCRequirement2> result;
 		LinkedList<int[]> positions = new LinkedList<int[]>();
 		
 		// Solution:
@@ -234,8 +234,8 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	public void delete_testActualizeBoxes() throws Exception {
 		int positionOfChange = 11;
 		int amountOfChange = -1;
-		LinkedList<TRCRequirement> reqs = null;
-		LinkedList<TRCRequirement> result;
+		LinkedList<TRCRequirement2> reqs = null;
+		LinkedList<TRCRequirement2> result;
 		LinkedList<int[]> positions = new LinkedList<int[]>();
 		
 		// Solution:
@@ -262,8 +262,8 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	public void delete2_testActualizeBoxes() throws Exception {
 		int positionOfChange = 11;
 		int amountOfChange = -4;
-		LinkedList<TRCRequirement> reqs = null;
-		LinkedList<TRCRequirement> result;
+		LinkedList<TRCRequirement2> reqs = null;
+		LinkedList<TRCRequirement2> result;
 		LinkedList<int[]> positions = new LinkedList<int[]>();
 		
 		// Solution:
@@ -290,8 +290,8 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	public void deleteInside_testActualizeBoxes() throws Exception {
 		int positionOfChange = 11;
 		int amountOfChange = -4;
-		LinkedList<TRCRequirement> reqs = null;
-		LinkedList<TRCRequirement> result;
+		LinkedList<TRCRequirement2> reqs = null;
+		LinkedList<TRCRequirement2> result;
 		LinkedList<int[]> positions = new LinkedList<int[]>();
 		
 		// Solution:
@@ -318,8 +318,8 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	public void deleteBehind_testActualizeBoxes() throws Exception {
 		int positionOfChange = 60;
 		int amountOfChange = -20;
-		LinkedList<TRCRequirement> reqs = null;
-		LinkedList<TRCRequirement> result;
+		LinkedList<TRCRequirement2> reqs = null;
+		LinkedList<TRCRequirement2> result;
 		LinkedList<int[]> positions = new LinkedList<int[]>();
 		
 		// Solution:
@@ -346,8 +346,8 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	public void merge_testActualizeBoxes() throws Exception {
 		int positionOfChange;
 		int amountOfChange;
-		LinkedList<TRCRequirement> reqs = null;
-		LinkedList<TRCRequirement> result;
+		LinkedList<TRCRequirement2> reqs = null;
+		LinkedList<TRCRequirement2> result;
 		LinkedList<int[]> positions = new LinkedList<int[]>();
 		LinkedList<int[]> positions1 = new LinkedList<int[]>();
 		
@@ -395,8 +395,8 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	public void noMergeInsertOne_testActualizeBoxes() throws Exception {
 		int positionOfChange;
 		int amountOfChange;
-		LinkedList<TRCRequirement> reqs = null;
-		LinkedList<TRCRequirement> result;
+		LinkedList<TRCRequirement2> reqs = null;
+		LinkedList<TRCRequirement2> result;
 		LinkedList<int[]> positions = new LinkedList<int[]>();
 		LinkedList<int[]> positions1 = new LinkedList<int[]>();
 		
@@ -432,8 +432,8 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	public void split_testActualizeBoxes() throws Exception {
 		int positionOfChange;
 		int amountOfChange;
-		LinkedList<TRCRequirement> reqs = null;
-		LinkedList<TRCRequirement> result;
+		LinkedList<TRCRequirement2> reqs = null;
+		LinkedList<TRCRequirement2> result;
 		
 		// Solution 1:
 		
@@ -482,7 +482,7 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	 * 
 	 * @return three Req with identical two Boxes: {{0, 20}, {21, 40}}
 	 */
-	public static LinkedList<TRCRequirement> threeRequirementsWithIdenticalBoxes() {
+	public static LinkedList<TRCRequirement2> threeRequirementsWithIdenticalBoxes() {
 		
 		int[] box0 = {0, 20};
 		int[] box1 = {21, 40};
@@ -504,11 +504,11 @@ public class BoxActualizerHelperTestactualizeBoxes {
 		positions3.add(box0b);
 		positions3.add(box1b);
 		
-		TRCRequirement testReq01 = new TRCRequirement("TEST-01", positions1);
-		TRCRequirement testReq02 = new TRCRequirement("TEST-02", positions2);
-		TRCRequirement testReq03 = new TRCRequirement("TEST-03", positions3);
+		TRCRequirement2 testReq01 = new TRCRequirement2("TEST-01", positions1);
+		TRCRequirement2 testReq02 = new TRCRequirement2("TEST-02", positions2);
+		TRCRequirement2 testReq03 = new TRCRequirement2("TEST-03", positions3);
 		
-		LinkedList<TRCRequirement> out = new LinkedList<TRCRequirement>();
+		LinkedList<TRCRequirement2> out = new LinkedList<TRCRequirement2>();
 		out.add(testReq01);
 		out.add(testReq02);
 		out.add(testReq03);
@@ -521,8 +521,8 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	public void partialSplit1_testActualizeBoxes() throws Exception {
 		int positionOfChange = 0;
 		int amountOfChange = 0;
-		LinkedList<TRCRequirement> reqs = null;
-		LinkedList<TRCRequirement> result;
+		LinkedList<TRCRequirement2> reqs = null;
+		LinkedList<TRCRequirement2> result;
 		
 		// Solution 1:
 		
@@ -568,8 +568,8 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	public void partialSplit2_testActualizeBoxes() throws Exception {
 		int positionOfChange = 0;
 		int amountOfChange = 0;
-		LinkedList<TRCRequirement> reqs = null;
-		LinkedList<TRCRequirement> result;
+		LinkedList<TRCRequirement2> reqs = null;
+		LinkedList<TRCRequirement2> result;
 		
 		// Solution 1:
 		
@@ -616,8 +616,8 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	public void deletionsAfterwards_testActualizeBoxes() throws Exception {
 		int positionOfChange;
 		int amountOfChange;
-		LinkedList<TRCRequirement> reqs = null;
-		LinkedList<TRCRequirement> result;
+		LinkedList<TRCRequirement2> reqs = null;
+		LinkedList<TRCRequirement2> result;
 		LinkedList<int[]> positions = new LinkedList<int[]>();
 		
 		// Solution 1:
@@ -661,7 +661,7 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	 * 
 	 * @return three Reqs with non Overlapping boxes
 	 */
-	public static LinkedList<TRCRequirement> threeRequirementsWithNonOverlappingBoxes() {
+	public static LinkedList<TRCRequirement2> threeRequirementsWithNonOverlappingBoxes() {
 		
 		int[] box0 = {0, 20};
 		int[] box1 = {21, 40};
@@ -676,11 +676,11 @@ public class BoxActualizerHelperTestactualizeBoxes {
 		positions3.add(box2);
 		positions1.add(box3);
 		
-		TRCRequirement testReq01 = new TRCRequirement("TEST-01", positions1);
-		TRCRequirement testReq02 = new TRCRequirement("TEST-02", positions2);
-		TRCRequirement testReq03 = new TRCRequirement("TEST-03", positions3);
+		TRCRequirement2 testReq01 = new TRCRequirement2("TEST-01", positions1);
+		TRCRequirement2 testReq02 = new TRCRequirement2("TEST-02", positions2);
+		TRCRequirement2 testReq03 = new TRCRequirement2("TEST-03", positions3);
 		
-		LinkedList<TRCRequirement> out = new LinkedList<TRCRequirement>();
+		LinkedList<TRCRequirement2> out = new LinkedList<TRCRequirement2>();
 		out.add(testReq01);
 		out.add(testReq02);
 		out.add(testReq03);
@@ -693,8 +693,8 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	public void bigDelete_testActualizeBoxes() throws Exception {
 		int positionOfChange = 0;
 		int amountOfChange = 0;
-		LinkedList<TRCRequirement> reqs = null;
-		LinkedList<TRCRequirement> result;
+		LinkedList<TRCRequirement2> reqs = null;
+		LinkedList<TRCRequirement2> result;
 		
 		// Solution 1:
 		
@@ -775,8 +775,8 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	public void bigDeleteRightEdge_testActualizeBoxes() throws Exception {
 		int positionOfChange;
 		int amountOfChange;
-		LinkedList<TRCRequirement> reqs = null;
-		LinkedList<TRCRequirement> result;
+		LinkedList<TRCRequirement2> reqs = null;
+		LinkedList<TRCRequirement2> result;
 		
 		// Solution 1:
 		
@@ -855,7 +855,7 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	 * 
 	 * @return three Reqs with Overlapping boxes
 	 */
-	public static LinkedList<TRCRequirement> threeRequirementsWithAdjacentAndOverlapping() {
+	public static LinkedList<TRCRequirement2> threeRequirementsWithAdjacentAndOverlapping() {
 		
 		int[] box1_1 = {0, 50}; // Adjacent
 		int[] box1_2 = {60, 99}; 
@@ -872,11 +872,11 @@ public class BoxActualizerHelperTestactualizeBoxes {
 		positions2.add(box2_2);
 		positions3.add(box3);
 		
-		TRCRequirement testReq01 = new TRCRequirement("TEST-01", positions1);
-		TRCRequirement testReq02 = new TRCRequirement("TEST-02", positions2);
-		TRCRequirement testReq03 = new TRCRequirement("TEST-03", positions3);
+		TRCRequirement2 testReq01 = new TRCRequirement2("TEST-01", positions1);
+		TRCRequirement2 testReq02 = new TRCRequirement2("TEST-02", positions2);
+		TRCRequirement2 testReq03 = new TRCRequirement2("TEST-03", positions3);
 		
-		LinkedList<TRCRequirement> out = new LinkedList<TRCRequirement>();
+		LinkedList<TRCRequirement2> out = new LinkedList<TRCRequirement2>();
 		out.add(testReq01);
 		out.add(testReq02);
 		out.add(testReq03);
@@ -889,8 +889,8 @@ public class BoxActualizerHelperTestactualizeBoxes {
 	public void complex_testActualizeBoxes() throws Exception {
 		int positionOfChange = 0;
 		int amountOfChange = 0;
-		LinkedList<TRCRequirement> reqs = null;
-		LinkedList<TRCRequirement> result;
+		LinkedList<TRCRequirement2> reqs = null;
+		LinkedList<TRCRequirement2> result;
 		
 		// Solution 1:
 		

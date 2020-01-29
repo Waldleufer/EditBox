@@ -18,7 +18,7 @@ import java.util.LinkedList;
 import org.eclipse.core.runtime.IPath;
 
 import pm.eclipse.editbox.impl.TRCFileInteraction;
-import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
+import mw.eclipse.TRC_Overlay.impl.TRCRequirement2;               
 
 /**
  * The BoxActualizerHelper Class offers the actualizeBoxes Method that handles Changes
@@ -37,13 +37,13 @@ public class BoxActualizerHelper {
 	 * @param amountOfChange		the length of the change in chars.
 	 * @param reqs					the requirements and Boxes before the Change. 
 	 */
-	public static LinkedList<TRCRequirement> actualizeBoxes(int positionOfChange, int amountOfChange, LinkedList<TRCRequirement> reqs) {
+	public static LinkedList<TRCRequirement2> actualizeBoxes(int positionOfChange, int amountOfChange, LinkedList<TRCRequirement2> reqs) {
 		
 		if (reqs == null) {
 			return null;
 		}
 
-		for (TRCRequirement r : reqs) {
+		for (TRCRequirement2 r : reqs) {
 //			DEBUGs Sysouts:
 //			System.out.println("Requirement from Table: " + r.toString());		
 //			System.out.println("Corresponding Action: " + positionOfChange + "; amount: " + amountOfChange);
@@ -226,7 +226,7 @@ public class BoxActualizerHelper {
 				r.setPositions(newpairs);
 				
 				// Debug Sysouts
-//				for (TRCRequirement trcRequirement : reqs) {
+//				for (TRCRequirement2 trcRequirement : reqs) {
 //					for(int[] p : trcRequirement.getPositions()) {
 //						System.out.print(" " + Arrays.toString(p));
 //					}
@@ -244,7 +244,7 @@ public class BoxActualizerHelper {
 	 * @param amountOfChange
 	 * @return reqs - the list of Requirements which must not be null;
 	 */
-	public static LinkedList<TRCRequirement> changeBoxes(int positionOfChange, int amountOfChange, LinkedList<TRCRequirement> reqs) {
+	public static LinkedList<TRCRequirement2> changeBoxes(int positionOfChange, int amountOfChange, LinkedList<TRCRequirement2> reqs) {
 		
 		if(amountOfChange <= 0) {
 			return reqs;
@@ -252,8 +252,8 @@ public class BoxActualizerHelper {
 		
 		int endOfChange = positionOfChange + amountOfChange;
 
-		for (Iterator<TRCRequirement> iterator = reqs.iterator(); iterator.hasNext();) {
-			TRCRequirement r = (TRCRequirement) iterator.next();
+		for (Iterator<TRCRequirement2> iterator = reqs.iterator(); iterator.hasNext();) {
+			TRCRequirement2 r = (TRCRequirement2) iterator.next();
 			
 			boolean active = r.isActive();
 			boolean changeHandled = false;
@@ -404,7 +404,7 @@ public class BoxActualizerHelper {
 				r.setPositions(newPairs);
 			}
 			// Debug Sysout
-//			for (TRCRequirement trcRequirement : reqs) {
+//			for (TRCRequirement2 trcRequirement : reqs) {
 //				for(int[] p : trcRequirement.getPositions()) {
 //					System.out.print(" " + Arrays.toString(p));
 //				}

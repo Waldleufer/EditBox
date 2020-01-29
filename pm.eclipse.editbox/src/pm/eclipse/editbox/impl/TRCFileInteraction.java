@@ -35,6 +35,8 @@ import org.eclipse.ui.PlatformUI;
 import mw.eclipse.TRC_Overlay.impl.BoxDecoratorImpl;
 import mw.eclipse.TRC_Overlay.impl.ReqIFFileInteraction;
 import mw.eclipse.TRC_Overlay.views.TRCView;
+import mw.eclipse.TRC_Overlay.impl.TRCRequirement2;
+
 
 /**
  * @author Martin
@@ -44,110 +46,110 @@ public class TRCFileInteraction {
 
 	private static String page;
 
-	/**
-	 * The TRCRequirement class defines how TRCRequirements shall be stored
-	 * internally. In Order to enable simple Read and Write operations this class
-	 * has to implement {@link Serializable}.
-	 * 
-	 * @author Martin
-	 *
-	 */
-	public static final class TRCRequirement implements Serializable {
-		/**
-		 * The generated serialVersionUID of this Object
-		 */
-		private static final long serialVersionUID = 3704543854027523254L;
-		private String id;
-		private LinkedList<int[]> positions;
-		private int red;
-		private int green;
-		private int blue;
-		private boolean active;
-		private String info;
+//	/**
+//	 * The TRCRequirement class defines how TRCRequirements shall be stored
+//	 * internally. In Order to enable simple Read and Write operations this class
+//	 * has to implement {@link Serializable}.
+//	 * 
+//	 * @author Martin
+//	 *
+//	 */
+//	public class TRCRequirement implements Serializable {
+//		/**
+//		 * The generated serialVersionUID of this Object
+//		 */
+//		private static final long serialVersionUID = 3704543854027523254L;
+//		private String id;
+//		private LinkedList<int[]> positions;
+//		private int red;
+//		private int green;
+//		private int blue;
+//		private boolean active;
+//		private String info;
+//
+//		/**
+//		 * Constructor for a new {@link TRCRequirement}
+//		 * 
+//		 * Creates a new TRCRequirement with the id, and initial boxes. Picks a random
+//		 * pastel color that can be changed later via {@link TRCView}
+//		 * 
+//		 * @param id        - the unique ID of the requirement
+//		 * @param positions - a list of (start, end) tuples.
+//		 */
+//		public TRCRequirement(String id, LinkedList<int[]> positions) {
+//			this.id = id;
+//			this.positions = positions;
+//			this.info = null;
+//			Random rand = new Random();
+//			int r = (int) (180.0 + rand.nextFloat() * 76.0);
+//			int g = (int) (180.0 + rand.nextFloat() * 76.0);
+//			int b = (int) (180.0 + rand.nextFloat() * 76.0);
+//			Color randomColor = new Color(null, r, g, b);
+//			setActive(false);
+//			// Debug:
+//			// Color randomColor = new Color(null, 100, 150, 0);
+//			setColor(randomColor);
+//		}
+//
+//		/**
+//		 * @return the unique id of a specific requirement.
+//		 */
+//		public String getId() {
+//			return id;
+//		}
+//
+//		/**
+//		 * @return the position Pairs: [Start, End] contained in a list.
+//		 */
+//		public LinkedList<int[]> getPositions() {
+//			return positions;
+//		}
+//
+//		/**
+//		 * sets the new position pairs: [Start, End] contained in a list.
+//		 */
+//		public void setPositions(LinkedList<int[]> positions) {
+//			this.positions = positions;
+//		}
+//
+//		@Override
+//		public String toString() {
+//			String out = id + ": ";
+//			for (int[] i : positions) {
+//				out += Arrays.toString(i) + "; ";
+//			}
+//			return out;
+//		}
+//
+//		public Color getColor() {
+//			return new Color(null, red, green, blue);
+//		}
+//
+//		public void setColor(Color color) {
+//			this.red = color.getRed();
+//			this.green = color.getGreen();
+//			this.blue = color.getBlue();
+//		}
+//
+//		public boolean isActive() {
+//			return active;
+//		}
+//
+//		public void setActive(boolean active) {
+//			this.active = active;
+//		}
+//
+//		public String getInfo() {
+//			return info;
+//		}
+//
+//		public void setInfo(String info) {
+//			this.info = info;
+//		}
+//
+//	}
 
-		/**
-		 * Constructor for a new {@link TRCRequirement}
-		 * 
-		 * Creates a new TRCRequirement with the id, and initial boxes. Picks a random
-		 * pastel color that can be changed later via {@link TRCView}
-		 * 
-		 * @param id        - the unique ID of the requirement
-		 * @param positions - a list of (start, end) tuples.
-		 */
-		public TRCRequirement(String id, LinkedList<int[]> positions) {
-			this.id = id;
-			this.positions = positions;
-			this.info = null;
-			Random rand = new Random();
-			int r = (int) (180.0 + rand.nextFloat() * 76.0);
-			int g = (int) (180.0 + rand.nextFloat() * 76.0);
-			int b = (int) (180.0 + rand.nextFloat() * 76.0);
-			Color randomColor = new Color(null, r, g, b);
-			setActive(false);
-			// Debug:
-			// Color randomColor = new Color(null, 100, 150, 0);
-			setColor(randomColor);
-		}
-
-		/**
-		 * @return the unique id of a specific requirement.
-		 */
-		public String getId() {
-			return id;
-		}
-
-		/**
-		 * @return the position Pairs: [Start, End] contained in a list.
-		 */
-		public LinkedList<int[]> getPositions() {
-			return positions;
-		}
-
-		/**
-		 * sets the new position pairs: [Start, End] contained in a list.
-		 */
-		public void setPositions(LinkedList<int[]> positions) {
-			this.positions = positions;
-		}
-
-		@Override
-		public String toString() {
-			String out = id + ": ";
-			for (int[] i : positions) {
-				out += Arrays.toString(i) + "; ";
-			}
-			return out;
-		}
-
-		public Color getColor() {
-			return new Color(null, red, green, blue);
-		}
-
-		public void setColor(Color color) {
-			this.red = color.getRed();
-			this.green = color.getGreen();
-			this.blue = color.getBlue();
-		}
-
-		public boolean isActive() {
-			return active;
-		}
-
-		public void setActive(boolean active) {
-			this.active = active;
-		}
-
-		public String getInfo() {
-			return info;
-		}
-
-		public void setInfo(String info) {
-			this.info = info;
-		}
-
-	}
-
-	public static void WriteReversedTRCsToFile(LinkedList<TRCRequirement> trcReqs) {
+	public static void WriteReversedTRCsToFile(LinkedList<TRCRequirement2> trcReqs) {
 		WriteReversedTRCsToFile(trcReqs, BoxDecoratorImpl.getCurrentActivePath());
 	}
 
@@ -159,10 +161,10 @@ public class TRCFileInteraction {
 	 *                order
 	 * @param path    - the Absolute system Path of the corresponding Code file
 	 */
-	public static void WriteReversedTRCsToFile(LinkedList<TRCRequirement> trcReqs, IPath path) {
+	public static void WriteReversedTRCsToFile(LinkedList<TRCRequirement2> trcReqs, IPath path) {
 
-		LinkedList<TRCRequirement> reversed = new LinkedList<TRCRequirement>(
-				Arrays.asList(new TRCRequirement[trcReqs.size()]));
+		LinkedList<TRCRequirement2> reversed = new LinkedList<TRCRequirement2>(
+				Arrays.asList(new TRCRequirement2[trcReqs.size()]));
 		Collections.copy(reversed, trcReqs);
 		Collections.reverse(reversed);
 
@@ -181,7 +183,7 @@ public class TRCFileInteraction {
 		}
 	}
 
-	public static void WriteTRCsToFile(LinkedList<TRCRequirement> trcReqs) {
+	public static void WriteTRCsToFile(LinkedList<TRCRequirement2> trcReqs) {
 		WriteTRCsToFile(trcReqs, BoxDecoratorImpl.getCurrentActivePath());
 	}
 
@@ -190,7 +192,7 @@ public class TRCFileInteraction {
 	 * @param trcReqs the TRCRequirement Array that needs to be saved
 	 * @param path    - the Absolute system Path of the corresponding Code file
 	 */
-	public static void WriteTRCsToFile(LinkedList<TRCRequirement> trcReqs, IPath path) {
+	public static void WriteTRCsToFile(LinkedList<TRCRequirement2> trcReqs, IPath path) {
 		try {
 			String stringPath = exchangeEnding(path.toOSString());
 
@@ -206,8 +208,16 @@ public class TRCFileInteraction {
 		}
 	}
 
-	public static LinkedList<TRCRequirement> ReadTRCsFromFile() {
+	public static LinkedList<TRCRequirement2> ReadTRCsFromFile() {
 		return ReadTRCsFromFile(BoxDecoratorImpl.getCurrentActivePath());
+	}
+	
+	public static TRCRequirement2 trcRequirementTotrcRequirement2 (TRCRequirement2 toChange) {
+		TRCRequirement2 n = new TRCRequirement2(toChange.getId(), toChange.getPositions());
+		n.setColor(toChange.getColor());
+		n.setActive(toChange.isActive());
+		
+		return n;
 	}
 
 	/**
@@ -217,7 +227,7 @@ public class TRCFileInteraction {
 	 *                           set to TRUE.
 	 * @return the linked List obtained from that file
 	 */
-	public static LinkedList<TRCRequirement> ReadTRCsFromFile(IPath filePath, boolean alwaysReadFromFile) {
+	public static LinkedList<TRCRequirement2> ReadTRCsFromFile(IPath filePath, boolean alwaysReadFromFile) {
 		if (alwaysReadFromFile) {
 			TRCView.setInitialized(false);
 		}
@@ -233,7 +243,7 @@ public class TRCFileInteraction {
 	 *         displayed. Which means reversed order corsesponding to as it is saved
 	 *         in the file.
 	 */
-	public static LinkedList<TRCRequirement> ReadTRCsFromFile(IPath filePath) {
+	public static LinkedList<TRCRequirement2> ReadTRCsFromFile(IPath filePath) {
 		checkWindowChanged();
 
 //		System.out.println("Initialised?: " + TRCView.isInitialized());
@@ -241,9 +251,9 @@ public class TRCFileInteraction {
 
 		// Try the shortcut. Don't read from file, take Requirements from View.
 		if (TRCView.isInitialized()) {
-			LinkedList<TRCRequirement> reqs;
+			LinkedList<TRCRequirement2> reqs;
 			try {
-				reqs = (LinkedList<TRCRequirement>) TRCView.getViewer().getInput();
+				reqs = (LinkedList<TRCRequirement2>) TRCView.getViewer().getInput();
 				return reqs;
 			} catch (Exception e) {
 				System.err.println("Not Initialised, due to: " + e.getMessage());
@@ -257,13 +267,13 @@ public class TRCFileInteraction {
 				FileInputStream fis = new FileInputStream(stringPath);
 				ObjectInputStream ois = new ObjectInputStream(fis);
 				Object read = ois.readObject();
-				LinkedList<TRCRequirement> list = null;
+				LinkedList<TRCRequirement2> list = null;
 				if (read == null) {
 					new Throwable("read = null").printStackTrace();
 				} else {
 					if (read instanceof LinkedList<?>) {
 						if (read != null) {
-							list = (LinkedList<TRCRequirement>) read;
+							list = (LinkedList<TRCRequirement2>) read;
 						}
 					}
 				}
@@ -272,10 +282,11 @@ public class TRCFileInteraction {
 
 				System.out.println("The Object was succesfully read from the file: " + stringPath);
 
-				LinkedList<TRCRequirement> reqs = new LinkedList<TRCRequirement>();
+				LinkedList<TRCRequirement2> reqs = new LinkedList<TRCRequirement2>();
 
-				for (Iterator<TRCRequirement> descIterator = list.descendingIterator(); descIterator.hasNext();) {
-					TRCRequirement r = (TRCRequirement) descIterator.next();
+				for (Iterator<TRCRequirement2> descIterator = list.descendingIterator(); descIterator.hasNext();) {
+					TRCRequirement2 r = (TRCRequirement2) descIterator.next();
+//					TRCRequirement2 n = trcRequirementTotrcRequirement2(r);
 					reqs.add(r);
 				}
 
@@ -320,9 +331,9 @@ public class TRCFileInteraction {
 
 	}
 
-	public static List<TRCRequirement> ReadTRCsFromFileAndUpdate(IPath filePath) {
+	public static List<TRCRequirement2> ReadTRCsFromFileAndUpdate(IPath filePath) {
 
-		LinkedList<TRCRequirement> reqs = TRCView.updateViewer();
+		LinkedList<TRCRequirement2> reqs = TRCView.updateViewer();
 		if (reqs == null) {
 			return null;
 		}
@@ -349,12 +360,12 @@ public class TRCFileInteraction {
 	 * @return the List of all active Requirements if there are any or an empty
 	 *         list.
 	 */
-	public static LinkedList<TRCRequirement> getActiveTRCRequirements(LinkedList<TRCRequirement> reqs) {
+	public static LinkedList<TRCRequirement2> getActiveTRCRequirements(LinkedList<TRCRequirement2> reqs) {
 		if (reqs == null) {
 			return null;
 		}
-		LinkedList<TRCRequirement> active = new LinkedList<TRCRequirement>();
-		for (TRCRequirement trcRequirement : reqs) {
+		LinkedList<TRCRequirement2> active = new LinkedList<TRCRequirement2>();
+		for (TRCRequirement2 trcRequirement : reqs) {
 			if (trcRequirement.isActive()) {
 				active.add(trcRequirement);
 			}

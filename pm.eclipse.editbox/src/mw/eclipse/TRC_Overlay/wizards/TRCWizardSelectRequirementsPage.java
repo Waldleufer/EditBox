@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import pm.eclipse.editbox.impl.TRCFileInteraction;
-import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
+import mw.eclipse.TRC_Overlay.impl.TRCRequirement2;               
 
 /**
  * The TRCWizardSelectRequirementsPage allows setting / editing the Requirement
@@ -26,7 +26,7 @@ import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
 public class TRCWizardSelectRequirementsPage extends WizardPage {
 	private Text requirementIDsText;
 	private TRCNewWizardPage newWisardPage;
-	private LinkedList<TRCRequirement> reqs;
+	private LinkedList<TRCRequirement2> reqs;
 
 	/**
 	 * Constructor for TRCWizardSelectRequirementsPage.
@@ -66,7 +66,7 @@ public class TRCWizardSelectRequirementsPage extends WizardPage {
 		}
 		String reqIDs = "";
 		if (reqs != null) {
-			for (TRCRequirement r : reqs) {
+			for (TRCRequirement2 r : reqs) {
 				reqIDs += r.getId() + "\n";
 			}
 		}
@@ -107,7 +107,7 @@ public class TRCWizardSelectRequirementsPage extends WizardPage {
 		return out;
 	}
 
-	public LinkedList<TRCRequirement> getOldRequirements() {
+	public LinkedList<TRCRequirement2> getOldRequirements() {
 		return reqs;
 	}
 }

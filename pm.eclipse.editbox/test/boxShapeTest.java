@@ -5,7 +5,7 @@ import java.util.List;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 
-import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
+import mw.eclipse.TRC_Overlay.impl.TRCRequirement2;               
 
 public class boxShapeTest {
 
@@ -34,7 +34,7 @@ public class boxShapeTest {
 		private List<Box> children;
 		public Object data;
 		
-		private TRCRequirement requirement;  // Requirement represented in this box
+		private TRCRequirement2 requirement;  // Requirement represented in this box
 		
 		@Override
 		public String toString() {
@@ -44,11 +44,11 @@ public class boxShapeTest {
 		/**
 		 * Adds the given Requirement ID to the List
 		 */
-		public void setRequirement(TRCRequirement requirement) {
+		public void setRequirement(TRCRequirement2 requirement) {
 			this.requirement = requirement;
 		}
 		
-		public TRCRequirement getRequirement() {
+		public TRCRequirement2 getRequirement() {
 			return requirement;
 		}
 
