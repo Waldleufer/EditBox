@@ -74,7 +74,6 @@ import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
  * The view uses a {@link TRCViewLabelProvider} to define how TRCRequirements
  * should be presented in the view.
  */
-
 public class TRCView extends ViewPart {
 
 	/**
