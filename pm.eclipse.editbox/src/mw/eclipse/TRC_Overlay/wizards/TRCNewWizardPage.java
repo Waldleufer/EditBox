@@ -27,7 +27,6 @@ import pm.eclipse.editbox.impl.TRCFileInteraction;
  * as the file name. The page will only accept file name without the extension
  * OR with the extension that matches the expected one (.trc).
  */
-
 public class TRCNewWizardPage extends WizardPage {
 	private Text sourceFileText;
 

@@ -83,8 +83,8 @@ public class TRCWizardSelectRequirementsPage extends WizardPage {
 			updateStatus("Please Specify at least one Requirement");
 			return;
 		}
-		// TODO: Validation
-		// TODO: Select from ReqIF File
+		// TODO: Possibly Validation
+		// TODO: Selecting from ReqIF File instead of specifying IDs
 		updateStatus(null);
 	}
 
