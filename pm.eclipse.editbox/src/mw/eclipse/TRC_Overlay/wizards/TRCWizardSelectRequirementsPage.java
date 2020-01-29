@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import pm.eclipse.editbox.impl.TRCFileInteraction;
-import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
+import mw.eclipse.TRC_Overlay.impl.TRCRequirement;               
 
 /**
  * The TRCWizardSelectRequirementsPage allows setting / editing the Requirement

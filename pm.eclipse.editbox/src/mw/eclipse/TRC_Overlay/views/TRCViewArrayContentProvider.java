@@ -17,7 +17,7 @@ import java.util.LinkedList;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 
-import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
+import mw.eclipse.TRC_Overlay.impl.TRCRequirement;               
 
 /**
  * The TRCViewArrayContentProvider works as a content provider for the

@@ -64,7 +64,7 @@ import org.eclipse.ui.part.ViewPart;
 import mw.eclipse.TRC_Overlay.impl.BoxDecoratorImpl;
 import pm.eclipse.editbox.EditBox;
 import pm.eclipse.editbox.impl.TRCFileInteraction;
-import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
+import mw.eclipse.TRC_Overlay.impl.TRCRequirement;               
 
 /**
  * This TRCView class plugs-in a new workbench view. The view shows

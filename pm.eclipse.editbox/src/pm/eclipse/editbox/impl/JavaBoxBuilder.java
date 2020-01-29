@@ -75,9 +75,9 @@ public class JavaBoxBuilder extends BoxBuilderImpl {
 	}
 	
 	private boolean commentEnds(int start, int end) {
-		for(int i = start; i<end; i++)
-			if (text.charAt(i)=='*' && text.charAt(i+1)=='/')
-				return true;
+//		for(int i = start; i<end; i++)
+//			if (text.charAt(i)=='*' && text.charAt(i+1)=='/')
+//				return true;
 		return false;
 	}
 

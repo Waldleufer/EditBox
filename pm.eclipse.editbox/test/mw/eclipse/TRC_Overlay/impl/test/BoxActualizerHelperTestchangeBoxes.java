@@ -13,7 +13,7 @@ import org.junit.tools.configuration.base.MethodRef;
 import mw.eclipse.TRC_Overlay.impl.test.BoxActualizerHelperTestactualizeBoxes;
 
 import mw.eclipse.TRC_Overlay.impl.BoxActualizerHelper;
-import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
+import mw.eclipse.TRC_Overlay.impl.TRCRequirement;
 
 @Generated(value = "org.junit-tools-1.1.0")
 public class BoxActualizerHelperTestchangeBoxes {
