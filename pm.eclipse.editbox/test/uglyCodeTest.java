@@ -7,56 +7,56 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import mw.eclipse.TRC_Overlay.impl.TRCRequirement;               
 
-public class boxShapeTest {
+public class uglyCodeTest {
 
 	public class Box {
 		/**
 		 *  start and end represent vertical positioning. Offset is the horizontal offset
 		 */
-		public int start,offset,end; 
+public int start,offset,end; 
 
 		
 
-		public Box parent;
+public Box parent;
 		public Rectangle rec;
-		public boolean isOn;
-		public int red;
+									public boolean isOn;
+	public int red;
 		public int green;
-		public int blue;
+				public int blue;
 		/**
 		 * horizontal End position
 		 */
-		public int maxEndOffset;
-		public int maxLineLen;
+public int maxEndOffset;
+public int maxLineLen;
 		public int level;
 		public int tabsStart = -1;
 		public boolean hasChildren;
-		private List<Box> children;
+private List<Box> children;
 		public Object data;
 		
-		private TRCRequirement requirement;  // Requirement represented in this box
+private TRCRequirement requirement;  // Requirement represented in this box
 		
 		@Override
-		public String toString() {
+public String toString() {
 			return "["+start+","+end+","+offset+","+maxEndOffset+"]";
 		}
 		
 		/**
 		 * Adds the given Requirement ID to the List
 		 */
-		public void setRequirement(TRCRequirement requirement) {
-			this.requirement = requirement; //123456789012345678901234567
+			public void setRequirement(TRCRequirement requirement) {
+		this.requirement = requirement;             
 		}
 		
 		public TRCRequirement getRequirement() {
 			return requirement;
 		}
 
-		public void setColor(Color color) {
+														public void setColor(Color color) {
 			this.red = color.getRed();
 			this.green = color.getGreen();
 			this.blue = color.getBlue();
-		}
+																						}
 		
 		public Color getColor() {
 			return new Color(null, red, green, blue);
@@ -65,26 +65,20 @@ public class boxShapeTest {
 		/**
 		 * @param start the start to set
 		 */
-		public void setStart(int start) {
-			this.start = start;
-		}
+		public void setStart(int start) { this.start = start; }
 
-		/**
-		 * @param end the end to set
-		 */
-		public void setEnd(int end) {
-			this.end = end;
-		}
+																/**
+																 * @param end the end to set
+																 */
+		public void setEnd(int end) {this.end = end;}
 		
-		public boolean intersects(int s, int e) {
-			return between(s, start, end) || between(e, start, end) || between(start, s, e) || between(end, s ,e);
-		}
+		public boolean intersects(int s, int e) {return between(s, start, end) || between(e, start, end) || between(start, s, e) || between(end, s ,e);}
 
-		protected boolean between(int m, int s, int e) {
+	protected boolean between(int m, int s, int e) {
 			return s<=m && e>=m;
 		}
 
-		public List<Box> children() {
+	public List<Box> children() {
 			return children != null ? children : Collections.EMPTY_LIST;
 		}
 		
