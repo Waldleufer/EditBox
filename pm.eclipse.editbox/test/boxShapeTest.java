@@ -13,7 +13,7 @@ public class boxShapeTest {
 		/**
 		 *  start and end represent vertical positioning. Offset is the horizontal offset
 		 */
-		public int start,offset,end;
+		public int start,offset,end; 
 
 		
 
