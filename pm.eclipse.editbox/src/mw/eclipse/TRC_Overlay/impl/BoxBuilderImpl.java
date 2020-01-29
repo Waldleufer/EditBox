@@ -197,7 +197,7 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 	 * @param offset
 	 */
 	protected void addbox0(int start, int end, int offset) {
-		System.err.println("BOX: " + currentbox.toString());
+//		System.err.println("BOX: " + currentbox.toString());
 
 		if (offset == currentbox.offset) { // Same indentation level
 			if ((emptyPrevLine && currentbox.parent != null)) { // handles empty lines on same indentation level
@@ -316,4 +316,3 @@ public class BoxBuilderImpl extends AbstractBoxBuilder {
 	}
 	
 }
-
