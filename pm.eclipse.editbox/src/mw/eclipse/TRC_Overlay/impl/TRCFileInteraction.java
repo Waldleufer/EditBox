@@ -67,7 +67,7 @@ public class TRCFileInteraction {
 			objectOut.writeObject(reversed);
 			objectOut.close();
 			fileOut.close();
-			System.out.println("The Object  was succesfully reversed-written to the file: " + stringPath);
+//			System.out.println("The Object  was succesfully reversed-written to the file: " + stringPath);
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -92,7 +92,7 @@ public class TRCFileInteraction {
 			objectOut.writeObject(trcReqs);
 			objectOut.close();
 			fileOut.close();
-			System.out.println("The Object  was succesfully written to the file: " + stringPath);
+//			System.out.println("The Object  was succesfully written to the file: " + stringPath);
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -163,7 +163,7 @@ public class TRCFileInteraction {
 				ois.close();
 				fis.close();
 
-				System.out.println("The Object was succesfully read from the file: " + stringPath);
+//				System.out.println("The Object was succesfully read from the file: " + stringPath);
 
 				LinkedList<TRCRequirement> reqs = new LinkedList<TRCRequirement>();
 
@@ -180,7 +180,7 @@ public class TRCFileInteraction {
 			} catch (Exception ex) {
 				// No file found or file access error
 				if (ex instanceof FileNotFoundException) {
-					System.out.println("FileNotFound");
+					System.err.println("FileNotFound");
 				} else {
 					new Throwable("File access Error").printStackTrace();
 					ex.printStackTrace();
