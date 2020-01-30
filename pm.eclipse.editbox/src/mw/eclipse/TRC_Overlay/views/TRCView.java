@@ -190,7 +190,11 @@ public class TRCView extends ViewPart {
 	 * @param requirements
 	 */
 	public static void updateViewer(LinkedList<TRCRequirement> requirements) {
-
+		
+		if(viewer == null) {
+			return;
+		}
+		
 		if (requirements == null) {
 			System.out.println("Requirements == null");
 			viewer.setInput(new LinkedList<TRCRequirement>());
@@ -217,6 +221,9 @@ public class TRCView extends ViewPart {
 	 * reads the TRCRequirements and updates the TRC View
 	 */
 	public static LinkedList<TRCRequirement> updateViewer() {
+		if(viewer == null) {
+			return;
+		}
 		LinkedList<TRCRequirement> requirements = TRCFileInteraction
 				.ReadTRCsFromFile(BoxDecoratorImpl.getCurrentActivePath());
 		if (requirements == null) {
