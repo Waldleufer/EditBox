@@ -1,7 +1,7 @@
 
 # ![](pm.eclipse.editbox/icons/editbox.png) TRC Overlay Eclipse plugin
 
-EditBox is using background colors to visualize requirements at sourcecode level.
+TRCOverlay is using background colors to visualize requirements at sourcecode level.
 
 This Projekt was part of my Bachelor Thesis.
 
