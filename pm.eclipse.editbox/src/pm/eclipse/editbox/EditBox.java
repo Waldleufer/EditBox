@@ -21,7 +21,16 @@ public class EditBox extends AbstractUIPlugin {
 	public static final String PLUGIN_ID = "pm.eclipse.editbox";
 	public static final String PREF_ENABLED = "enabled";
 	public static final String PREF_DEFAULT_THEME = "default_theme";
-
+	private static final String ICONSFOLDER = "icons/";
+	public static final String IMG_ARROW_UP_TOP = ICONSFOLDER + "arrow_up_top.png";
+	public static final String IMG_ARROW_UP = ICONSFOLDER + "arrow_up.png";
+	public static final String IMG_ARROW_DOWN = ICONSFOLDER + "arrow_down.png";
+	public static final String IMG_ARROW_DOWN_END = ICONSFOLDER + "arrow_down_end.png";
+	public static final String IMG_SET_REQUIREMENTS = ICONSFOLDER + "set_requirements.png";
+	public static final String IMG_CHECKBOX_CLEARED = ICONSFOLDER +  "checkboxcleared.gif";
+	public static final String IMG_CHECKBOX_SELECTED = ICONSFOLDER + "checkboxselected.gif";
+	public static final String IMG_CHECKBOX_UNSELECTED = ICONSFOLDER + "checkboxunselected.gif";
+	
 	private static EditBox plugin;
 
 	private BoxProviderRegistry registry;

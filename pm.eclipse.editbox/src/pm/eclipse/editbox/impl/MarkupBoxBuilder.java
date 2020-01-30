@@ -2,6 +2,8 @@ package pm.eclipse.editbox.impl;
 
 import java.util.LinkedList;
 
+import mw.eclipse.TRC_Overlay.impl.BoxBuilderImpl;
+
 public class MarkupBoxBuilder extends BoxBuilderImpl {
 
 	protected void addLine(int start, int end, int offset, boolean empty) {

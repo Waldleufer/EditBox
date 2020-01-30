@@ -1,3 +1,17 @@
+/**
+ * Copyright (c) 2020 Martin Wagner.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.spdx.org/licenses/EPL-1.0
+ * 
+ * Contributors
+ * @author Piotr Metel
+ * @author Paul Verest 
+ * @author Martin Wagner : Adapted Boxes to support the TRCOverlay
+ * 
+ */
+
 package pm.eclipse.editbox;
 
 import java.util.ArrayList;
@@ -7,7 +21,7 @@ import java.util.List;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 
-import pm.eclipse.editbox.impl.TRCFileInteraction.TRCRequirement;
+import mw.eclipse.TRC_Overlay.impl.TRCRequirement;               
 
 public class Box {
 	/**

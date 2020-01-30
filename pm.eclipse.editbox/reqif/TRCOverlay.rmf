@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ASCII"?>
+<configuration:ProrToolExtension xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:configuration="http://eclipse.org/rmf/pror/toolextensions/1.0">
+  <specViewConfigurations>
+    <specification href="TRCOverlay.reqif#_specificationDocument"/>
+    <columns label="requirementID" width="100"/>
+    <columns label="PlainText" width="377"/>
+    <columns label="WordTraceId" width="100"/>
+    <columns label="atomic" width="100"/>
+    <columns label="RichText" width="100"/>
+    <columns label="Legal Obligation" width="100"/>
+    <columns label="implement" width="100"/>
+    <columns label="implementerEnhanced" width="100"/>
+    <columns label="ListNumberText" width="100"/>
+    <columns label="kind" width="100"/>
+    <leftHeaderColumn label="Lead Header Column" width="30"/>
+  </specViewConfigurations>
+  <generalConfiguration>
+    <labelConfiguration>
+      <defaultLabel>requirementID</defaultLabel>
+      <defaultLabel>Description</defaultLabel>
+    </labelConfiguration>
+  </generalConfiguration>
+  <presentationConfigurations xsi:nil="true"/>
+</configuration:ProrToolExtension>
