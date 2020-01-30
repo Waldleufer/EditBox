@@ -222,8 +222,8 @@ public class TRCView extends ViewPart {
 	 */
 	public static LinkedList<TRCRequirement> updateViewer() {
 		if(viewer == null) {
-			return;
-		}
+			return null;
+		s
 		LinkedList<TRCRequirement> requirements = TRCFileInteraction
 				.ReadTRCsFromFile(BoxDecoratorImpl.getCurrentActivePath());
 		if (requirements == null) {
